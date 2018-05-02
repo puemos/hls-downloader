@@ -1,0 +1,31 @@
+{
+  "short_name": "HLS Download",
+  "name": "HLS Downloader",
+  "description": "HLS videos sniffer and downloader",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_title": "HLS Downloader"
+  },
+  "version": "1.0.1",
+  "background": {
+    "scripts": ["static/js/background.js"],
+    "persistent": true
+  },
+  "web_accessible_resources": ["/assets/**/*"],
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "webNavigation",
+    "tabs",
+    "http://*/*",
+    "https://*/*",
+    "debugger"
+  ],
+  "icons": {
+    "16": "/assets/logo16.png",
+    "48": "/assets/logo48.png",
+    "128": "/assets/logo128.png",
+    "256": "/assets/logo256.png"
+  }
+}
