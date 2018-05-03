@@ -5,7 +5,7 @@ Google Chrome Extension for sniffing and downloading [HTTP Live streams (HLS)](h
 [![style: styled-components](https://img.shields.io/badge/style-%F0%9F%92%85%20styled--components-orange.svg?colorB=daa357&colorA=db748e)](https://github.com/styled-components/styled-components)
 
 
-[![Chrome Web Store](https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_340x96.png)](https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej)
+[![Chrome Web Store](https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_206x58.png)](https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej)
 
 
 ![440x280](https://user-images.githubusercontent.com/13174025/39468430-39580b26-4d33-11e8-942c-b318ef0d4d3a.png)
