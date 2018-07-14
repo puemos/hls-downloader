@@ -18,7 +18,7 @@ import {
   downloadFinished
 } from "../action-creators";
 import { DOWNLOAD_PLAYLIST, REMOVE_DOWNLOAD } from "../action-types";
-import { BlobBuilder, getURI, playlistFilename, joinWithURI } from "../utils";
+import { BlobBuilder, getURI } from "../utils";
 import createQueue from "./queue";
 
 const segmentHandlerFactory = ({

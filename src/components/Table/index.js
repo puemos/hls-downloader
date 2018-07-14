@@ -15,12 +15,15 @@ const Body = styled(Col)`
   ${elevationMixin(4)};
 `;
 
-const Shrugging = styled(Row)`
+const NoResults = styled(Row)`
   width: 100%;
   text-align: center;
   height: 100%;
-  font-size: 2rem;
+  font-size: 1rem;
   user-select: none;
+`;
+const Shrug = styled.div`
+  font-size: 2rem;
 `;
 
 class Table extends Component {
@@ -30,9 +33,12 @@ class Table extends Component {
     return (
       <Body>
         {noRequets && (
-          <Shrugging center="xs" middle="xs">
-            <span>¯\_(ツ)_/¯</span>
-          </Shrugging>
+          <NoResults center="xs" middle="xs">
+            <div>
+              <Shrug>¯\_(ツ)_/¯</Shrug>
+              <div>nothing here</div>
+            </div>
+          </NoResults>
         )}
         {items.map(renderRow)}
       </Body>

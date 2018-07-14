@@ -35,7 +35,7 @@ const Detail = styled.span`
 
 class PlaylistRow extends Component {
   render() {
-    const { playlist, pos, onDownloadClick } = this.props;
+    const { playlist, onDownloadClick } = this.props;
     const { RESOLUTION, BANDWIDTH } = playlist.attributes;
 
     return (

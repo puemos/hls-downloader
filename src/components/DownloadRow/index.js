@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import { Circle } from "rc-progress";
 import React, { Component } from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
@@ -5,7 +6,6 @@ import styled from "styled-components";
 import colors from "../../theme/colors";
 import { Download } from "../Svgs/Download";
 import { Trashcan } from "../Svgs/Trashcan";
-import { urlnameParse } from "../RequestRow";
 
 const DownloadButton = styled.a`
   background-color: transparent;
@@ -53,10 +53,23 @@ const StyledDate = styled(Col)`
   font-size: 0.6rem;
   color: ${colors.gray400};
 `;
-// function parseCreation(download) {
-//   const time = new Date(download.created);
-//   return `${time.toLocaleTimeString()}`;
-// }
+
+const urlnameParse = R.ifElse(
+  R.pipe(
+    R.length,
+    R.lt(40)
+  ),
+  R.pipe(
+    R.converge(R.concat, [
+      R.take(15),
+      R.pipe(
+        R.takeLast(15),
+        R.concat("...")
+      )
+    ])
+  ),
+  R.identity
+);
 
 class DownloadRow extends Component {
   render() {

@@ -44,11 +44,14 @@ const Tab = styled(NavLink)`
   border-bottom-width: 3px;
   border-bottom-color: ${colors.amber700};
   user-select: none;
-  transition: all 0.3s/*  cubic-bezier(0.165, 0.84, 0.44, 1) */;
+  transition: all 0.3s /*  cubic-bezier(0.165, 0.84, 0.44, 1) */;
+  background-color: rgba(255, 255, 255, 0);
+
   &.active {
     pointer-events: none;
     height: 30px;
     padding-top: 15px;
+    background-color: rgba(255, 255, 255, 0.11);
   }
 `;
 

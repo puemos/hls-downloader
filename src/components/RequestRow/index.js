@@ -39,7 +39,7 @@ const StyledDate = styled(Col)`
   color: ${colors.gray400};
 `;
 
-export const urlnameParse = R.ifElse(
+const urlnameParse = R.ifElse(
   R.pipe(
     R.length,
     R.lt(40)

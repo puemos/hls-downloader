@@ -10,7 +10,11 @@ const Body = styled(Col)`
   height: 300px;
   padding: 20px;
 `;
-
+const Detail = styled.div`
+  & + & {
+    margin-top: 10px;
+  }
+`;
 class AboutView extends Component {
   render() {
     return (
@@ -18,20 +22,29 @@ class AboutView extends Component {
         <Row center="xs" middle="xs" style={{ height: "100%" }}>
           <Col center="xs" middle="xs">
             <div>
-              <div>
-                <img
-                  src="/assets/logo.png"
-                  alt="hls-downloader logo"
-                  style={{ width: 48, height: 48 }}
-                />
-              </div>
-              <div>Written by: Shy Alter</div>
-              <div>
-                Source code:{" "}
-                <a href="https://github.com/puemos/hls-downloader-chrome-extension">
-                  hls-downloader-chrome-extension
+              <Detail>
+                <span role="img" aria-label="">
+                  🛠
+                </span>{" "}
+                +{" "}
+                <span role="img" aria-label="">
+                  💅
+                </span>: Shy Alter{" "}
+              </Detail>
+              <Detail>
+                follow me on twitter{" "}
+                <a href="https://twitter.com/@puemos">@puemos</a>
+              </Detail>
+              <Detail>
+                <a href="https://github.com/puemos/hls-downloader-chrome-extension/issues">
+                  Report a bug
                 </a>
-              </div>
+              </Detail>
+              <Detail>
+                <a href="https://github.com/puemos/hls-downloader-chrome-extension">
+                  Source code
+                </a>
+              </Detail>
             </div>
           </Col>
         </Row>

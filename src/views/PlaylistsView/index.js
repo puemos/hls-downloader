@@ -29,7 +29,7 @@ class RequestView extends Component {
               playlist={playlistItem}
               onDownloadClick={() => {
                 memoryHistory.push("/downloads");
-                downloadPlaylist({ playlistItem, request });
+                downloadPlaylist({ playlist: playlistItem, request });
               }}
             />
           )}
