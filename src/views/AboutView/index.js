@@ -18,21 +18,23 @@ class AboutView extends Component {
   render() {
     return (
       <Body center="xs" middle="xs">
-        <Row center="xs" middle="xs">
+        <Row center="xs" middle="xs" style={{ height: "100%" }}>
           <Col center="xs" middle="xs">
             <div>
-              <img
-                src="/assets/logo.png"
-                alt="hls-downloader logo"
-                style={{ width: 100, height: 100 }}
-              />
-            </div>
-            <div>Written by: Shy Alter</div>
-            <div>
-              Source code:{" "}
-              <a href="https://github.com/puemos/hls-downloader-chrome-extension">
-                hls-downloader-chrome-extension
-              </a>
+              <div>
+                <img
+                  src="/assets/logo.png"
+                  alt="hls-downloader logo"
+                  style={{ width: 48, height: 48 }}
+                />
+              </div>
+              <div>Written by: Shy Alter</div>
+              <div>
+                Source code:{" "}
+                <a href="https://github.com/puemos/hls-downloader-chrome-extension">
+                  hls-downloader-chrome-extension
+                </a>
+              </div>
             </div>
           </Col>
         </Row>

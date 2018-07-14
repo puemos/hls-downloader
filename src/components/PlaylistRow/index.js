@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import colors from "../../../theme/colors";
-import { Plus } from "../../Svgs/Plus";
+import colors from "../../theme/colors";
+import { Plus } from "../Svgs/Plus";
 
 const DownloadButton = styled.button`
   background-color: transparent;

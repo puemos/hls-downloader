@@ -5,10 +5,10 @@ import { Col, Grid, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import { memoryHistory } from "../../modules/router/history";
 import colors from "../../theme/colors";
-import AboutView from "../AboutView";
-import DownloadsView from "../DownloadsView";
-import RequestListView from "../RequestListView";
-import RequestView from "../RequestView";
+import AboutView from "../../views/AboutView";
+import DownloadsView from "../../views/DownloadsView";
+import RequestListView from "../../views/RequestListView";
+import RequestView from "../../views/RequestView";
 
 const Main = styled(Grid)`
   min-width: 450px;
@@ -17,17 +17,17 @@ const Main = styled(Grid)`
 `;
 
 const Nav = styled(Row)`
-  height: 60px;
+  height: 48px;
   background-color: #ff5656;
   background: linear-gradient(to right, #ff5656 0%, #f4005d 100%);
 `;
 
 const Tab = styled(NavLink)`
   width: 100%;
-  height: 60px;
+  height: 48px;
   background-color: transparent;
   border: 0;
-  text-transform: uppercase;
+  text-transform: lowercase;
   color: ${colors.white};
   text-decoration: none;
   outline: none;

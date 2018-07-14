@@ -24,7 +24,7 @@ injectGlobal`
     font-size: 20px;
   }
   body {
-    font-family: 'IBM Plex Sans Condensed', sans-serif;
+    font-family: 'PT Sans', sans-serif;
     margin: 0;
   }
 `;

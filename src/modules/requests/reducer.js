@@ -18,8 +18,10 @@ export default function requests(state = initState, action) {
   switch (action.type) {
     case ADD_REQUEST: {
       const items = denormalizeRequests(state);
+      console.log([...items, action.payload]);
+
       const { entities, result } = normalize(
-        [...items, action.payload],
+        R.uniqBy(R.prop("url"), [...items, action.payload]),
         [requestSchema]
       );
       return { ...state, entities, result };
@@ -30,6 +32,7 @@ export default function requests(state = initState, action) {
         ({ tabId }) => tabId !== action.payload,
         items
       );
+
       const { entities, result } = normalize(filteredItems, [requestSchema]);
       return {
         ...state,

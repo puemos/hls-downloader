@@ -3,11 +3,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Col } from "react-styled-flexboxgrid";
 import styled from "styled-components";
+import DownloadRow from "../../components/DownloadRow";
 import elevationMixin from "../../mixin/elevation";
+import { removeDownload } from "../../modules/downloads/action-creators";
 import { downloadsItemsSelector } from "../../modules/downloads/selectors";
 import colors from "../../theme/colors";
-import DownloadRow from "./DownloadRow";
-import { removeDownload } from "../../modules/downloads/action-creators";
 
 const Body = styled(Col)`
   width: 100%;

@@ -6,18 +6,23 @@ import { composeWithDevTools } from "remote-redux-devtools";
 import { middleware } from "../router/middleware";
 import reducer from "./reducers";
 import sagas from "./sagas";
-const composeEnhancers = composeWithDevTools({ realtime: true, port: 8000 });
 
 const sagaMiddleware = createSagaMiddleware();
 const middlewares = [sagaMiddleware, middleware];
+let enhancers = applyMiddleware(...middlewares);
+
+if (process.env.NODE_ENV === "development") {
+  const composeEnhancers = composeWithDevTools({ realtime: true, port: 8000 });
+  enhancers = composeEnhancers(
+    applyMiddleware(...middlewares)
+    // other store enhancers if any
+  );
+}
 
 export const store = createStore(
   reducer,
   /* preloadedState, */
-  composeEnhancers(
-    applyMiddleware(...middlewares)
-    // other store enhancers if any
-  )
+  enhancers
 );
 
 sagaMiddleware.run(sagas);

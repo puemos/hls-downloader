@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Col } from "react-styled-flexboxgrid";
 import styled from "styled-components";
+import PlaylistRow from "../../components/PlaylistRow";
 import elevationMixin from "../../mixin/elevation";
 import { downloadPlaylist } from "../../modules/downloads/action-creators";
 import { currentRequestSelector } from "../../modules/requests/selectors";
-import colors from "../../theme/colors";
-import PlaylistRow from "./PlaylistRow";
 import { memoryHistory } from "../../modules/router/history";
+import colors from "../../theme/colors";
 
 const Body = styled(Col)`
   width: 100%;
@@ -52,4 +52,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RequestView);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RequestView);

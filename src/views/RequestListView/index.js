@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import RequestTable from "../../components/RequestTable";
 import { requestsByActiveTabSelector } from "../../modules/requests/selectors";
-import RequestTable from "../RequestTable";
 
 class RequestListView extends Component {
   render() {
