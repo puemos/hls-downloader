@@ -1,6 +1,6 @@
 {
   "name": "hls-downloader-chrome-extension",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "start": "NODE_ENV=development webpack -w --config config/webpack.config.dev.js",

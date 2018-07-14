@@ -1,13 +1,13 @@
 {
   "short_name": "HLS Download",
   "name": "HLS Downloader",
-  "description": "HLS videos sniffer and downloader",
+  "description": "HTTP stream sniffer and downloader",
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "index.html",
     "default_title": "HLS Downloader"
   },
-  "version": "1.0.1",
+  "version": "1.1.0",
   "background": {
     "scripts": ["static/js/background.js"],
     "persistent": true
