@@ -16,7 +16,8 @@ Google Chrome Extension for sniffing and downloading [HTTP Live streams (HLS)](h
 - `npm install`
 - `npm run build`
 - `chrome://extensions`
-- `LOAD UNPACKED`
+- `LOAD UNPACKED` 
+- `choose <REPO_PATH>/build`
 
 ## Usage
  
