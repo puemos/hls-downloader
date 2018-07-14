@@ -4,35 +4,34 @@ import { connect } from "react-redux";
 import { Col } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import DownloadRow from "../../components/DownloadRow";
-import elevationMixin from "../../mixin/elevation";
+import Table from "../../components/Table";
 import { removeDownload } from "../../modules/downloads/action-creators";
 import { downloadsItemsSelector } from "../../modules/downloads/selectors";
 import colors from "../../theme/colors";
 
 const Body = styled(Col)`
-  width: 100%;
-
   background-color: ${colors.white};
   max-height: 400px;
   height: 300px;
-
-  overflow-y: scroll;
-  ${elevationMixin(4)};
+  width: 100%;
 `;
 
 class DownloadsView extends Component {
+  renderRow(download) {}
   render() {
     const { downloads, removeDownload } = this.props;
     return (
       <Body>
-        {R.reverse(Object.values(downloads)).map((download, idx) => (
-          <DownloadRow
-            key={download.id}
-            download={download}
-            pos={idx + 1}
-            removeDownload={removeDownload}
-          />
-        ))}
+        <Table
+          items={R.reverse(Object.values(downloads))}
+          renderRow={downloadItem => (
+            <DownloadRow
+              key={downloadItem.id}
+              download={downloadItem}
+              removeDownload={removeDownload}
+            />
+          )}
+        />
       </Body>
     );
   }
@@ -44,4 +43,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   removeDownload: downloadId => dispatch(removeDownload(downloadId))
 });
-export default connect(mapStateToProps, mapDispatchToProps)(DownloadsView);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DownloadsView);

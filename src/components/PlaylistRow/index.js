@@ -28,6 +28,11 @@ const StyledRow = styled(Row)`
   }
 `;
 
+const Detail = styled.span`
+  font-size: 0.6rem;
+  color: ${colors.gray500};
+`;
+
 class PlaylistRow extends Component {
   render() {
     const { playlist, pos, onDownloadClick } = this.props;
@@ -37,11 +42,15 @@ class PlaylistRow extends Component {
       <StyledRow middle="xs" between="xs">
         <Col xs={10}>
           <Row>
-            <Col xs={1}>{`${pos}.`}</Col>
-            {BANDWIDTH && <Col xs={5}>Bandwidth: {BANDWIDTH}</Col>}
+            {BANDWIDTH && (
+              <Col>
+                Bandwidth: <Detail>{BANDWIDTH}</Detail>
+              </Col>
+            )}
             {RESOLUTION && (
-              <Col xs={6}>
-                Resolution: {`${RESOLUTION.width}x${RESOLUTION.height}`}
+              <Col>
+                Resolution:{" "}
+                <Detail>{`${RESOLUTION.width}x${RESOLUTION.height}`}</Detail>
               </Col>
             )}
           </Row>

@@ -3,8 +3,8 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import colors from "../../../theme/colors";
-import { Expand } from "../../Svgs/Expand";
+import colors from "../../theme/colors";
+import { Expand } from "../Svgs/Expand";
 
 const DownloadButton = styled.button`
   background-color: transparent;
@@ -34,24 +34,42 @@ const StyledLink = styled(Link)`
   text-decoration: none;
 `;
 
-const urlnameParse = R.ifElse(
-  R.pipe(R.length, R.lt(40)),
+const StyledDate = styled(Col)`
+  font-size: 0.6rem;
+  color: ${colors.gray400};
+`;
+
+export const urlnameParse = R.ifElse(
   R.pipe(
-    R.converge(R.concat, [R.take(20), R.pipe(R.takeLast(20), R.concat("..."))])
+    R.length,
+    R.lt(40)
+  ),
+  R.pipe(
+    R.converge(R.concat, [
+      R.take(20),
+      R.pipe(
+        R.takeLast(20),
+        R.concat("...")
+      )
+    ])
   ),
   R.identity
 );
 
 class RequestRow extends Component {
   render() {
-    const { pos, request } = this.props;
+    const { request } = this.props;
+    const date = new Date(request.timeStamp).toLocaleTimeString();
+
     return (
       <StyledLink key={request.requestId} to={`/request/${request.requestId}`}>
         <StyledRow middle="xs" between="xs">
           <Col>
             <Row>
-              <Col>{`${pos}.`}</Col>
               <Col title={request.url}>{urlnameParse(request.url)}</Col>
+            </Row>
+            <Row>
+              <StyledDate>{date}</StyledDate>
             </Row>
           </Col>
 

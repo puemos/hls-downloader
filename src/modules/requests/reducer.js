@@ -18,8 +18,6 @@ export default function requests(state = initState, action) {
   switch (action.type) {
     case ADD_REQUEST: {
       const items = denormalizeRequests(state);
-      console.log([...items, action.payload]);
-
       const { entities, result } = normalize(
         R.uniqBy(R.prop("url"), [...items, action.payload]),
         [requestSchema]

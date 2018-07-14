@@ -5,6 +5,7 @@ import styled from "styled-components";
 import colors from "../../theme/colors";
 import { Download } from "../Svgs/Download";
 import { Trashcan } from "../Svgs/Trashcan";
+import { urlnameParse } from "../RequestRow";
 
 const DownloadButton = styled.a`
   background-color: transparent;
@@ -48,6 +49,10 @@ const StyledTitle = styled(Col)`
   overflow: hidden;
   text-align: left;
 `;
+const StyledDate = styled(Col)`
+  font-size: 0.6rem;
+  color: ${colors.gray400};
+`;
 // function parseCreation(download) {
 //   const time = new Date(download.created);
 //   return `${time.toLocaleTimeString()}`;
@@ -55,14 +60,19 @@ const StyledTitle = styled(Col)`
 
 class DownloadRow extends Component {
   render() {
-    const { download, pos, removeDownload } = this.props;
-    const progress = download.finished / download.total * 100;
+    const { download, removeDownload } = this.props;
+    const progress = (download.finished / download.total) * 100;
+    const date = new Date(download.created).toLocaleTimeString();
     return (
       <StyledRow center="xs" middle="xs" between="xs" progress={progress}>
         <Col xs={10}>
           <Row>
-            <Col xs={1}>{`${pos}.`}</Col>
-            <StyledTitle xs={10}>{download.title}</StyledTitle>
+            <StyledTitle title={download.title} xs={10}>
+              {urlnameParse(download.title)}
+            </StyledTitle>
+          </Row>
+          <Row start="xs">
+            <StyledDate xs={12}>{`${date}`}</StyledDate>
           </Row>
         </Col>
 

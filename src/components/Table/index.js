@@ -4,14 +4,13 @@ import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import elevationMixin from "../../mixin/elevation";
 import colors from "../../theme/colors";
-import RequestRow from "./RequestRow";
 
-const RequestBody = styled(Col)`
-  width: 100%;
+const Body = styled(Col)`
   background-color: ${colors.white};
   max-height: 400px;
   height: 300px;
-
+  /* width: calc(100% - 0.5rem); */
+  width: 100%;
   overflow-y: scroll;
   ${elevationMixin(4)};
 `;
@@ -24,23 +23,21 @@ const Shrugging = styled(Row)`
   user-select: none;
 `;
 
-class RequestTable extends Component {
+class Table extends Component {
   render() {
-    const { requests } = this.props;
-    const noRequets = R.isEmpty(requests);
+    const { items, renderRow } = this.props;
+    const noRequets = R.isEmpty(items);
     return (
-      <RequestBody>
+      <Body>
         {noRequets && (
           <Shrugging center="xs" middle="xs">
             <span>¯\_(ツ)_/¯</span>
           </Shrugging>
         )}
-        {requests.map((r, idx) => (
-          <RequestRow pos={idx + 1} key={r.requestId} request={r} />
-        ))}
-      </RequestBody>
+        {items.map(renderRow)}
+      </Body>
     );
   }
 }
 
-export default RequestTable;
+export default Table;

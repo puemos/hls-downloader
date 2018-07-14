@@ -2,40 +2,30 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Col } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import PlaylistRow from "../../components/PlaylistRow";
-import elevationMixin from "../../mixin/elevation";
-import { downloadPlaylist } from "../../modules/downloads/action-creators";
-import { currentRequestSelector } from "../../modules/requests/selectors";
-import { memoryHistory } from "../../modules/router/history";
+import RequestRow from "../../components/RequestRow";
+import Table from "../../components/Table";
+import { requestsByActiveTabSelector } from "../../modules/requests/selectors";
 import colors from "../../theme/colors";
 
 const Body = styled(Col)`
-  width: 100%;
   background-color: ${colors.white};
   max-height: 400px;
   height: 300px;
-
-  overflow-y: scroll;
-  ${elevationMixin(4)};
+  width: 100%;
 `;
 
-class RequestView extends Component {
+class RequestListView extends Component {
   render() {
-    const { request, downloadPlaylist } = this.props;
+    const { requests } = this.props;
+
     return (
       <Body>
-        {request.manifest &&
-          request.manifest.playlists.map((playlist, idx) => (
-            <PlaylistRow
-              key={playlist.uri}
-              playlist={playlist}
-              pos={idx + 1}
-              onDownloadClick={() => {
-                memoryHistory.push("/downloads");
-                downloadPlaylist(playlist);
-              }}
-            />
-          ))}
+        <Table
+          items={requests}
+          renderRow={requestItem => (
+            <RequestRow key={requestItem.id} request={requestItem} />
+          )}
+        />
       </Body>
     );
   }
@@ -43,16 +33,8 @@ class RequestView extends Component {
 
 const mapStateToProps = state => {
   return {
-    request: currentRequestSelector(state)
-  };
-};
-const mapDispatchToProps = dispatch => {
-  return {
-    downloadPlaylist: playlist => dispatch(downloadPlaylist(playlist))
+    requests: requestsByActiveTabSelector(state)
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RequestView);
+export default connect(mapStateToProps)(RequestListView);

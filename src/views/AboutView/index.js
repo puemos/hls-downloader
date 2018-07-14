@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import elevationMixin from "../../mixin/elevation";
 import colors from "../../theme/colors";
 
 const Body = styled(Col)`
@@ -10,8 +9,6 @@ const Body = styled(Col)`
   max-height: 400px;
   height: 300px;
   padding: 20px;
-  overflow-y: scroll;
-  ${elevationMixin(4)};
 `;
 
 class AboutView extends Component {

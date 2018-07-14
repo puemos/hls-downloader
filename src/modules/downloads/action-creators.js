@@ -8,8 +8,8 @@ import {
   REMOVE_DOWNLOAD
 } from "./action-types";
 
-export function downloadPlaylist(playlist) {
-  return { type: DOWNLOAD_PLAYLIST, payload: playlist };
+export function downloadPlaylist({ playlist, request }) {
+  return { type: DOWNLOAD_PLAYLIST, payload: { playlist, request } };
 }
 
 export function addDownload(download) {

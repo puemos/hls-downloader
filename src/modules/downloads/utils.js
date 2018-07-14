@@ -1,15 +1,26 @@
 import * as R from "ramda";
 
-export const playlistFilename = R.pipe(R.split("/"), R.takeLast(2), R.head);
+export const playlistFilename = R.pipe(
+  R.split("/"),
+  R.takeLast(1),
+  R.head,
+  R.split(".m3u8"),
+  R.head,
+);
 
-export const joinWithPlaylistURI = playlistURI => uri =>
-  R.pipe(R.split("/"), R.dropLast(1), R.append(uri), R.join("/"))(playlistURI);
+export const joinWithURI = base => uri =>
+  R.pipe(
+    R.split("/"),
+    R.dropLast(1),
+    R.append(uri),
+    R.join("/")
+  )(base);
 
-export const getURIWithPlaylist = playlistURI => {
+export const getURI = base => {
   return R.ifElse(
     R.startsWith("http"),
     R.identity,
-    joinWithPlaylistURI(playlistURI)
+    joinWithURI(base)
   );
 };
 
@@ -25,8 +36,6 @@ export function BlobBuilder() {
       return count;
     },
     build: () => {
-      console.log("asdasdasd");
-      
       return new Blob(blobs, {
         type: "video/mp2t"
       });

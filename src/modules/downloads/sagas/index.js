@@ -1,11 +1,24 @@
 import * as R from "ramda";
 import { channel } from "redux-saga";
-import { all, call, cancel, fork, put, race, take, takeEvery } from "redux-saga/effects";
+import {
+  all,
+  call,
+  cancel,
+  fork,
+  put,
+  race,
+  take,
+  takeEvery
+} from "redux-saga/effects";
 import uuid from "uuid";
 import { parsePlaylist } from "../../../background/Parser";
-import { addDownload, downloadChange, downloadFinished } from "../action-creators";
+import {
+  addDownload,
+  downloadChange,
+  downloadFinished
+} from "../action-creators";
 import { DOWNLOAD_PLAYLIST, REMOVE_DOWNLOAD } from "../action-types";
-import { BlobBuilder, getURIWithPlaylist, playlistFilename } from "../utils";
+import { BlobBuilder, getURI, playlistFilename, joinWithURI } from "../utils";
 import createQueue from "./queue";
 
 const segmentHandlerFactory = ({
@@ -36,17 +49,20 @@ const segmentHandlerFactory = ({
 function* downloadPlaylist(action) {
   const QUEUE_CONCURRENT = 2;
 
-  const { payload: playlist } = action;
+  const {
+    payload: { playlist, request }
+  } = action;
   const blobBuilder = BlobBuilder();
   try {
     const id = uuid.v4();
-    const { segments } = yield call(parsePlaylist, playlist.uri);
-    const getSegmentURI = getURIWithPlaylist(playlist.uri);
+    const uri = getURI(request.url)(playlist.uri);
+    const { segments } = yield call(parsePlaylist, uri);
+    const getSegmentURI = getURI(uri);
 
     yield put(
       addDownload({
         id,
-        title: playlistFilename(playlist.uri),
+        title: request.url,
         total: segments.length,
         finished: 0,
         created: Date.now()
@@ -76,7 +92,6 @@ function* downloadPlaylist(action) {
         allDone: take(allDoneChannel),
         cancelDownload: take(REMOVE_DOWNLOAD)
       });
-      console.log(cancelDownload, allDone);
 
       if (!R.isNil(cancelDownload) && R.propEq("payload", id, cancelDownload)) {
         yield cancel(watcherTask);

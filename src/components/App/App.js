@@ -7,7 +7,7 @@ import { memoryHistory } from "../../modules/router/history";
 import colors from "../../theme/colors";
 import AboutView from "../../views/AboutView";
 import DownloadsView from "../../views/DownloadsView";
-import RequestListView from "../../views/RequestListView";
+import PlaylistsView from "../../views/PlaylistsView";
 import RequestView from "../../views/RequestView";
 
 const Main = styled(Grid)`
@@ -22,9 +22,16 @@ const Nav = styled(Row)`
   background: linear-gradient(to right, #ff5656 0%, #f4005d 100%);
 `;
 
+const Label = styled.span`
+  margin-right: 5px;
+`;
+
 const Tab = styled(NavLink)`
+  margin: auto;
+  text-align: center;
   width: 100%;
-  height: 48px;
+  height: 36px;
+  padding-top: 21px;
   background-color: transparent;
   border: 0;
   text-transform: lowercase;
@@ -33,15 +40,15 @@ const Tab = styled(NavLink)`
   outline: none;
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
-  border-bottom: 1px solid transparent;
+  border-bottom: solid transparent;
+  border-bottom-width: 3px;
+  border-bottom-color: ${colors.amber700};
   user-select: none;
-  transition: border-bottom-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  &:hover {
-    border-bottom-color: ${colors.white};
-  }
+  transition: all 0.3s/*  cubic-bezier(0.165, 0.84, 0.44, 1) */;
   &.active {
     pointer-events: none;
-    border-bottom-color: ${colors.white};
+    height: 30px;
+    padding-top: 15px;
   }
 `;
 
@@ -49,20 +56,37 @@ class App extends Component {
   renderTabs() {
     return (
       <Nav middle="xs" around="xs">
-        <Col>
-          <Tab exact to="/">
-            Sniffer
-          </Tab>
+        <Col xs={4}>
+          <Row center="xs" middle="xs">
+            <Tab exact to="/">
+              <Label>{"Sniffer"}</Label>
+
+              <span role="img" aria-label="">
+                🔎
+              </span>
+            </Tab>
+          </Row>
         </Col>
-        <Col>
-          <Tab exact to="/downloads">
-            Downloads
-          </Tab>
+        <Col xs={4}>
+          <Row center="xs" middle="xs">
+            <Tab exact to="/downloads">
+              <Label>{"Downloads"}</Label>
+
+              <span role="img" aria-label="">
+                🌐
+              </span>
+            </Tab>
+          </Row>
         </Col>
-        <Col>
-          <Tab exact to="/about">
-            About
-          </Tab>
+        <Col xs={4}>
+          <Row center="xs" middle="xs">
+            <Tab exact to="/about">
+              <Label>{"About"}</Label>
+              <span role="img" aria-label="">
+                👌
+              </span>
+            </Tab>
+          </Row>
         </Col>
       </Nav>
     );
@@ -77,8 +101,8 @@ class App extends Component {
                 <Col xs={12}>{this.renderTabs()}</Col>
               </Row>
               <Row>
-                <Route exact path="/" component={RequestListView} />
-                <Route exact path="/request/:id" component={RequestView} />
+                <Route exact path="/" component={RequestView} />
+                <Route exact path="/request/:id" component={PlaylistsView} />
                 <Route exact path="/downloads" component={DownloadsView} />
                 <Route exact path="/about" component={AboutView} />
               </Row>
