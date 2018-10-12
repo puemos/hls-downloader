@@ -12,8 +12,8 @@ import RequestView from "../../views/RequestView";
 
 const Main = styled(Grid)`
   min-width: 450px;
-  color: ${colors.gray700};
-  background-color: ${colors.gray50};
+  color: ${props => props.theme.colors.gray700};
+  background-color: ${props => props.theme.colors.gray50};
 `;
 
 const Nav = styled(Row)`
@@ -35,14 +35,14 @@ const Tab = styled(NavLink)`
   background-color: transparent;
   border: 0;
   text-transform: lowercase;
-  color: ${colors.white};
+  color: ${props => props.theme.colors.white};
   text-decoration: none;
   outline: none;
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
   border-bottom: solid transparent;
   border-bottom-width: 3px;
-  border-bottom-color: ${colors.amber700};
+  border-bottom-color: ${props => props.theme.colors.amber700};
   user-select: none;
   transition: all 0.3s /*  cubic-bezier(0.165, 0.84, 0.44, 1) */;
   background-color: rgba(255, 255, 255, 0);

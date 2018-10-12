@@ -10,7 +10,7 @@ import { memoryHistory } from "../../modules/router/history";
 import colors from "../../theme/colors";
 
 const Body = styled(Col)`
-  background-color: ${colors.white};
+  background-color: ${props => props.theme.colors.white};
   max-height: 400px;
   height: 300px;
   width: 100%;

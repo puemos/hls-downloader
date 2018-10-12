@@ -7,7 +7,7 @@ import { Plus } from "../Svgs/Plus";
 const DownloadButton = styled.button`
   background-color: transparent;
   border: 0;
-  color: ${colors.gray300};
+  color: ${props => props.theme.colors.gray300};
   outline: none;
   cursor: pointer;
   transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -16,21 +16,21 @@ const DownloadButton = styled.button`
 const StyledRow = styled(Row)`
   height: 60px;
   padding: 0 10px;
-  border-bottom: 1px solid ${colors.gray200};
-  color: ${colors.gray700};
+  border-bottom: 1px solid ${props => props.theme.colors.gray200};
+  color: ${props => props.theme.colors.gray700};
   transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 
   &:hover {
-    background-color: ${colors.gray100};
+    background-color: ${props => props.theme.colors.gray100};
     ${DownloadButton} {
-      color: ${colors.gray600};
+      color: ${props => props.theme.colors.gray600};
     }
   }
 `;
 
 const Detail = styled.span`
   font-size: 0.6rem;
-  color: ${colors.gray500};
+  color: ${props => props.theme.colors.gray500};
 `;
 
 class PlaylistRow extends Component {

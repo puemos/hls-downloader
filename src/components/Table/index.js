@@ -6,7 +6,7 @@ import elevationMixin from "../../mixin/elevation";
 import colors from "../../theme/colors";
 
 const Body = styled(Col)`
-  background-color: ${colors.white};
+  background-color: ${props => props.theme.colors.white};
   max-height: 400px;
   height: 300px;
   /* width: calc(100% - 0.5rem); */
