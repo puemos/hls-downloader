@@ -2,7 +2,6 @@ import * as R from "ramda";
 import React, { Component } from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import colors from "../../theme/colors";
 import { Download } from "../Svgs/Download";
 import { Trashcan } from "../Svgs/Trashcan";
 

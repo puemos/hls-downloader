@@ -7,7 +7,6 @@ import DownloadRow from "../../components/DownloadRow";
 import Table from "../../components/Table";
 import { removeDownload } from "../../modules/downloads/action-creators";
 import { downloadsItemsSelector } from "../../modules/downloads/selectors";
-import colors from "../../theme/colors";
 
 const Body = styled(Col)`
   background-color: ${props => props.theme.colors.white};
@@ -17,7 +16,6 @@ const Body = styled(Col)`
 `;
 
 class DownloadsView extends Component {
-  renderRow(download) {}
   render() {
     const { downloads, removeDownload } = this.props;
     return (

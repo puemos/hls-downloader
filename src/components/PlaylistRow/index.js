@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import colors from "../../theme/colors";
 import { Plus } from "../Svgs/Plus";
 
 const DownloadButton = styled.button`
@@ -11,6 +10,9 @@ const DownloadButton = styled.button`
   outline: none;
   cursor: pointer;
   transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  &:hover {
+    color: ${props => props.theme.colors.gray500};
+  }
 `;
 
 const StyledRow = styled(Row)`
@@ -22,15 +24,13 @@ const StyledRow = styled(Row)`
 
   &:hover {
     background-color: ${props => props.theme.colors.gray100};
-    ${DownloadButton} {
-      color: ${props => props.theme.colors.gray600};
-    }
   }
 `;
 
 const Detail = styled.span`
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   color: ${props => props.theme.colors.gray500};
+  margin-right: 5px;
 `;
 
 class PlaylistRow extends Component {
