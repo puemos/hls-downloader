@@ -8,7 +8,7 @@ const publicPath = "/";
 module.exports = {
   entry: {
     popup: [require.resolve("./polyfills"), paths.appIndexJs],
-    background: ["babel-polyfill", paths.appBackgroundJs]
+    background: ["@babel/polyfill", paths.appBackgroundJs]
   },
   output: {
     path: paths.appBuild,
