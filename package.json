@@ -10,7 +10,9 @@
     "preupload": "npm run pack",
     "upload": "webstore upload --source extension.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
     "prewebstore-publish": "npm run upload",
-    "webstore-publish": "webstore publish --client-id $CLIENT_ID"
+    "webstore-publish": "webstore publish --client-id $CLIENT_ID",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
@@ -48,7 +50,10 @@
     "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
-    "babel-core": "^7.0.0-bridge.0",
+    "@storybook/react": "3.4.11",
+    "babel-preset-react": "6.24.1",
+    "babel-preset-env": "1.7.0",
+    "babel-core": "6.26.3",
     "babel-eslint": "7.2.3",
     "babel-jest": "20.0.3",
     "babel-loader": "^8.0.0",
