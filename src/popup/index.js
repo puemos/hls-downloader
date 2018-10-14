@@ -2,8 +2,9 @@ import React from "react";
 import { Store } from "react-chrome-redux";
 import { render } from "react-dom";
 import { Provider } from "react-redux";
-import { injectGlobal } from "styled-components";
+import { injectGlobal, ThemeProvider } from "styled-components";
 import App from "../components/App/App";
+import { theme } from "../theme";
 
 const store = new Store({
   portName: "HLS_DOWNLOADER" // communication port name
@@ -13,7 +14,9 @@ const store = new Store({
 // so you can use tools like `react-redux` no problem!
 render(
   <Provider store={store}>
-    <App />
+    <ThemeProvider theme={theme}>
+      <App />
+    </ThemeProvider>
   </Provider>,
   document.getElementById("root")
 );
@@ -21,10 +24,10 @@ render(
 injectGlobal`
   html {
     font-weight: 400;
-    font-size: 20px;
+    font-size: 16px;
   }
   body {
-    font-family: 'PT Sans', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     margin: 0;
   }
 `;

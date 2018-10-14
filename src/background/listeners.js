@@ -18,20 +18,20 @@ chrome.webRequest.onBeforeRequest.addListener(
     store.dispatch(addRequest({ ...req, manifest }));
   },
   {
-    urls: ["http://*/*.m3u8", "https://*/*.m3u8"]
+    urls: ["http://*/*.m3u8*", "https://*/*.m3u8*"]
   },
   []
 );
 
 chrome.tabs.onActivated.addListener(tab => {
   chrome.tabs.query({ currentWindow: true, active: true }, tabs => {
-    store.dispatch(changeTab(tabs[0].id));
+    tabs[0] && store.dispatch(changeTab(tabs[0].id));
   });
 });
 
 chrome.windows.onFocusChanged.addListener(windowId => {
   chrome.tabs.query({ currentWindow: true, active: true }, tabs => {
-    store.dispatch(changeTab(tabs[0].id));
+    tabs[0] && store.dispatch(changeTab(tabs[0].id));
   });
 });
 

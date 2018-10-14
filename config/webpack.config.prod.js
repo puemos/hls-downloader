@@ -49,7 +49,7 @@ module.exports = {
         comparisons: false
       },
       mangle: {
-        safari10: true
+        safari10: false
       },
       output: {
         comments: false,

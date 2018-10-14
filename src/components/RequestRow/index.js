@@ -1,12 +1,19 @@
 import * as R from "ramda";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Col, Row } from "react-styled-flexboxgrid";
+import { Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import colors from "../../theme/colors";
+import { copyToClipboard } from "../DownloadRow";
+import {
+  CopyButton,
+  DetailsRow,
+  StyledDate,
+  StyledRow,
+  StyledTitle
+} from "../Row/elements";
 import { Expand } from "../Svgs/Expand";
 
-const DownloadButton = styled.button`
+const MoreButton = styled.button`
   background-color: transparent;
   border: 0;
   color: ${props => props.theme.colors.gray300};
@@ -15,28 +22,8 @@ const DownloadButton = styled.button`
   transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 `;
 
-const StyledRow = styled(Row)`
-  height: 60px;
-  padding: 0 10px;
-  border-bottom: 1px solid ${props => props.theme.colors.gray200};
-  color: ${props => props.theme.colors.gray700};
-  transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-
-  &:hover {
-    background-color: ${props => props.theme.colors.gray100};
-    ${DownloadButton} {
-      color: ${props => props.theme.colors.gray600};
-    }
-  }
-`;
-
-const StyledLink = styled(Link)`
+const MoreAction = styled(Link)`
   text-decoration: none;
-`;
-
-const StyledDate = styled(Col)`
-  font-size: 0.6rem;
-  color: ${props => props.theme.colors.gray400};
 `;
 
 const urlnameParse = R.ifElse(
@@ -59,27 +46,32 @@ const urlnameParse = R.ifElse(
 class RequestRow extends Component {
   render() {
     const { request } = this.props;
-    const date = new Date(request.timeStamp).toLocaleTimeString();
+    const date =
+      new Date(request.timeStamp).toLocaleDateString() +
+      " " +
+      new Date(request.timeStamp).toLocaleTimeString();
 
     return (
-      <StyledLink key={request.requestId} to={`/request/${request.requestId}`}>
-        <StyledRow middle="xs" between="xs">
-          <Col>
-            <Row>
-              <Col title={request.url}>{urlnameParse(request.url)}</Col>
-            </Row>
-            <Row>
-              <StyledDate>{date}</StyledDate>
-            </Row>
-          </Col>
-
-          <Col>
-            <DownloadButton>
-              <Expand />
-            </DownloadButton>
-          </Col>
-        </StyledRow>
-      </StyledLink>
+      <StyledRow middle="xs" between="xs">
+        <DetailsRow>
+          <Row start="xs">
+            <StyledTitle title={request.url} xs={10}>
+              {urlnameParse(request.url)}
+            </StyledTitle>
+            <CopyButton onClick={() => copyToClipboard(request.url)}>
+              copy
+            </CopyButton>
+          </Row>
+          <Row start="xs">
+            <StyledDate xs={12}>{`${date}`}</StyledDate>
+          </Row>
+        </DetailsRow>
+        <MoreAction to={`/request/${request.requestId}`}>
+          <MoreButton>
+            <Expand />
+          </MoreButton>
+        </MoreAction>
+      </StyledRow>
     );
   }
 }

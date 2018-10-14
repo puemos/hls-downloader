@@ -4,6 +4,7 @@ import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import { Download } from "../Svgs/Download";
 import { Trashcan } from "../Svgs/Trashcan";
+import { StyledRow, DetailsRow, StyledTitle, CopyButton, StyledDate } from "../Row/elements";
 
 const DownloadButton = styled.a`
   background-color: transparent;
@@ -32,49 +33,26 @@ const RemoveButton = styled.button`
     color: ${props => props.theme.colors.gray500};
   }
 `;
-const CopyButton = styled.button`
-  background-color: transparent;
-  border: 0;
-  color: ${props => props.theme.colors.gray300};
-  transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  outline: none;
-  cursor: pointer;
-  &:hover {
-    color: ${props => props.theme.colors.gray500};
+
+
+const Progress = styled.span`
+  font-size: 0.8rem;
+  text-align: right;
+
+  color: ${props => props.theme.colors.blue500};
+  &::after {
+    font-size: 0.7rem;
+
+    content: "%";
   }
 `;
 
-const StyledRow = styled(Row)`
-  height: 60px;
-  padding: 0 10px;
-  border-bottom: 1px solid ${props => props.theme.colors.gray200};
-  color: ${props => props.theme.colors.gray700};
-  transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-
-  &:hover {
-    background-color: ${props => props.theme.colors.gray100};
-  }
-`;
-
-const StyledTitle = styled.span`
-  font-size: 0.9rem;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  text-align: left;
-  margin-right: 5px;
-`;
-const StyledDate = styled(Col)`
-  font-size: 0.6rem;
-  color: ${props => props.theme.colors.gray400};
-`;
-const DetailsRow = styled(Col)`
-  flex-grow: 1;
-`;
 const RemoveCol = styled(Col)`
   width: 20px;
 `;
 const ProgressCol = styled(Col)`
   width: 50px;
+  line-height: 1rem;
 `;
 const ActionsRow = styled(Row)`
   width: 70px;
@@ -96,7 +74,7 @@ const urlnameParse = R.ifElse(
   ),
   R.identity
 );
-function copyToClipboard(text) {
+export function copyToClipboard(text) {
   const input = document.createElement("input");
   input.style.position = "fixed";
   input.style.opacity = 0;
@@ -110,7 +88,10 @@ class DownloadRow extends Component {
   render() {
     const { download, removeDownload } = this.props;
     const progress = ((download.finished / download.total) * 100).toFixed(0);
-    const date = new Date(download.created).toLocaleTimeString();
+    const date =
+      new Date(download.created).toLocaleDateString() +
+      " " +
+      new Date(download.created).toLocaleTimeString();
     return (
       <StyledRow center="xs" middle="xs" between="xs">
         <DetailsRow>
@@ -139,7 +120,7 @@ class DownloadRow extends Component {
                     <Download />
                   </DownloadButton>
                 ) : (
-                  progress + "%"
+                  <Progress>{progress}</Progress>
                 )}
               </div>
             </Row>

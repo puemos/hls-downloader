@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import { Plus } from "../Svgs/Plus";
+import { StyledRow } from "../Row/elements";
 
 const DownloadButton = styled.button`
   background-color: transparent;
@@ -15,19 +16,12 @@ const DownloadButton = styled.button`
   }
 `;
 
-const StyledRow = styled(Row)`
-  height: 60px;
-  padding: 0 10px;
-  border-bottom: 1px solid ${props => props.theme.colors.gray200};
-  color: ${props => props.theme.colors.gray700};
-  transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-
-  &:hover {
-    background-color: ${props => props.theme.colors.gray100};
-  }
+const DetailLabel = styled.span`
+  font-size: 0.7rem;
+  color: ${props => props.theme.colors.gray800};
 `;
 
-const Detail = styled.span`
+const DetailValue = styled.span`
   font-size: 0.7rem;
   color: ${props => props.theme.colors.gray500};
   margin-right: 5px;
@@ -44,13 +38,16 @@ class PlaylistRow extends Component {
           <Row>
             {BANDWIDTH && (
               <Col>
-                Bandwidth: <Detail>{BANDWIDTH}</Detail>
+                <DetailLabel>Bandwidth:</DetailLabel>{" "}
+                <DetailValue>{BANDWIDTH}</DetailValue>
               </Col>
             )}
             {RESOLUTION && (
               <Col>
-                Resolution:{" "}
-                <Detail>{`${RESOLUTION.width}x${RESOLUTION.height}`}</Detail>
+                <DetailLabel>Resolution:</DetailLabel>{" "}
+                <DetailValue>{`${RESOLUTION.width}x${
+                  RESOLUTION.height
+                }`}</DetailValue>
               </Col>
             )}
           </Row>

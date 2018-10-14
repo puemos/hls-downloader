@@ -5,7 +5,6 @@ import styled from "styled-components";
 import RequestRow from "../../components/RequestRow";
 import Table from "../../components/Table";
 import { requestsByActiveTabSelector } from "../../modules/requests/selectors";
-import colors from "../../theme/colors";
 
 const Body = styled(Col)`
   background-color: ${props => props.theme.colors.white};

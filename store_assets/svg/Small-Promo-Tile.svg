@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="440"
+   height="280"
+   viewBox="0 0 116.41666 74.083335"
+   version="1.1"
+   id="svg1901"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="Small-Promo-Tile.svg">
+  <defs
+     id="defs1895" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.74101562"
+     inkscape:cx="202.29837"
+     inkscape:cy="236.12019"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1366"
+     inkscape:window-height="713"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata1898">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-222.91664)">
+    <g
+       id="g864"
+       transform="matrix(0.57634067,0,0,0.57634067,-17.67475,222.14204)">
+      <g
+         id="g1791"
+         transform="matrix(0.82850929,0,0,0.82850929,67.413309,3.5129815)">
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.62771988px;line-height:125%;font-family:Purisa;-inkscape-font-specification:Purisa;letter-spacing:0px;word-spacing:0px;fill:#42a5f5;fill-opacity:1;stroke:none;stroke-width:0.76569283px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="35.773731"
+           y="97.302917"
+           id="text5840-3-7"><tspan
+             sodipodi:role="line"
+             id="tspan5838-6-5"
+             x="35.773731"
+             y="97.302917"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Pacifico;-inkscape-font-specification:Pacifico;fill:#42a5f5;fill-opacity:1;stroke-width:0.76569283px">downloader</tspan></text>
+        <rect
+           y="50.390034"
+           x="-28.583399"
+           height="49.131218"
+           width="64.429451"
+           id="rect946"
+           style="fill:#55a8f6;fill-opacity:1;stroke:#ffffff;stroke-width:0.23882675;stroke-opacity:1" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:46.45639038px;line-height:125%;font-family:Purisa;-inkscape-font-specification:Purisa;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.16140962px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="-25.444544"
+           y="95.518768"
+           id="text5840-3"><tspan
+             sodipodi:role="line"
+             id="tspan5838-6"
+             x="-25.444544"
+             y="95.518768"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Pacifico;-inkscape-font-specification:Pacifico;fill:#ffffff;fill-opacity:1;stroke-width:1.16140962px">hls</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

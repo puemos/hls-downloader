@@ -1,13 +1,13 @@
 {
   "short_name": "HLS Download",
   "name": "HLS Downloader",
-  "description": "HTTP stream sniffer and downloader",
+  "description": "HTTP Live Stream sniff & downloader",
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "index.html",
     "default_title": "HLS Downloader"
   },
-  "version": "1.1.0",
+  "version": "1.2.0",
   "background": {
     "scripts": ["static/js/background.js"],
     "persistent": true
@@ -23,9 +23,9 @@
     "debugger"
   ],
   "icons": {
-    "16": "/assets/logo16.png",
-    "48": "/assets/logo48.png",
-    "128": "/assets/logo128.png",
-    "256": "/assets/logo256.png"
+    "16": "/assets/icons/16.png",
+    "48": "/assets/icons/48.png",
+    "128": "/assets/icons/128.png",
+    "256": "/assets/icons/256.png"
   }
 }

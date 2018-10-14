@@ -7,7 +7,6 @@ import Table from "../../components/Table";
 import { downloadPlaylist } from "../../modules/downloads/action-creators";
 import { currentRequestSelector } from "../../modules/requests/selectors";
 import { memoryHistory } from "../../modules/router/history";
-import colors from "../../theme/colors";
 
 const Body = styled(Col)`
   background-color: ${props => props.theme.colors.white};

@@ -8,7 +8,7 @@ const Body = styled(Col)`
   max-height: 400px;
   height: 300px;
   /* width: calc(100% - 0.5rem); */
-  margin: 0 10px;
+  /* margin: 0 10px; */
 `;
 
 const NoResults = styled(Row)`
