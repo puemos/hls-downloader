@@ -1,14 +1,31 @@
+## 1.2.0
+
+### Add
+
+- rebranding
+- copy playlist url link
+- storybook
+
+### Change
+
+- colors and styles
+
+### Fix
+
+- wildcard for playlists
+
+
 ## 1.1.0
 
-### add
+### Add
 
 - Timestamps for sniffer & downloads
 
-### changes
+### Change
 
 - Tabs style
 
-### fix
+### Fix
 
 - playlist relative uri
 - scrollbars
