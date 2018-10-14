@@ -6,6 +6,8 @@ const paths = require("./paths");
 const getClientEnvironment = require("./env");
 const common = require("./webpack.config.common");
 const publicPath = paths.servedPath;
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== "false";
 const publicUrl = publicPath.slice(0, -1);
@@ -24,6 +26,11 @@ module.exports = {
   module: common.module,
   node: common.node,
   plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: "public"
+      }
+    ]),
     new InterpolateHtmlPlugin(env.raw),
     new HtmlWebpackPlugin({
       inject: true,
@@ -42,21 +49,14 @@ module.exports = {
       }
     }),
     new webpack.DefinePlugin(env.stringified),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-
-        comparisons: false
-      },
-      mangle: {
-        safari10: false
-      },
-      output: {
-        comments: false,
-
-        ascii_only: true
-      },
-      sourceMap: shouldUseSourceMap
+    new UglifyJsPlugin({
+      uglifyOptions: {
+        ecma: 6,
+        output: {
+          comments: false,
+          beautify: false
+        }
+      }
     }),
     new ManifestPlugin({
       fileName: "asset-manifest.json"
