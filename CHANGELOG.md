@@ -1,3 +1,9 @@
+## 1.2.1
+
+### Change
+
+- update deps
+
 ## 1.2.0
 
 ### Add
