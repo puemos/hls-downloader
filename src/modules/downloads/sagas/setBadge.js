@@ -1,6 +1,6 @@
 import { takeEvery, select } from "redux-saga/effects";
 import { requestsByActiveTabSelector } from "../../requests/selectors";
-import { CHANGE_TAB } from "../../tabs/action-types";
+import { CHANGE_TAB, REMOVE_TAB } from "../../tabs/action-types";
 import { ADD_REQUEST } from "../../requests/action-types";
 
 function* onSetBadge() {
@@ -11,5 +11,5 @@ function* onSetBadge() {
 }
 
 export default function* setBadgeSaga() {
-  yield takeEvery([ADD_REQUEST, CHANGE_TAB], onSetBadge);
+  yield takeEvery([ADD_REQUEST, CHANGE_TAB, REMOVE_TAB], onSetBadge);
 }
