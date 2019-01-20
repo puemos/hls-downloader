@@ -4,7 +4,13 @@ import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import { Download } from "../Svgs/Download";
 import { Trashcan } from "../Svgs/Trashcan";
-import { StyledRow, DetailsRow, StyledTitle, CopyButton, StyledDate } from "../Row/elements";
+import {
+  StyledRow,
+  DetailsRow,
+  StyledTitle,
+  CopyButton,
+  StyledDate
+} from "../Row/elements";
 
 const DownloadButton = styled.a`
   background-color: transparent;
@@ -33,7 +39,6 @@ const RemoveButton = styled.button`
     color: ${props => props.theme.colors.gray500};
   }
 `;
-
 
 const Progress = styled.span`
   font-size: 0.8rem;
@@ -86,7 +91,7 @@ export function copyToClipboard(text) {
 }
 class DownloadRow extends Component {
   render() {
-    const { download, removeDownload } = this.props;
+    const { download, removeDownload, chromeDownload } = this.props;
     const progress = ((download.finished / download.total) * 100).toFixed(0);
     const date =
       new Date(download.created).toLocaleDateString() +
@@ -114,8 +119,11 @@ class DownloadRow extends Component {
               <div>
                 {progress >= 100 ? (
                   <DownloadButton
-                    href={download.link}
-                    download={`${download.title}.mp4`}
+                    // href={download.link}
+                    onClick={() => {
+                      chromeDownload(download);
+                    }}
+                    // download={`${download.title}.mp4`}
                   >
                     <Download />
                   </DownloadButton>

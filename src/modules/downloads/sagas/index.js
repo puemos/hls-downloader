@@ -8,7 +8,8 @@ import {
   put,
   race,
   take,
-  takeEvery
+  takeEvery,
+  select
 } from "redux-saga/effects";
 import uuid from "uuid";
 import { parsePlaylist } from "../../../background/Parser";
@@ -20,6 +21,8 @@ import {
 import { DOWNLOAD_PLAYLIST, REMOVE_DOWNLOAD } from "../action-types";
 import { BlobBuilder, getURI } from "../utils";
 import createQueue from "./queue";
+import { ADD_REQUEST } from "../../requests/action-types";
+import { requestsByActiveTabSelector } from "../../requests/selectors";
 
 const segmentHandlerFactory = ({
   blobBuilder,

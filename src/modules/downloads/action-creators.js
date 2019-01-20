@@ -5,7 +5,8 @@ import {
   DOWNLOAD_CHANGE,
   ADD_DOWNLOAD,
   CANCEL_DOWNLOAD,
-  REMOVE_DOWNLOAD
+  REMOVE_DOWNLOAD,
+  CHROME_DOWNLOAD
 } from "./action-types";
 
 export function downloadPlaylist({ playlist, request }) {
@@ -20,6 +21,9 @@ export function cancelDownload(downloadId) {
 }
 export function removeDownload(downloadId) {
   return { type: REMOVE_DOWNLOAD, payload: downloadId };
+}
+export function chromeDownload(download) {
+  return { type: CHROME_DOWNLOAD, payload: download };
 }
 export function downloadFinished(download) {
   return { type: DOWNLOAD_FINISHED, payload: download };

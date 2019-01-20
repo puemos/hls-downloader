@@ -20,7 +20,8 @@
     "tabs",
     "http://*/*",
     "https://*/*",
-    "debugger"
+    "debugger",
+    "downloads"
   ],
   "icons": {
     "16": "/assets/icons/16.png",

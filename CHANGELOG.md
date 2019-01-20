@@ -1,3 +1,14 @@
+## 1.3.0
+
+### Add
+
+- Save as
+- Badge indicator
+
+### Change
+
+- update deps
+
 ## 1.2.1
 
 ### Change
@@ -19,7 +30,6 @@
 ### Fix
 
 - wildcard for playlists
-
 
 ## 1.1.0
 

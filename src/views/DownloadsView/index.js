@@ -5,7 +5,10 @@ import { Col } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import DownloadRow from "../../components/DownloadRow";
 import Table from "../../components/Table";
-import { removeDownload } from "../../modules/downloads/action-creators";
+import {
+  removeDownload,
+  chromeDownload
+} from "../../modules/downloads/action-creators";
 import { downloadsItemsSelector } from "../../modules/downloads/selectors";
 
 const Body = styled(Col)`
@@ -17,7 +20,7 @@ const Body = styled(Col)`
 
 class DownloadsView extends Component {
   render() {
-    const { downloads, removeDownload } = this.props;
+    const { downloads, removeDownload, chromeDownload } = this.props;
     return (
       <Body>
         <Table
@@ -27,6 +30,7 @@ class DownloadsView extends Component {
               key={downloadItem.id}
               download={downloadItem}
               removeDownload={removeDownload}
+              chromeDownload={chromeDownload}
             />
           )}
         />
@@ -39,7 +43,8 @@ const mapStateToProps = state => ({
   downloads: downloadsItemsSelector(state)
 });
 const mapDispatchToProps = dispatch => ({
-  removeDownload: downloadId => dispatch(removeDownload(downloadId))
+  removeDownload: downloadId => dispatch(removeDownload(downloadId)),
+  chromeDownload: download => dispatch(chromeDownload(download))
 });
 export default connect(
   mapStateToProps,

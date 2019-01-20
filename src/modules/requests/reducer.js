@@ -11,7 +11,7 @@ const initState = {
   result: []
 };
 
-const denormalizeRequests = state =>
+export const denormalizeRequests = state =>
   denormalize(state.result, [requestSchema], state.entities);
 
 export default function requests(state = initState, action) {
