@@ -25,9 +25,9 @@ class DownloadsView extends Component {
       <Body>
         <Table
           items={R.reverse(Object.values(downloads))}
-          renderRow={downloadItem => (
+          renderRow={(downloadItem, idx) => (
             <DownloadRow
-              key={downloadItem.id}
+              key={downloadItem.id || idx}
               download={downloadItem}
               removeDownload={removeDownload}
               chromeDownload={chromeDownload}

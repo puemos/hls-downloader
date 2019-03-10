@@ -8,8 +8,7 @@ import {
   put,
   race,
   take,
-  takeEvery,
-  select
+  takeEvery
 } from "redux-saga/effects";
 import uuid from "uuid";
 import { parsePlaylist } from "../../../background/Parser";
@@ -20,9 +19,8 @@ import {
 } from "../action-creators";
 import { DOWNLOAD_PLAYLIST, REMOVE_DOWNLOAD } from "../action-types";
 import { BlobBuilder, getURI } from "../utils";
+import { downloadChunk } from "./downloadChunk";
 import createQueue from "./queue";
-import { ADD_REQUEST } from "../../requests/action-types";
-import { requestsByActiveTabSelector } from "../../requests/selectors";
 
 const segmentHandlerFactory = ({
   blobBuilder,
@@ -31,9 +29,12 @@ const segmentHandlerFactory = ({
   segmentsCount,
   allDoneChannel
 }) =>
-  function* segmentHandler({ uri, index }) {
-    const res = yield call(fetch, getSegmentURI(uri));
-    const blob = yield res.blob();
+  function* segmentHandler({ uri, index, key }) {
+    const blob = yield call(downloadChunk, {
+      getSegmentURI,
+      key,
+      chunkURI: uri
+    });
 
     blobBuilder.add(index, blob);
 
@@ -87,7 +88,13 @@ function* downloadPlaylist(action) {
     const watcherTask = yield fork(watcher);
     yield all(
       segments.map((segment, index) =>
-        put(addTaskChannel, { payload: { uri: segment.uri, index } })
+        put(addTaskChannel, {
+          payload: {
+            uri: segment.uri,
+            key: segment.key,
+            index
+          }
+        })
       )
     );
     while (true) {

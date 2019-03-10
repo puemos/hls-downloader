@@ -21,8 +21,8 @@ class RequestListView extends Component {
       <Body>
         <Table
           items={requests}
-          renderRow={requestItem => (
-            <RequestRow key={requestItem.id} request={requestItem} />
+          renderRow={(requestItem, idx) => (
+            <RequestRow key={requestItem.id || idx} request={requestItem} />
           )}
         />
       </Body>

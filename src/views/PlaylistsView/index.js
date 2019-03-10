@@ -22,9 +22,9 @@ class RequestView extends Component {
       <Body>
         <Table
           items={request.manifest ? request.manifest.playlists : []}
-          renderRow={playlistItem => (
+          renderRow={(playlistItem, idx) => (
             <PlaylistRow
-              key={playlistItem.id}
+              key={playlistItem.id || idx}
               playlist={playlistItem}
               onDownloadClick={() => {
                 memoryHistory.push("/downloads");
