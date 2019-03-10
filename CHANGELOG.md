@@ -1,3 +1,15 @@
+# HLS downloader changelog
+
+## 1.4.0
+
+### Add
+
+- AES decrypt
+
+### Change
+
+- Upgrade deps
+
 ## 1.3.1
 
 ### Fix
