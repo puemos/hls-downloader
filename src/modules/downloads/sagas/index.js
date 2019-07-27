@@ -15,7 +15,8 @@ import { parsePlaylist } from "../../../background/Parser";
 import {
   addDownload,
   downloadChange,
-  downloadFinished
+  downloadFinished,
+  chromeDownload
 } from "../action-creators";
 import { DOWNLOAD_PLAYLIST, REMOVE_DOWNLOAD } from "../action-types";
 import { BlobBuilder, getURI } from "../utils";
@@ -111,6 +112,7 @@ function* downloadPlaylist(action) {
         yield cancel(watcherTask);
         const link = URL.createObjectURL(blobBuilder.build());
         yield put(downloadFinished({ id, link }));
+        yield put(chromeDownload({ id, link }));
         return;
       }
     }
