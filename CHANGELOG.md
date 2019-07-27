@@ -1,5 +1,11 @@
 # HLS downloader changelog
 
+## 1.5.0
+
+### Add
+
+- Auto-download playlist
+
 ## 1.4.1
 
 ### Change
