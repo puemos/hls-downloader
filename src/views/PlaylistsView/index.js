@@ -9,7 +9,6 @@ import { currentRequestSelector } from "../../modules/requests/selectors";
 import { memoryHistory } from "../../modules/router/history";
 
 const Body = styled(Col)`
-  background-color: ${props => props.theme.colors.white};
   max-height: 400px;
   height: 300px;
   width: 100%;

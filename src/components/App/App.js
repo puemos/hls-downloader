@@ -1,20 +1,14 @@
 import React, { Component } from "react";
 import { Route } from "react-router-dom";
 import { ConnectedRouter } from "react-router-redux";
-import { Col, Grid, Row } from "react-styled-flexboxgrid";
-import styled from "styled-components";
+import { Col, Row } from "react-styled-flexboxgrid";
 import { memoryHistory } from "../../modules/router/history";
 import AboutView from "../../views/AboutView";
 import DownloadsView from "../../views/DownloadsView";
 import PlaylistsView from "../../views/PlaylistsView";
 import RequestView from "../../views/RequestView";
 import Tabs from "../Tabs";
-
-const Main = styled(Grid)`
-  min-width: 450px;
-  color: ${props => props.theme.colors.gray700};
-  background-color: ${props => props.theme.colors.gray50};
-`;
+import { Main } from "./Main";
 
 class App extends Component {
   render() {

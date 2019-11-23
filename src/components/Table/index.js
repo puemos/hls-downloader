@@ -4,7 +4,6 @@ import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 
 const Body = styled(Col)`
-  background-color: ${props => props.theme.colors.white};
   max-height: 400px;
   height: 300px;
   /* width: calc(100% - 0.5rem); */

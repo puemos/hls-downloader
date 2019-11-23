@@ -4,7 +4,6 @@ import styled from "styled-components";
 
 const Body = styled(Col)`
   width: 100%;
-  background-color: ${props => props.theme.colors.white};
   max-height: 400px;
   height: 300px;
   padding: 20px;

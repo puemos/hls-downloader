@@ -18,15 +18,15 @@ export const CopyButton = styled.button`
 `;
 
 export const StyledRow = styled(Row)`
-  height: 60px;
-  padding: 0 10px;
+  height: 70px;
+  margin: 10px 10px;
+  padding: 0px 10px;
   border-bottom: 1px solid ${props => props.theme.colors.gray100};
   color: ${props => props.theme.colors.gray700};
   transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-
-  &:hover {
-    background-color: ${props => props.theme.colors.gray50};
-  }
+  background-color: ${props => props.theme.colors.white};
+  border-radius: 6px;
+  box-shadow: #d8d3d3 0 0 12px 0px;
 `;
 
 export const StyledTitle = styled.span`
@@ -39,10 +39,9 @@ export const StyledTitle = styled.span`
 `;
 
 export const StyledDate = styled(Col)`
-  font-size: 0.6rem;
+margin-top: 6px;
+  font-size: 0.7rem;
   color: ${props => props.theme.colors.gray400};
 `;
 
-export const DetailsRow = styled(Col)`
-  flex-grow: 1;
-`;
+export const DetailsRow = styled(Col)``;

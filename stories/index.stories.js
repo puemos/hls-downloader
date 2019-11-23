@@ -1,28 +1,25 @@
-import { Router } from "react-router-dom";
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import { Col, Grid } from "react-styled-flexboxgrid";
+import { Router } from "react-router-dom";
+import { Col } from "react-styled-flexboxgrid";
 import styled, { injectGlobal, ThemeProvider } from "styled-components";
+import { Main } from "../src/components/App/Main";
 import DownloadRow from "../src/components/DownloadRow";
 import PlaylistRow from "../src/components/PlaylistRow";
+import RequestRow from "../src/components/RequestRow";
 import Table from "../src/components/Table";
 import Tabs from "../src/components/Tabs";
-import { theme } from "../src/theme";
 import { memoryHistory } from "../src/modules/router/history";
-import RequestRow from "../src/components/RequestRow";
+import { theme } from "../src/theme";
 import AboutView from "../src/views/AboutView";
 
-const Main = styled(Grid)`
-  min-width: 450px;
+const StoryMain = styled(Main)`
   width: 450px;
-  color: ${props => props.theme.colors.gray700};
-  background-color: ${props => props.theme.colors.white};
   border: 1px solid rgba(0, 0, 0, 0.1);
   height: 400px;
 `;
 
 const Body = styled(Col)`
-  background-color: ${props => props.theme.colors.white};
   max-height: 400px;
   height: 300px;
 `;
@@ -33,7 +30,7 @@ injectGlobal`
     font-size: 16px;
   }
   body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'helvetica', sans-serif;
     margin: 0;
   }
 `;
@@ -41,7 +38,7 @@ injectGlobal`
 storiesOf("Tabs", module)
   .add("PlaylistRow", () => (
     <ThemeProvider theme={theme}>
-      <Main>
+      <StoryMain>
         <Router history={memoryHistory}>
           <Tabs />
         </Router>
@@ -70,13 +67,13 @@ storiesOf("Tabs", module)
             )}
           />
         </Body>
-      </Main>
+      </StoryMain>
     </ThemeProvider>
   ))
   .add("RequestRow", () => (
     <ThemeProvider theme={theme}>
       <Router history={memoryHistory}>
-        <Main>
+        <StoryMain>
           <Tabs />
           <Body>
             <Table
@@ -99,14 +96,14 @@ storiesOf("Tabs", module)
               )}
             />
           </Body>
-        </Main>
+        </StoryMain>
       </Router>
     </ThemeProvider>
   ))
 
   .add("DownloadRow", () => (
     <ThemeProvider theme={theme}>
-      <Main>
+      <StoryMain>
         <Router history={memoryHistory}>
           <Tabs />
         </Router>
@@ -149,16 +146,16 @@ storiesOf("Tabs", module)
             )}
           />
         </Body>
-      </Main>
+      </StoryMain>
     </ThemeProvider>
   ))
   .add("About", () => (
     <ThemeProvider theme={theme}>
-      <Main>
+      <StoryMain>
         <Router history={memoryHistory}>
           <Tabs />
         </Router>
         <AboutView />
-      </Main>
+      </StoryMain>
     </ThemeProvider>
   ));

@@ -7,7 +7,6 @@ import Table from "../../components/Table";
 import { requestsByActiveTabSelector } from "../../modules/requests/selectors";
 
 const Body = styled(Col)`
-  background-color: ${props => props.theme.colors.white};
   max-height: 400px;
   height: 300px;
   width: 100%;
