@@ -1,4 +1,6 @@
-![300x190](./store_assets/png/sceenshot-1.png)
+<p align="center">
+<img src="./store_assets/png/sceenshot-1.png" width="450">
+</p>
 
 # HLS-downloader
 
