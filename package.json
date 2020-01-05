@@ -6,7 +6,6 @@
     "test": "react-scripts test",
     "prebuild": "rm -rf build",
     "prepack": "npm run build",
-    "zip": "zip -r extension.zip build",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
