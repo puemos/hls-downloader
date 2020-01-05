@@ -12,13 +12,18 @@ const ActionsRow = styled(Row)`
   margin-top: 3rem;
 `;
 const Detail = styled.div`
-  text-align: left;
+  text-align: center;
   & + & {
     margin-top: 10px;
   }
 `;
 const DetailValue = styled.span`
   color: ${props => props.theme.colors.blue500};
+`;
+const Co = styled.div`
+  color: ${props => props.theme.colors.gray600};
+  font-size: 0.8rem;
+  text-align: center;
 `;
 const DetailLink = styled.a`
   color: ${props => props.theme.colors.blue500};
@@ -29,8 +34,7 @@ const DetailLink = styled.a`
   }
 `;
 const DetailButton = styled.a`
-  background-color: ${props => props.theme.colors.blue500};
-  color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.gray600};
   text-decoration: none;
   border-radius: 10px;
   padding: 5px 10px;
@@ -41,10 +45,10 @@ const DetailButton = styled.a`
   &:active,
   &:visited {
     text-decoration: none;
-    color: ${props => props.theme.colors.white};
+    color: ${props => props.theme.colors.gray600};
   }
   &:hover {
-    background-color: ${props => props.theme.colors.blue400};
+    color: ${props => props.theme.colors.gray600};
   }
 `;
 function AboutView() {
@@ -53,11 +57,14 @@ function AboutView() {
       <Row center="xs" middle="xs" style={{ height: "100%" }}>
         <Col center="xs" start="xs">
           <Detail>
-            made with <span role="img">❤</span> by:{" "}
-            <DetailValue>Shy Alter</DetailValue>
+            Made with{" "}
+            <span role="img" style={{ color: "red" }}>
+              ❤
+            </span>{" "}
+            by <DetailValue>Shy Alter</DetailValue>
           </Detail>
           <Detail>
-            follow me on twitter:{" "}
+            Follow me on twitter{" "}
             <DetailLink target="blank" href="https://twitter.com/@puemos">
               @puemos
             </DetailLink>
@@ -78,6 +85,17 @@ function AboutView() {
           </ActionsRow>
         </Col>
       </Row>
+      <Co>
+        This extension is completely free and published under the MIT license.
+        However, if you are using it and enjoy it, you are welcome to making{" "}
+        <a
+          target="blank"
+          href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url"
+        >
+          a donation of
+        </a>{" "}
+        your choice.
+      </Co>
     </Body>
   );
 }

@@ -14,7 +14,7 @@ const Label = styled.span``;
 const Tab = styled(NavLink)`
   margin: auto;
   text-align: center;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 0.95rem;
   text-transform: capitalize;
   height: 100%;

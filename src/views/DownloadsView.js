@@ -1,8 +1,6 @@
 import * as R from "ramda";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col } from "react-styled-flexboxgrid";
-import styled from "styled-components";
 import DownloadRow from "../components/DownloadRow";
 import Table from "../components/Table";
 import {
@@ -10,12 +8,7 @@ import {
   removeDownload
 } from "../modules/downloads/action-creators";
 import { downloadsItemsSelector } from "../modules/downloads/selectors";
-
-const Body = styled(Col)`
-  max-height: 400px;
-  height: 300px;
-  width: 100%;
-`;
+import { Body } from "./Body";
 
 function DownloadsView() {
   const dispatch = useDispatch();
@@ -23,6 +16,7 @@ function DownloadsView() {
   return (
     <Body>
       <Table
+        emptyMsg="You didin't download any video, yet :)"
         items={R.reverse(Object.values(downloads))}
         renderRow={(downloadItem, idx) => (
           <DownloadRow

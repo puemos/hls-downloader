@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { injectGlobal, ThemeProvider } from "styled-components";
 import App from "./components/App/App";
 import { theme } from "./theme";
+import { BrowserRouter } from "react-router-dom";
 
 const store = new Store({
   portName: "HLS_DOWNLOADER" // communication port name
@@ -15,7 +16,9 @@ const store = new Store({
 render(
   <Provider store={store}>
     <ThemeProvider theme={theme}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </ThemeProvider>
   </Provider>,
   document.getElementById("root")

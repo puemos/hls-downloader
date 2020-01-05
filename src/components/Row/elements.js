@@ -4,23 +4,29 @@ import styled from "styled-components";
 export const CopyButton = styled.button`
   background-color: transparent;
   border: 0;
-  color: ${props => props.theme.colors.gray50};
-  background-color: ${props => props.theme.colors.gray300};
-  border-radius: 10px;
+  color: ${props => props.theme.colors.gray400};
   line-height: 0;
   font-size: 0.6rem;
-  transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
   outline: none;
   cursor: pointer;
+`;
+export const MoreButton = styled.button`
+  background-color: transparent;
+  border: 0;
+  color: ${props => props.theme.colors.gray300};
+  outline: none;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+
   &:hover {
-    background-color: ${props => props.theme.colors.gray400};
+    transform: translateX(5px);
   }
 `;
 
 export const StyledRow = styled(Row)`
   height: 70px;
   margin: 10px 10px;
-  padding: 0px 10px;
+  padding: 0px 5px 0px 10px;
   border-bottom: 1px solid ${props => props.theme.colors.gray100};
   color: ${props => props.theme.colors.gray700};
   transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -39,7 +45,7 @@ export const StyledTitle = styled.span`
 `;
 
 export const StyledDate = styled(Col)`
-margin-top: 6px;
+  margin-top: 6px;
   font-size: 0.7rem;
   color: ${props => props.theme.colors.gray400};
 `;

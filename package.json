@@ -7,10 +7,6 @@
     "prebuild": "rm -rf build",
     "prepack": "npm run build",
     "pack": "zip -r extension.zip build",
-    "preupload": "npm run pack",
-    "upload": "webstore upload --source extension.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
-    "prewebstore-publish": "npm run upload",
-    "webstore-publish": "webstore publish --client-id $CLIENT_ID",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },

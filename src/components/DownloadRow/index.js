@@ -11,6 +11,7 @@ import {
   CopyButton,
   StyledDate
 } from "../Row/elements";
+import { Copy } from "../Svgs/Copy";
 
 const DownloadButton = styled.a`
   background-color: transparent;
@@ -53,29 +54,20 @@ const Progress = styled.span`
 `;
 
 const RemoveCol = styled(Col)`
-  width: 20px;
+  width: 50px;
 `;
 const ProgressCol = styled(Col)`
   width: 50px;
   line-height: 1rem;
 `;
 const ActionsRow = styled(Row)`
-  width: 70px;
+  width: 50px;
 `;
 
 const urlnameParse = R.ifElse(
+  R.pipe(R.length, R.lt(50)),
   R.pipe(
-    R.length,
-    R.lt(50)
-  ),
-  R.pipe(
-    R.converge(R.concat, [
-      R.take(20),
-      R.pipe(
-        R.takeLast(20),
-        R.concat("...")
-      )
-    ])
+    R.converge(R.concat, [R.take(20), R.pipe(R.takeLast(20), R.concat("..."))])
   ),
   R.identity
 );
@@ -105,7 +97,7 @@ class DownloadRow extends Component {
               {urlnameParse(download.title)}
             </StyledTitle>
             <CopyButton onClick={() => copyToClipboard(download.title)}>
-              copy
+              <Copy></Copy>
             </CopyButton>
           </Row>
           <Row start="xs">

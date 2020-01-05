@@ -1,16 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Col } from "react-styled-flexboxgrid";
-import styled from "styled-components";
 import RequestRow from "../components/RequestRow";
 import Table from "../components/Table";
 import { requestsByActiveTabSelector } from "../modules/requests/selectors";
-
-const Body = styled(Col)`
-  max-height: 400px;
-  height: 300px;
-  width: 100%;
-`;
+import { Body } from "./Body";
 
 function RequestListView() {
   const requests = useSelector(requestsByActiveTabSelector);
@@ -19,6 +12,7 @@ function RequestListView() {
     <Body>
       <Table
         items={requests}
+        emptyMsg="Sorry, i wasn't able to find any HTTP Live Streams"
         renderRow={(requestItem, idx) => (
           <RequestRow key={requestItem.id || idx} request={requestItem} />
         )}
