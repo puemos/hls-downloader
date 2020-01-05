@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    tags:
+    - 'v*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: borales/actions-yarn@v2.0.0
+      with:
+        cmd: install
+    - uses: borales/actions-yarn@v2.0.0
+      with:
+        cmd: build
+    - uses: borales/actions-yarn@v2.0.0
+      with:
+        cmd: pack
+    - name: Chrome Extension upload & publish
+      uses: Passiverecords/chrome-extension-upload-action@1.4.1
+      with:
+        # Auth refresh token
+        refresh-token: ${{ secrets.REFRESH_TOKEN }}
+        # Extension application target id
+        app-id: ${{ secrets.EXTENSION_ID }}
+        # Token client id
+        client-id: ${{ secrets.CLIENT_ID }}
+        # Token client secret
+        client-secret: ${{ secrets.CLIENT_SECRET }}
+        # Name of zipped target upload file
+        file-name: extension.zip
+        # True Or False to publish after upload
+        publish: True
