@@ -1,6 +1,8 @@
 export async function downloadChunk({ getSegmentURI, key, chunkURI }) {
-  const arrayBuffer = await fetch(getSegmentURI(getSegmentURI(chunkURI))).then(
-    res => res.arrayBuffer()
+  console.log("454", getSegmentURI(chunkURI));
+
+  const arrayBuffer = await fetch(getSegmentURI(chunkURI)).then(res =>
+    res.arrayBuffer()
   );
   if (key) {
     const decryptData = await decryptChunk({

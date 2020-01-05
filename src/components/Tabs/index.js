@@ -6,8 +6,7 @@ import styled from "styled-components";
 const Nav = styled(Row)`
   /* height: 32px; */
   padding: 16px 0;
-  background-color: ${props => props.theme.colors.white};
-  border-bottom: 2px solid ${props => props.theme.colors.gray100};
+  background-color: ${props => props.theme.colors.header};
 `;
 
 const Label = styled.span``;
@@ -15,8 +14,8 @@ const Label = styled.span``;
 const Tab = styled(NavLink)`
   margin: auto;
   text-align: center;
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-weight: 400;
+  font-size: 0.95rem;
   text-transform: capitalize;
   height: 100%;
   color: ${props => props.theme.colors.gray400};
@@ -30,7 +29,7 @@ const Tab = styled(NavLink)`
     border-left: 0;
   }
   &.active {
-    color: ${props => props.theme.colors.blue400};
+    color: ${props => props.theme.colors.primary};
   }
 `;
 
@@ -38,7 +37,7 @@ class Tabs extends Component {
   render() {
     return (
       <Nav middle="xs" around="xs">
-        <Tab exact to="/">
+        <Tab exact to="/sniffer">
           <div>
             <Label>{"Sniffer"}</Label>
           </div>

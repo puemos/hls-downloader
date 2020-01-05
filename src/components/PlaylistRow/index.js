@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import { Plus } from "../Svgs/Plus";
-import { StyledRow } from "../Row/elements";
+import { MoreButton, StyledRow } from "../Row/elements";
+import { RightArrow } from "../Svgs/RightArrow";
 
 const DownloadButton = styled.button`
   background-color: transparent;
@@ -17,12 +17,12 @@ const DownloadButton = styled.button`
 `;
 
 const DetailLabel = styled.span`
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: ${props => props.theme.colors.gray800};
 `;
 
 const DetailValue = styled.span`
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: ${props => props.theme.colors.gray500};
   margin-right: 5px;
 `;
@@ -36,26 +36,29 @@ class PlaylistRow extends Component {
       <StyledRow middle="xs" between="xs">
         <Col xs={10}>
           <Row>
-            {BANDWIDTH && (
-              <Col>
-                <DetailLabel>Bandwidth:</DetailLabel>{" "}
-                <DetailValue>{BANDWIDTH}</DetailValue>
-              </Col>
-            )}
             {RESOLUTION && (
               <Col>
                 <DetailLabel>Resolution:</DetailLabel>{" "}
-                <DetailValue>{`${RESOLUTION.width}x${
-                  RESOLUTION.height
-                }`}</DetailValue>
+                <DetailValue>{`${RESOLUTION.width}x${RESOLUTION.height}`}</DetailValue>
               </Col>
+            )}
+            {BANDWIDTH && (
+              <>
+                <div style={{ width: 15 }}></div>
+                <Col>
+                  <DetailLabel>Bandwidth:</DetailLabel>{" "}
+                  <DetailValue>{BANDWIDTH}</DetailValue>
+                </Col>
+              </>
             )}
           </Row>
         </Col>
 
         <Col>
           <DownloadButton onClick={onDownloadClick}>
-            <Plus />
+            <MoreButton>
+              <RightArrow />
+            </MoreButton>
           </DownloadButton>
         </Col>
       </StyledRow>

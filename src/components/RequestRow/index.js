@@ -9,36 +9,20 @@ import {
   DetailsRow,
   StyledDate,
   StyledRow,
-  StyledTitle
+  StyledTitle,
+  MoreButton
 } from "../Row/elements";
-import { Expand } from "../Svgs/Expand";
-
-const MoreButton = styled.button`
-  background-color: transparent;
-  border: 0;
-  color: ${props => props.theme.colors.gray300};
-  outline: none;
-  cursor: pointer;
-  transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-`;
+import { RightArrow } from "../Svgs/RightArrow";
+import { Copy } from "../Svgs/Copy";
 
 const MoreAction = styled(Link)`
   text-decoration: none;
 `;
 
 const urlnameParse = R.ifElse(
+  R.pipe(R.length, R.lt(40)),
   R.pipe(
-    R.length,
-    R.lt(40)
-  ),
-  R.pipe(
-    R.converge(R.concat, [
-      R.take(20),
-      R.pipe(
-        R.takeLast(20),
-        R.concat("...")
-      )
-    ])
+    R.converge(R.concat, [R.take(20), R.pipe(R.takeLast(20), R.concat("..."))])
   ),
   R.identity
 );
@@ -59,7 +43,7 @@ class RequestRow extends Component {
               {urlnameParse(request.url)}
             </StyledTitle>
             <CopyButton onClick={() => copyToClipboard(request.url)}>
-              copy
+              <Copy></Copy>
             </CopyButton>
           </Row>
           <Row start="xs">
@@ -68,7 +52,7 @@ class RequestRow extends Component {
         </DetailsRow>
         <MoreAction to={`/request/${request.requestId}`}>
           <MoreButton>
-            <Expand />
+            <RightArrow />
           </MoreButton>
         </MoreAction>
       </StyledRow>

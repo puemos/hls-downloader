@@ -210,5 +210,9 @@ export default {
   blueGray700: "#455a64",
   blueGray800: "#37474f",
   blueGray900: "#263238",
-  blueGray1000: "#11171a"
+  blueGray1000: "#11171a",
+
+  header: "#f4f4f6",
+  background: "#e1e3e6",
+  primary: "#007aff"
 };
