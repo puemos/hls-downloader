@@ -3,12 +3,11 @@ import { applyMiddleware, createStore } from "redux";
 import createSagaMiddleware from "redux-saga";
 
 import { composeWithDevTools } from "remote-redux-devtools";
-import { middleware } from "../router/middleware";
 import reducer from "./reducers";
 import sagas from "./sagas";
 
 const sagaMiddleware = createSagaMiddleware();
-const middlewares = [sagaMiddleware, middleware];
+const middlewares = [sagaMiddleware];
 let enhancers = applyMiddleware(...middlewares);
 
 if (process.env.NODE_ENV === "development") {

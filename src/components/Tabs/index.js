@@ -37,7 +37,7 @@ class Tabs extends Component {
   render() {
     return (
       <Nav middle="xs" around="xs">
-        <Tab exact to="/">
+        <Tab exact to="/sniffer">
           <div>
             <Label>{"Sniffer"}</Label>
           </div>

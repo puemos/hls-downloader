@@ -1,13 +1,6 @@
 import * as R from "ramda";
 import { createSelector } from "reselect";
 import { activeTabSelector } from "../tabs/selectors";
-import { createMatchSelector } from "react-router-redux";
-
-const currentRequestIdSelector = R.pipe(
-  createMatchSelector({ path: "/request/:id" }),
-  R.prop("params"),
-  R.prop("id")
-);
 
 export const requestItemsSelector = R.pathOr({}, [
   "requests",
@@ -15,11 +8,10 @@ export const requestItemsSelector = R.pathOr({}, [
   "requests"
 ]);
 
-export const currentRequestSelector = createSelector(
-  requestItemsSelector,
-  currentRequestIdSelector,
-  (requests, requestId) => R.propOr({}, requestId, requests)
-);
+export const currentRequestSelector = requestId =>
+  createSelector(requestItemsSelector, requests =>
+    R.propOr({}, requestId, requests)
+  );
 
 export const requestsByActiveTabSelector = createSelector(
   requestItemsSelector,
