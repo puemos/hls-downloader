@@ -46,13 +46,14 @@ const segmentHandlerFactory = ({
         finished: blobBuilder.count()
       })
     );
+
     if (R.equals(blobBuilder.count(), segmentsCount)) {
       yield allDoneChannel.put({ type: "DONE" });
     }
   };
 
 function* downloadPlaylist(action) {
-  const QUEUE_CONCURRENT = 2;
+  const QUEUE_CONCURRENT = 4;
 
   const {
     payload: { playlist, request }
@@ -86,7 +87,7 @@ function* downloadPlaylist(action) {
       }),
       QUEUE_CONCURRENT
     );
-    const watcherTask = yield fork(watcher);
+    yield fork(watcher);
     yield all(
       segments.map((segment, index) =>
         put(addTaskChannel, {
@@ -103,14 +104,11 @@ function* downloadPlaylist(action) {
         allDone: take(allDoneChannel),
         cancelDownload: take(REMOVE_DOWNLOAD)
       });
-      debugger
 
       if (!R.isNil(cancelDownload) && R.propEq("payload", id, cancelDownload)) {
-        yield cancel(watcherTask);
         return;
       }
       if (allDone) {
-        yield cancel(watcherTask);
         const link = URL.createObjectURL(blobBuilder.build());
         yield put(downloadFinished({ id, link }));
         yield put(chromeDownload({ id, link }));
