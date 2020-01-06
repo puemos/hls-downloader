@@ -2,7 +2,7 @@
   "version": "1.6.4",
   "private": true,
   "scripts": {
-    "build": "react-scripts build && parcel build src/background/background.js -d build/static/js",
+    "build": "react-scripts build && parcel build src/background/background.js -d build/static/js --no-source-maps",
     "test": "react-scripts test",
     "prebuild": "rm -rf build",
     "prepack": "npm run build",
@@ -48,6 +48,5 @@
     "env": {
       "webextensions": true
     }
-  },
-  "browserslist": "Chrome > 66"
+  }
 }
