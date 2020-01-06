@@ -17,6 +17,7 @@ extension.zip
 .env.development.local
 .env.test.local
 .env.production.local
+.cache
 
 npm-debug.log*
 yarn-debug.log*
