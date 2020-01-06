@@ -10,13 +10,13 @@ const sagaMiddleware = createSagaMiddleware();
 const middlewares = [sagaMiddleware];
 let enhancers = applyMiddleware(...middlewares);
 
-if (process.env.NODE_ENV === "development") {
+// if (process.env.NODE_ENV === "development") {
   const composeEnhancers = composeWithDevTools({ realtime: true, port: 8000 });
   enhancers = composeEnhancers(
     applyMiddleware(...middlewares)
     // other store enhancers if any
   );
-}
+// }
 
 export const store = createStore(
   reducer,
