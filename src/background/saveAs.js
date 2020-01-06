@@ -13,6 +13,8 @@ function getFilename(download) {
 }
 
 function saveAs(action) {
+  console.log("asdsadasdsadjdgk");
+  
   const { payload: download } = action;
   chrome.downloads.download({
     url: download.link,

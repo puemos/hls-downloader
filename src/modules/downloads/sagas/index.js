@@ -62,7 +62,6 @@ function* downloadPlaylist(action) {
     const id = uuid.v4();
     const uri = getURI(request.url)(playlist.uri);
     const { segments } = yield call(parsePlaylist, uri);
-    console.log('sdf',uri)
     const getSegmentURI = getURI(uri);
 
     yield put(
@@ -104,6 +103,7 @@ function* downloadPlaylist(action) {
         allDone: take(allDoneChannel),
         cancelDownload: take(REMOVE_DOWNLOAD)
       });
+      debugger
 
       if (!R.isNil(cancelDownload) && R.propEq("payload", id, cancelDownload)) {
         yield cancel(watcherTask);
