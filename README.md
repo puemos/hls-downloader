@@ -13,6 +13,14 @@ Google Chrome Extension for sniffing and downloading [HTTP Live streams (HLS)](h
 
 [![style: styled-components](https://img.shields.io/badge/style-%F0%9F%92%85%20styled--components-orange.svg?colorB=daa357&colorA=db748e)](https://github.com/styled-components/styled-components) [![Storybook](https://cdn.jsdelivr.net/gh/storybookjs/brand@master/badge/badge-storybook.svg)](https://github.com/storybooks/storybook)
 
+**Table of Contents**
+- [Storybook](#storybook)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Contributor Covenant Code of Conduct](#contributor-covenant-code-of-conduct)
+- [Credits](#credits)
+- [License](#license)
 
 
 ## Storybook
@@ -34,13 +42,19 @@ Google Chrome Extension for sniffing and downloading [HTTP Live streams (HLS)](h
 TODO: Write usage instructions
  
 ## Contributing
- 
+
+[Contributing guideline](./CONTRIBUTING.md)
+
+TL;DR
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
- 
+
+## Contributor Covenant Code of Conduct
+
+[Code of Conduct guideline](./CODE_OF_CONDUCT.md)
  
 ## Credits
  
@@ -51,7 +65,7 @@ Lead Developer - Shy Alter (@puemos)
  
 The MIT License (MIT)
 
-Copyright (c) 2019 Shy Alter
+Copyright (c) 2020 Shy Alter
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
