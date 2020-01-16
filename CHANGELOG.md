@@ -1,5 +1,33 @@
 # HLS downloader changelog
 
+## 1.7.0
+
+### Add
+
+- Auto save
+- Use page title for the file name
+
+### Change
+
+- UI Enhancments
+- Updated to the latest style-components
+
+## 1.6.3
+
+### Change
+
+- New UI
+- Updated to the latest create-react-app
+- Use parcel in order to pack the background app
+- Refactor the stories
+
+### Fix
+
+- URL resolve issues
+- [#45](https://github.com/puemos/hls-downloader-chrome-extension/issues/45)
+- [#43](https://github.com/puemos/hls-downloader-chrome-extension/issues/43)
+- [#41](https://github.com/puemos/hls-downloader-chrome-extension/issues/41)
+
 ## 1.5.0
 
 ### Add
