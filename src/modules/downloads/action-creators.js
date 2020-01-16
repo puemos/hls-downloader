@@ -9,8 +9,8 @@ import {
   CHROME_DOWNLOAD
 } from "./action-types";
 
-export function downloadPlaylist({ playlist, request, tab }) {
-  return { type: DOWNLOAD_PLAYLIST, payload: { playlist, request, tab } };
+export function downloadPlaylist({ playlist, request }) {
+  return { type: DOWNLOAD_PLAYLIST, payload: { playlist, request } };
 }
 
 export function addDownload(download) {

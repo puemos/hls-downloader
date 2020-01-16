@@ -10,12 +10,10 @@ chrome.webRequest.onBeforeRequest.addListener(
       return;
     }
     const manifest = await parseFile(req.url);
-    chrome.tabs.query({ currentWindow: true, index: req.tabId }, tabs => {
-      const tab = tabs[0];
-      if (!R.has("playlists", manifest)) {
-        return;
-      }
-
+    if (!R.has("playlists", manifest)) {
+      return;
+    }
+    chrome.tabs.get(req.tabId, tab => {
       store.dispatch(addRequest({ ...req, manifest, tab }));
     });
   },

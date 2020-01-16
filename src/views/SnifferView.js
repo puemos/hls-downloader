@@ -15,14 +15,16 @@ function RequestListView() {
       <Table
         items={requests}
         emptyMsg="Sorry, i wasn't able to find any HTTP Live Streams"
-        renderRow={(requestItem, idx) => (
-          <RequestRow
-            tab={requestItem.tab}
-            key={requestItem.id || idx}
-            request={requestItem}
-            onClick={() => history.push(`/request/${requestItem.requestId}`)}
-          />
-        )}
+        renderRow={(requestItem, idx) =>
+          console.log(requestItem) || (
+            <RequestRow
+              tab={requestItem.tab}
+              key={requestItem.id || idx}
+              request={requestItem}
+              onClick={() => history.push(`/request/${requestItem.requestId}`)}
+            />
+          )
+        }
       />
     </Body>
   );
