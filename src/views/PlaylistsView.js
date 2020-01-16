@@ -1,4 +1,5 @@
 import React from "react";
+import * as R from "ramda";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import PlaylistRow from "../components/PlaylistRow";
@@ -18,8 +19,10 @@ function PlaylistsView(props) {
   const history = useHistory();
   const { id } = useParams();
   const request = useSelector(currentRequestSelector(id));
-  const items = request.manifest ? request.manifest.playlists : [];
-  items.sort(sortByResulotion);
+  const items = request.manifest
+    ? R.sort(sortByResulotion, request.manifest.playlists)
+    : [];
+
   return (
     <Body>
       <Table
@@ -28,9 +31,12 @@ function PlaylistsView(props) {
           <PlaylistRow
             key={playlistItem.id || idx}
             playlist={playlistItem}
-            onDownloadClick={() => {
+            tab={request.tab}
+            onClick={() => {
               history.push("/downloads");
-              dispatch(downloadPlaylist({ playlist: playlistItem, request }));
+              dispatch(
+                downloadPlaylist({ playlist: playlistItem, request })
+              );
             }}
           />
         )}

@@ -2,7 +2,7 @@ import React from "react";
 import { Store } from "react-chrome-redux";
 import { render } from "react-dom";
 import { Provider } from "react-redux";
-import { injectGlobal, ThemeProvider } from "styled-components";
+import { ThemeProvider } from "styled-components";
 import App from "./components/App/App";
 import { theme } from "./theme";
 import { BrowserRouter } from "react-router-dom";
@@ -24,13 +24,3 @@ render(
   document.getElementById("root")
 );
 
-injectGlobal`
-  html {
-    font-weight: 400;
-    font-size: 16px;
-  }
-  body {
-    font-family: 'helvetica', sans-serif;
-    margin: 0;
-  }
-`;

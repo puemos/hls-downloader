@@ -17,5 +17,5 @@ export const requestsByActiveTabSelector = createSelector(
   requestItemsSelector,
   activeTabSelector,
   (requests, activeTab) =>
-    R.pipe(R.values, R.filter(R.propEq("tabId", activeTab)))(requests)
+    R.pipe(R.values, R.filter(R.propEq("tabId", activeTab.id)))(requests)
 );

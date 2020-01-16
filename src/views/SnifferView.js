@@ -4,9 +4,11 @@ import RequestRow from "../components/RequestRow";
 import Table from "../components/Table";
 import { requestsByActiveTabSelector } from "../modules/requests/selectors";
 import { Body } from "./Body";
+import { useHistory } from "react-router";
 
 function RequestListView() {
   const requests = useSelector(requestsByActiveTabSelector);
+  const history = useHistory();
 
   return (
     <Body>
@@ -14,7 +16,12 @@ function RequestListView() {
         items={requests}
         emptyMsg="Sorry, i wasn't able to find any HTTP Live Streams"
         renderRow={(requestItem, idx) => (
-          <RequestRow key={requestItem.id || idx} request={requestItem} />
+          <RequestRow
+            tab={requestItem.tab}
+            key={requestItem.id || idx}
+            request={requestItem}
+            onClick={() => history.push(`/request/${requestItem.requestId}`)}
+          />
         )}
       />
     </Body>

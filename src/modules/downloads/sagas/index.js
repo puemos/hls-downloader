@@ -56,7 +56,7 @@ function* downloadPlaylist(action) {
   const QUEUE_CONCURRENT = 4;
 
   const {
-    payload: { playlist, request }
+    payload: { playlist, request, tab }
   } = action;
   const blobBuilder = BlobBuilder();
   try {
@@ -71,7 +71,8 @@ function* downloadPlaylist(action) {
         title: request.url,
         total: segments.length,
         finished: 0,
-        created: Date.now()
+        created: Date.now(),
+        tab: request.tab
       })
     );
 
@@ -111,7 +112,7 @@ function* downloadPlaylist(action) {
       if (allDone) {
         const link = URL.createObjectURL(blobBuilder.build());
         yield put(downloadFinished({ id, link }));
-        yield put(chromeDownload({ id, link }));
+        yield put(chromeDownload({ id, link, title: request.url, tab: request.tab }));
         return;
       }
     }

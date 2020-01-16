@@ -1,13 +1,16 @@
 import React from "react";
 
-export const Trashcan = ({ width = 12, height = 16 }) => (
-  <svg width={width} height={height} viewBox="0 0 12 16">
-    <g>
-      <path
-        fill="currentColor"
-        fillRule="evenodd"
-        d="M11 2H9c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1H2c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1v9c0 .55.45 1 1 1h7c.55 0 1-.45 1-1V5c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm-1 12H3V5h1v8h1V5h1v8h1V5h1v8h1V5h1v9zm1-10H2V3h9v1z"
-      />
-    </g>
+export const Trashcan = ({ width = 16, height = 16 }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={width}
+    height={height}
+    viewBox="0 0 24 24"
+  >
+    <path
+      fill="currentColor"
+      stroke="currentColor"
+      d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm4.151 17.943l-4.143-4.102-4.117 4.159-1.833-1.833 4.104-4.157-4.162-4.119 1.833-1.833 4.155 4.102 4.106-4.16 1.849 1.849-4.1 4.141 4.157 4.104-1.849 1.849z"
+    />
   </svg>
 );

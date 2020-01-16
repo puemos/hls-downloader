@@ -1,4 +1,3 @@
-import * as R from "ramda";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Row } from "react-styled-flexboxgrid";
@@ -10,54 +9,51 @@ import {
   StyledDate,
   StyledRow,
   StyledTitle,
+  StyledSubTitle,
   MoreButton
 } from "../Row/elements";
 import { RightArrow } from "../Svgs/RightArrow";
 import { Copy } from "../Svgs/Copy";
+import { urlnameParse } from "./urlnameParse";
 
-const MoreAction = styled(Link)`
+const MoreAction = styled.div`
   text-decoration: none;
 `;
 
-const urlnameParse = R.ifElse(
-  R.pipe(R.length, R.lt(40)),
-  R.pipe(
-    R.converge(R.concat, [R.take(20), R.pipe(R.takeLast(20), R.concat("..."))])
-  ),
-  R.identity
-);
+function RequestRow(props) {
+  const { request, tab, onClick } = props;
+  const date =
+    new Date(request.timeStamp).toLocaleDateString() +
+    " " +
+    new Date(request.timeStamp).toLocaleTimeString();
 
-class RequestRow extends Component {
-  render() {
-    const { request } = this.props;
-    const date =
-      new Date(request.timeStamp).toLocaleDateString() +
-      " " +
-      new Date(request.timeStamp).toLocaleTimeString();
-
-    return (
-      <StyledRow middle="xs" between="xs">
-        <DetailsRow>
-          <Row start="xs">
-            <StyledTitle title={request.url} xs={10}>
-              {urlnameParse(request.url)}
-            </StyledTitle>
-            <CopyButton onClick={() => copyToClipboard(request.url)}>
-              <Copy></Copy>
-            </CopyButton>
-          </Row>
-          <Row start="xs">
-            <StyledDate xs={12}>{`${date}`}</StyledDate>
-          </Row>
-        </DetailsRow>
-        <MoreAction to={`/request/${request.requestId}`}>
-          <MoreButton>
-            <RightArrow />
-          </MoreButton>
-        </MoreAction>
-      </StyledRow>
-    );
-  }
+  return (
+    <StyledRow middle="xs" between="xs" onClick={onClick}>
+      <DetailsRow>
+        <Row start="xs">
+          <StyledTitle title={tab.title} xs={10}>
+            {tab.title}
+          </StyledTitle>
+        </Row>
+        <Row start="xs">
+          <StyledSubTitle title={request.url} xs={10}>
+            {urlnameParse(request.url)}
+          </StyledSubTitle>
+          <CopyButton onClick={() => copyToClipboard(request.url)}>
+            <Copy></Copy>
+          </CopyButton>
+        </Row>
+        <Row start="xs">
+          <StyledDate xs={12}>{`${date}`}</StyledDate>
+        </Row>
+      </DetailsRow>
+      <MoreAction>
+        <MoreButton>
+          <RightArrow />
+        </MoreButton>
+      </MoreAction>
+    </StyledRow>
+  );
 }
 
 export default RequestRow;
