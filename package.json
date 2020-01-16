@@ -1,5 +1,5 @@
 {
-  "version": "1.6.5",
+  "version": "1.7.0",
   "private": true,
   "scripts": {
     "build": "react-scripts build && parcel build src/background/background.js -d build/static/js --no-source-maps",
