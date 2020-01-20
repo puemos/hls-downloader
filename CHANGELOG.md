@@ -2,6 +2,14 @@
 
 ## 1.7.0
 
+
+### Change
+
+- Change copy button to use text
+- Refactor the github action to use chrome-webstore-upload-cli
+
+## 1.7.0
+
 ### Add
 
 - Auto save
