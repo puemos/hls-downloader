@@ -2,13 +2,20 @@ import { Col, Row } from "react-styled-flexboxgrid";
 import styled, { css } from "styled-components";
 
 export const CopyButton = styled.button`
-  background-color: transparent;
+  background-color: ${props => props.theme.colors.gray200};
   border: 0;
-  color: ${props => props.theme.colors.gray400};
+  color: ${props => props.theme.colors.gray500};
   line-height: 0;
-  font-size: 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
   outline: none;
   cursor: pointer;
+  &:hover {
+    background-color: ${props => props.theme.colors.gray300};
+  }
+  &:active {
+    background-color: ${props => props.theme.colors.gray400};
+  }
 `;
 export const RemoveButton = styled.button`
   position: absolute;

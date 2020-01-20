@@ -1,20 +1,10 @@
-import * as R from "ramda";
 import React from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
-import {
-  CopyButton,
-  DetailsRow,
-  StyledDate,
-  StyledRow,
-  StyledTitle,
-  StyledSubTitle,
-  RemoveButton
-} from "../Row/elements";
-import { Copy } from "../Svgs/Copy";
+import { urlnameParse } from "../RequestRow/urlnameParse";
+import { CopyButton, DetailsRow, RemoveButton, StyledDate, StyledRow, StyledSubTitle, StyledTitle } from "../Row/elements";
 import { Download } from "../Svgs/Download";
 import { Trashcan } from "../Svgs/Trashcan";
-import { urlnameParse } from "../RequestRow/urlnameParse";
 
 const DownloadButton = styled.a`
   background-color: transparent;
@@ -88,7 +78,7 @@ function DownloadRow(props) {
             {urlnameParse(download.title)}
           </StyledSubTitle>
           <CopyButton onClick={() => copyToClipboard(download.title)}>
-            <Copy></Copy>
+            copy
           </CopyButton>
         </Row>
         <Row start="xs">

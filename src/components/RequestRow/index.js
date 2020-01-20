@@ -1,19 +1,9 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import { Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import { copyToClipboard } from "../DownloadRow";
-import {
-  CopyButton,
-  DetailsRow,
-  StyledDate,
-  StyledRow,
-  StyledTitle,
-  StyledSubTitle,
-  MoreButton
-} from "../Row/elements";
+import { CopyButton, DetailsRow, MoreButton, StyledDate, StyledRow, StyledSubTitle, StyledTitle } from "../Row/elements";
 import { RightArrow } from "../Svgs/RightArrow";
-import { Copy } from "../Svgs/Copy";
 import { urlnameParse } from "./urlnameParse";
 
 const MoreAction = styled.div`
@@ -40,7 +30,7 @@ function RequestRow(props) {
             {urlnameParse(request.url)}
           </StyledSubTitle>
           <CopyButton onClick={() => copyToClipboard(request.url)}>
-            <Copy></Copy>
+          copy
           </CopyButton>
         </Row>
         <Row start="xs">

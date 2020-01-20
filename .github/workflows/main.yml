@@ -27,13 +27,7 @@ jobs:
         with:
           args: zip -r extension.zip build
 
-      - name: publish to chrome store
-        uses: trmcnvn/chrome-addon@v2
-        with:
-          # extension is only necessary when updating an existing addon,
-          # omitting it will create a new addon
-          zip: extension.zip
-          extension: ${{ secrets.EXTENSION_ID }}
-          client-id: ${{ secrets.CLIENT_ID }}
-          client-secret: ${{ secrets.CLIENT_SECRET }}
-          refresh-token: ${{ secrets.REFRESH_TOKEN }}
+      - name: upload and publish to chrome store
+        run: |
+          npx chrome-webstore-upload-cli upload --source extension.zip --extension-id ${{ secrets.EXTENSION_ID }} --client-id ${{ secrets.CLIENT_ID }} --client-secret ${{ secrets.CLIENT_SECRET }} --refresh-token ${{ secrets.REFRESH_TOKEN }}
+          npx chrome-webstore-upload-cli publish --client-id ${{ secrets.CLIENT_ID }}
