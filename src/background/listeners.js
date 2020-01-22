@@ -1,4 +1,4 @@
-import * as R from "ramda";
+import { has } from "ramda";
 import { addRequest } from "../modules/requests/action-creators";
 import { store } from "../modules/store";
 import { changeTab, removeTab } from "../modules/tabs/action-creators";
@@ -10,7 +10,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       return;
     }
     const manifest = await parseFile(req.url);
-    if (!R.has("playlists", manifest)) {
+    if (!has("playlists", manifest)) {
       return;
     }
     chrome.tabs.get(req.tabId, tab => {

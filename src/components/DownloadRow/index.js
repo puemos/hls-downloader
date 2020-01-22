@@ -2,7 +2,15 @@ import React from "react";
 import { Col, Row } from "react-styled-flexboxgrid";
 import styled from "styled-components";
 import { urlnameParse } from "../RequestRow/urlnameParse";
-import { CopyButton, DetailsRow, RemoveButton, StyledDate, StyledRow, StyledSubTitle, StyledTitle } from "../Row/elements";
+import {
+  CopyButton,
+  DetailsRow,
+  RemoveButton,
+  StyledDate,
+  StyledRow,
+  StyledSubTitle,
+  StyledTitle
+} from "../Row/elements";
 import { Download } from "../Svgs/Download";
 import { Trashcan } from "../Svgs/Trashcan";
 
@@ -21,8 +29,6 @@ const DownloadButton = styled.a`
     color: ${props => props.theme.colors.gray700};
   }
 `;
-
-
 
 const Progress = styled.span`
   font-size: 0.8rem;
@@ -91,11 +97,7 @@ function DownloadRow(props) {
           <Row middle="xs" center="xs">
             <div>
               {downloadReady ? (
-                <DownloadButton
-                  onClick={() => {
-                    chromeDownload(download);
-                  }}
-                >
+                <DownloadButton onClick={chromeDownload}>
                   <Download />
                 </DownloadButton>
               ) : (
@@ -106,7 +108,7 @@ function DownloadRow(props) {
         </ProgressCol>
         <RemoveCol>
           <Row middle="xs" center="xs">
-            <RemoveButton onClick={() => removeDownload(download.id)}>
+            <RemoveButton onClick={removeDownload}>
               <Trashcan />
             </RemoveButton>
           </Row>

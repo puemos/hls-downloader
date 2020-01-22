@@ -1,4 +1,4 @@
-import * as R from "ramda";
+import { equals, isNil, propEq } from "ramda";
 import { channel } from "redux-saga";
 import {
   all,
@@ -47,7 +47,7 @@ const segmentHandlerFactory = ({
       })
     );
 
-    if (R.equals(blobBuilder.count(), segmentsCount)) {
+    if (equals(blobBuilder.count(), segmentsCount)) {
       yield allDoneChannel.put({ type: "DONE" });
     }
   };
@@ -88,7 +88,7 @@ function* downloadPlaylist(action) {
       }),
       QUEUE_CONCURRENT
     );
-    yield fork(watcher);
+    const watcherTask = yield fork(watcher);
     yield all(
       segments.map((segment, index) =>
         put(addTaskChannel, {
@@ -106,13 +106,16 @@ function* downloadPlaylist(action) {
         cancelDownload: take(REMOVE_DOWNLOAD)
       });
 
-      if (!R.isNil(cancelDownload) && R.propEq("payload", id, cancelDownload)) {
+      if (!isNil(cancelDownload) && propEq("payload", id, cancelDownload)) {
+        yield cancel(watcherTask);
         return;
       }
       if (allDone) {
         const link = URL.createObjectURL(blobBuilder.build());
         yield put(downloadFinished({ id, link }));
-        yield put(chromeDownload({ id, link, title: request.url, tab: request.tab }));
+        yield put(
+          chromeDownload({ id, link, title: request.url, tab: request.tab })
+        );
         return;
       }
     }

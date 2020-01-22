@@ -22,8 +22,8 @@ function DownloadsView() {
           <DownloadRow
             key={downloadItem.id || idx}
             download={downloadItem}
-            removeDownload={downloadId => dispatch(removeDownload(downloadId))}
-            chromeDownload={download => dispatch(chromeDownload(download))}
+            removeDownload={() => dispatch(removeDownload(downloadItem.id))}
+            chromeDownload={() => dispatch(chromeDownload(downloadItem))}
           />
         )}
       />
