@@ -1,7 +1,12 @@
 # HLS downloader changelog
 
-## 1.7.0
+## 1.7.2
 
+### Fix
+
+- [https://github.com/puemos/hls-downloader-chrome-extension/issues/51](After deleting a download the download page is crashing)
+
+## 1.7.1
 
 ### Change
 
