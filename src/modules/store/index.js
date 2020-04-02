@@ -1,4 +1,4 @@
-import { wrapStore } from "react-chrome-redux";
+import { wrapStore } from "webext-redux";
 import { applyMiddleware, createStore } from "redux";
 import createSagaMiddleware from "redux-saga";
 

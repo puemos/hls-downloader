@@ -15,12 +15,10 @@
   "web_accessible_resources": ["/assets/**/*"],
   "permissions": [
     "webRequest",
-    "webRequestBlocking",
     "webNavigation",
     "tabs",
-    "http://*/*",
-    "https://*/*",
-    "debugger",
+    "http://*/*.m3u8",
+    "https://*/*.m3u8",
     "downloads"
   ],
   "icons": {
