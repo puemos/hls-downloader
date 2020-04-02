@@ -28,6 +28,10 @@ jobs:
           args: zip -r extension.zip build
 
       - name: upload and publish to chrome store
+        env: # Or as an environment variable
+          EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
         run: |
-          npx chrome-webstore-upload-cli upload --source extension.zip --extension-id ${{ secrets.EXTENSION_ID }} --client-id ${{ secrets.CLIENT_ID }} --client-secret ${{ secrets.CLIENT_SECRET }} --refresh-token ${{ secrets.REFRESH_TOKEN }}
-          npx chrome-webstore-upload-cli publish --client-id ${{ secrets.CLIENT_ID }}
+          npx chrome-webstore-upload-cli upload --source extension.zip
