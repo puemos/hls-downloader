@@ -6,8 +6,7 @@ node_modules
 coverage
 
 # production
-build
-extension.zip
+dist
 
 # misc
 .DS_Store
