@@ -12,10 +12,9 @@
     "typescript": "3.8.3"
   },
   "dependencies": {
-    "@types/hls.js": "^0.12.6",
     "@types/node": "13.11.0",
     "@types/redux-logger": "3.0.7",
-    "hls.js": "0.13.2",
+    "p-queue": "^6.3.0",
     "redux": "4.0.5",
     "redux-logger": "3.0.6"
   }

@@ -10,14 +10,19 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "@videojs/vhs-utils": "^1.3.0",
+    "core": "../core",
+    "eventemitter3": "4.0.0",
+    "m3u8-parser": "^4.4.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "typescript": "~3.7.2"
+    "typescript": "~3.7.2",
+    "url-toolkit": "^2.1.6"
   },
   "scripts": {
-    "preinstall": "cd ../core && npm install",
-    "prestart": "cd ../core && npm run build",
+    "preinstall": "(cd ../core && yarn)",
+    "prestart": "(cd ../core && yarn build) && yarn add ../core",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
