@@ -1,61 +1,13 @@
 {
-  "version": "1.7.3",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
-    "start": "yarn start:popup | yarn start:background",
-    "start:popup": "react-scripts start",
-    "start:background": "webpack --config background.config.js --mode development --watch",
-    "build": "yarn build:popup | yarn build:background",
-    "build:popup": "react-scripts build",
-    "build:background": "webpack --config background.config.js --mode production",
-    "test": "react-scripts test",
-    "prebuild": "rm -rf build",
-    "prepack": "npm run build",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+
   },
   "dependencies": {
-    "@types/chrome": "0.0.91",
-    "@videojs/vhs-utils": "^1.2.0",
-    "history": "4.10.1",
-    "m3u8-parser": "4.4.0",
-    "normalizr": "^3.2.4",
-    "ramda": "0.27.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-redux": "7.1.3",
-    "react-router": "5.1.2",
-    "react-router-dom": "5.1.2",
-    "react-styled-flexboxgrid": "3.1.0",
-    "redux": "4.0.5",
-    "redux-saga": "1.1.3",
-    "remote-redux-devtools": "0.5.16",
-    "reselect": "^3.0.1",
-    "sanitize-filename": "^1.6.3",
-    "styled-components": "5.0.0",
-    "typeface-open-sans": "0.0.54",
-    "uuid": "^3.2.1",
-    "webext-redux": "^2.1.6"
+
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
-    "@storybook/addon-actions": "5.2.8",
-    "@storybook/addon-links": "5.2.8",
-    "@storybook/addons": "5.2.8",
-    "@storybook/react": "5.2.8",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "babel-loader": "^8.1.0",
-    "react-scripts": "3.4.1",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
-  },
-  "eslintConfig": {
-    "extends": "react-app",
-    "env": {
-      "webextensions": true
-    }
+
   }
 }
