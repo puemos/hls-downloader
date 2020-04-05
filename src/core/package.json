@@ -20,6 +20,9 @@
     "@types/redux-logger": "3.0.7",
     "p-queue": "^6.3.0",
     "redux": "4.0.5",
-    "redux-logger": "3.0.6"
+    "redux-logger": "3.0.6",
+    "redux-observable": "^1.2.0",
+    "rxjs": "^6.5.5",
+    "typesafe-actions": "^5.1.0"
   }
 }

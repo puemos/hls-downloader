@@ -8,7 +8,7 @@ import { IParser } from "../services/Parser";
 import { getFragmentsDetailsFactory } from "../useCases/getFragmentsDetails";
 import { saveFragmentFactory } from "./saveFragment";
 
-export const saveLevelFactory = (
+export const savePlaylistFactory = (
   config: Config,
   loader: ILoader,
   decryptor: IDecryptor,
