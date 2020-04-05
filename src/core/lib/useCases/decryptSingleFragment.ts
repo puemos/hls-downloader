@@ -1,8 +1,8 @@
-import { Decryptor } from "../services/Decryptor";
-import { Loader } from "../services/Loader";
+import { IDecryptor } from "../services/Decryptor";
+import { ILoader } from "../services/Loader";
 import { Key } from "../entities/key";
 
-export const decryptSingleFragmentFactory = (loader: Loader, decryptor: Decryptor) => {
+export const decryptSingleFragmentFactory = (loader: ILoader, decryptor: IDecryptor) => {
   const run = async (key: Key, data: ArrayBuffer): Promise<ArrayBuffer> => {
     if (!key.uri || !key.iv) {
       return data;

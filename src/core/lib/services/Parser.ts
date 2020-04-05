@@ -1,8 +1,8 @@
 import { Fragment } from "../entities/fragment";
-import { Level } from "../entities/level";
+import { Playlist } from "../entities/playlist";
 
-export interface Parser {
-  parseMasterPlaylist(string: string, baseurl: string): Level[];
+export interface IParser {
+  parseMasterPlaylist(string: string, baseurl: string): Playlist[];
   parseLevelPlaylist(
     string: string,
     baseurl: string,
