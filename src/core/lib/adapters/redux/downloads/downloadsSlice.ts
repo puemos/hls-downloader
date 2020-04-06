@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Playlist } from "../../../entities/playlist";
-import { of } from "rxjs";
-import { map, catchError } from "rxjs/operators";
 import { ActionType } from "typesafe-actions";
+import { Playlist } from "../../../entities/playlist";
 
 export interface IDownloadsState {
   playlists: Record<string, Playlist>;
@@ -10,15 +8,15 @@ export interface IDownloadsState {
 }
 
 export type PlaylistStatus = {
+  status: "downloading" | "done";
   total: number;
   done: number;
 };
 export interface IDownloadPlaylistPayload {
   playlist: Playlist;
 }
-export interface IUpdateDownloadStatusPayload {
+export interface IFinishDownloadPayload {
   playlistID: string;
-  status: PlaylistStatus;
 }
 export interface IIncStatusPayload {
   playlistID: string;
@@ -33,20 +31,24 @@ export const downloadsSlice = createSlice({
   name: "downloads",
   initialState: initialDownloadsState,
   reducers: {
-    addDownload(state, action: PayloadAction<IDownloadPlaylistPayload>) {
+    downloadPlaylist(state, action: PayloadAction<IDownloadPlaylistPayload>) {
       const { playlist } = action.payload;
+
       state.playlists[playlist.uri] = playlist;
     },
-    updateDownloadStatus(
-      state,
-      action: PayloadAction<IUpdateDownloadStatusPayload>
-    ) {
-      const { playlistID, status } = action.payload;
-      state.playlistsStatus[playlistID] = status;
+    finishDownload(state, action: PayloadAction<IFinishDownloadPayload>) {
+      const { playlistID } = action.payload;
+      const playlistStatus = state.playlistsStatus[playlistID];
+
+      playlistStatus.done = playlistStatus.total;
+      playlistStatus.status = "done";
     },
     incDownloadStatus(state, action: PayloadAction<IIncStatusPayload>) {
       const { playlistID } = action.payload;
-      state.playlistsStatus[playlistID].done++;
+      const playlistStatus = state.playlistsStatus[playlistID];
+
+      playlistStatus.status = "downloading";
+      playlistStatus.done++;
     },
   },
 });

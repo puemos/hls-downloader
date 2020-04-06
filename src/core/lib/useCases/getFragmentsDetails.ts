@@ -3,10 +3,20 @@ import { Playlist } from "../entities/playlist";
 import { Fragment } from "../entities/fragment";
 import { ILoader } from "../services/Loader";
 
-export const getFragmentsDetailsFactory = (loader: ILoader, parser: IParser) => {
-  const run = async (playlist: Playlist): Promise<Fragment[]> => {
+export const getFragmentsDetailsFactory = (
+  loader: ILoader,
+  parser: IParser
+) => {
+  const run = async (
+    playlist: Playlist
+  ): Promise<Fragment[]> => {
     const levelPlaylistText = await loader.fetchText(playlist.uri);
-    return parser.parseLevelPlaylist(levelPlaylistText, playlist.uri, playlist.index);
+    const fragments = parser.parseLevelPlaylist(
+      levelPlaylistText,
+      playlist.uri,
+      playlist.index
+    );
+    return fragments;
   };
   return run;
 };
