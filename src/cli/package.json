@@ -1,0 +1,24 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "author": "puemos",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "preinstall": "(cd ../core && yarn)",
+    "prestart": "(cd ../core && yarn build) && yarn add ../core",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "3.8.3"
+  },
+  "dependencies": {
+
+    "@types/node": "13.11.0"
+
+  }
+}
