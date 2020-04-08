@@ -1,9 +1,13 @@
-export function fetchText(url: string) {
-  return fetch(url).then((res) => res.text());
+import fetch from "node-fetch";
+
+export async function fetchText(url: string) {
+  const res = await fetch(url);
+  return await res.text();
 }
 
-export function fetchArrayBuffer(url: string) {
-  return fetch(url).then((res) => res.arrayBuffer());
+export async function fetchArrayBuffer(url: string) {
+  const res = await fetch(url);
+  return await res.arrayBuffer();
 }
 
 export const Fetch = {

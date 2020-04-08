@@ -1,21 +1,24 @@
-import { Action, configureStore } from "@reduxjs/toolkit";
+import { Action, configureStore, Middleware } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware } from "redux-observable";
-import { downloadPlaylistFragmentEpic } from "../../controller/downloadPlaylistEpic";
+import { downloadPlaylistEpics } from "../../controller/downloadPlaylistEpics";
+import { Dependencies } from "../../services/Dependencies";
 import { rootReducer, RootState } from "./rootReducer";
 
-const epicMiddleware = createEpicMiddleware<
-  Action<any>,
-  Action<any>,
-  RootState
->();
+export function createStore(dependencies: Dependencies) {
+  const epicMiddleware = createEpicMiddleware<
+    Action<any>,
+    Action<any>,
+    RootState
+  >({ dependencies });
 
-const rootEpic = combineEpics(downloadPlaylistFragmentEpic);
+  const rootEpic = combineEpics(downloadPlaylistEpics);
 
-const store = configureStore<RootState>({
-  reducer: rootReducer,
-  middleware: [epicMiddleware],
-});
+  const store = configureStore<RootState, Action<any>, Middleware[]>({
+    reducer: rootReducer,
+    middleware: [epicMiddleware],
+  });
 
-epicMiddleware.run(rootEpic);
+  epicMiddleware.run(rootEpic);
 
-type AppDispatch = typeof store.dispatch;
+  return store;
+}

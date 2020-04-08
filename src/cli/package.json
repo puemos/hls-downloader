@@ -11,14 +11,21 @@
   "scripts": {
     "preinstall": "(cd ../core && yarn)",
     "prestart": "(cd ../core && yarn build) && yarn add ../core",
-    "build": "tsc"
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "devDependencies": {
     "typescript": "3.8.3"
   },
   "dependencies": {
-
-    "@types/node": "13.11.0"
-
+    "@types/inquirer": "^6.5.0",
+    "@types/node": "13.11.0",
+    "@types/node-fetch": "^2.5.5",
+    "@videojs/vhs-utils": "^1.3.0",
+    "core": "../core",
+    "inquirer": "^7.1.0",
+    "m3u8-parser": "^4.4.0",
+    "node-fetch": "^2.6.0"
   }
 }

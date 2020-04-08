@@ -1,11 +1,11 @@
 // @ts-ignore
 import { Parser } from "m3u8-parser";
 // @ts-ignore
-import resolveUrl from "@videojs/vhs-utils/dist/resolve-url";
+import * as resolveUrl from "@videojs/vhs-utils/dist/resolve-url";
 import { Fragment } from "core/dist/entities/fragment";
-import { Level } from "core/dist/entities/level";
+import { Playlist } from "core/dist/entities/playlist";
 
-function parseMasterPlaylist(string: string, baseurl: string): Level[] {
+function parseMasterPlaylist(string: string, baseurl: string): Playlist[] {
   // @ts-ignore
   const parser = new Parser();
   parser.push(string);
@@ -32,8 +32,8 @@ function parseLevelPlaylist(
     index: index,
     uri: resolveUrl(baseurl, s.uri),
     key: {
-      iv: s.decryptdata?.iv,
-      uri: s.decryptdata?.uri,
+      iv: null,
+      uri: null,
     },
   }));
 }
