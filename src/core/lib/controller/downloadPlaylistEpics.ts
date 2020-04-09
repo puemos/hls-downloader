@@ -1,6 +1,6 @@
-import { Epic, combineEpics } from "redux-observable";
+import { combineEpics, Epic } from "redux-observable";
 import { from, of } from "rxjs";
-import { filter, map, mergeMap, concatAll, concatMap } from "rxjs/operators";
+import { filter, map, mergeMap } from "rxjs/operators";
 import {
   DownloadAction,
   downloadsSlice,
@@ -9,8 +9,10 @@ import { RootState } from "../adapters/redux/rootReducer";
 import { Dependencies } from "../services/Dependencies";
 import { downloadSingleFragmentFactory } from "../useCases/downloadSingleFragment";
 import { getFragmentsDetailsFactory } from "../useCases/getFragmentsDetails";
+import { mergeBucketFactory } from "../useCases/mergeBucket";
+import { writeToBucketFactory } from "../useCases/writeToBucket";
 import { writeToFileFactory } from "../useCases/writeToFile";
-import { appendToFileFactory } from "../useCases/appendToFile";
+import { createBucketFactory } from "../useCases/writeToBucket copy";
 
 export const fetchPlaylistFragmentsDetailsEpic: Epic<
   DownloadAction,
@@ -21,13 +23,6 @@ export const fetchPlaylistFragmentsDetailsEpic: Epic<
   return action$.pipe(
     filter(downloadsSlice.actions.downloadPlaylist.match),
     map((action) => action.payload.playlist),
-    mergeMap(
-      (playlist) =>
-        from(
-          writeToFileFactory(fs)(`${playlist.id}.mp4`, new ArrayBuffer(0))
-        ).pipe(),
-      (playlist) => playlist
-    ),
     mergeMap(
       (playlist) =>
         from(getFragmentsDetailsFactory(loader, parser)(playlist)).pipe(),
@@ -56,9 +51,17 @@ export const downloadPlaylistFragmentsEpic: Epic<
   return action$.pipe(
     filter(downloadsSlice.actions.fetchPlaylistFragmentsDetails.match),
     map((action) => action.payload),
-    concatMap(({ fragments, playlistID }) =>
+    mergeMap(
+      ({ fragments, playlistID }) =>
+        from(createBucketFactory(fs)(playlistID, fragments.length)),
+      ({ fragments, playlistID }) => ({
+        fragments,
+        playlistID,
+      })
+    ),
+    mergeMap(({ fragments, playlistID }) =>
       from(fragments).pipe(
-        concatMap(
+        mergeMap(
           (fragment) => from(downloadSingleFragmentFactory(loader)(fragment)),
           (fragment, data) => ({
             fragment,
@@ -68,9 +71,9 @@ export const downloadPlaylistFragmentsEpic: Epic<
         )
       )
     ),
-    concatMap(
+    mergeMap(
       ({ data, playlistID, fragment }) =>
-        appendToFileFactory(fs)(`${playlistID}.mp4`, data),
+        writeToBucketFactory(fs)(playlistID, fragment.index, data),
       ({ playlistID }) => ({
         playlistID,
       })
@@ -85,7 +88,7 @@ export const downloadPlaylistFragmentsEpic: Epic<
   );
 };
 
-export const finishPlaylistFragmentsEpic: Epic<
+export const incDownloadStatusEpic: Epic<
   DownloadAction,
   DownloadAction,
   RootState,
@@ -106,8 +109,29 @@ export const finishPlaylistFragmentsEpic: Epic<
   );
 };
 
+export const finishPlaylistFragmentsEpic: Epic<
+  DownloadAction,
+  null,
+  RootState,
+  Dependencies
+> = (action$, _store$, { fs }) => {
+  return action$.pipe(
+    filter(downloadsSlice.actions.finishDownload.match),
+    map((action) => action.payload.playlistID),
+    mergeMap(
+      (playlistID) => from(mergeBucketFactory(fs)(playlistID)),
+      (playlistID, data) => ({ playlistID, data })
+    ),
+    mergeMap(({ playlistID, data }) =>
+      from(writeToFileFactory(fs)(`${playlistID}.mp4`, data))
+    ),
+    mergeMap(() => of(null))
+  );
+};
+
 export const downloadPlaylistEpics = combineEpics(
   fetchPlaylistFragmentsDetailsEpic,
   downloadPlaylistFragmentsEpic,
+  incDownloadStatusEpic,
   finishPlaylistFragmentsEpic
 );

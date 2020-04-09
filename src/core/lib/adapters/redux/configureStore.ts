@@ -3,6 +3,7 @@ import { combineEpics, createEpicMiddleware } from "redux-observable";
 import { downloadPlaylistEpics } from "../../controller/downloadPlaylistEpics";
 import { Dependencies } from "../../services/Dependencies";
 import { rootReducer, RootState } from "./rootReducer";
+import logger from "redux-logger";
 
 export function createStore(dependencies: Dependencies) {
   const epicMiddleware = createEpicMiddleware<
@@ -15,7 +16,7 @@ export function createStore(dependencies: Dependencies) {
 
   const store = configureStore<RootState, Action<any>, Middleware[]>({
     reducer: rootReducer,
-    middleware: [epicMiddleware],
+    middleware: [/*logger*/ epicMiddleware],
   });
 
   epicMiddleware.run(rootEpic);

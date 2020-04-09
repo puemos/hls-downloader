@@ -24,6 +24,7 @@
     "@types/node-fetch": "^2.5.5",
     "@videojs/vhs-utils": "^1.3.0",
     "core": "../core",
+    "fs-chunk-store": "^2.0.1",
     "inquirer": "^7.1.0",
     "m3u8-parser": "^4.4.0",
     "node-fetch": "^2.6.0"
