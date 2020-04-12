@@ -8,7 +8,7 @@ export interface IDownloadsState {
   playlistsStatus: Record<string, PlaylistStatus>;
 }
 export interface PlaylistStatus {
-  status: "downloading" | "done" | "merging";
+  status: "downloading" | "done" | "merging" | "init";
   total: number;
   done: number;
 }
@@ -49,10 +49,9 @@ export const downloadsSlice = createSlice({
       state.playlistsStatus[playlistID] = {
         done: 0,
         total: fragments.length,
-        status: "downloading",
+        status: "init",
       };
     },
-
     finishDownload(state, action: PayloadAction<IFinishDownloadPayload>) {
       const { playlistID } = action.payload;
       const playlistStatus = state.playlistsStatus[playlistID];
@@ -63,10 +62,11 @@ export const downloadsSlice = createSlice({
     incDownloadStatus(state, action: PayloadAction<IIncStatusPayload>) {
       const { playlistID } = action.payload;
       const playlistStatus = state.playlistsStatus[playlistID];
-
+      
       playlistStatus.status = "downloading";
       playlistStatus.done++;
     },
+    saveDownload() {},
   },
 });
 

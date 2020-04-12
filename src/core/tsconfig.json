@@ -2,8 +2,11 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "outDir": "./dist",
     "declaration": true,
-    "lib": ["es2015", "dom"]
-  }
+    "strict": true,
+    "lib": ["es2015", "dom"],
+    "outDir": "lib",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*"]
 }

@@ -12,7 +12,7 @@ import { getFragmentsDetailsFactory } from "../useCases/getFragmentsDetails";
 import { mergeBucketFactory } from "../useCases/mergeBucket";
 import { writeToBucketFactory } from "../useCases/writeToBucket";
 import { writeToFileFactory } from "../useCases/writeToFile";
-import { createBucketFactory } from "../useCases/writeToBucket copy";
+import { createBucketFactory } from "../useCases/createBucketFactory";
 
 export const fetchPlaylistFragmentsDetailsEpic: Epic<
   DownloadAction,
@@ -111,7 +111,7 @@ export const incDownloadStatusEpic: Epic<
 
 export const finishPlaylistFragmentsEpic: Epic<
   DownloadAction,
-  null,
+  DownloadAction,
   RootState,
   Dependencies
 > = (action$, _store$, { fs }) => {
@@ -125,7 +125,7 @@ export const finishPlaylistFragmentsEpic: Epic<
     mergeMap(({ playlistID, data }) =>
       from(writeToFileFactory(fs)(`${playlistID}.mp4`, data))
     ),
-    mergeMap(() => of(null))
+    mergeMap(() => of(downloadsSlice.actions.saveDownload()))
   );
 };
 

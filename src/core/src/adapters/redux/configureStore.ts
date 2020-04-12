@@ -4,17 +4,18 @@ import { downloadPlaylistEpics } from "../../controller/downloadPlaylistEpics";
 import { Dependencies } from "../../services/Dependencies";
 import { rootReducer, RootState } from "./rootReducer";
 import logger from "redux-logger";
+import { DownloadAction } from "./downloads/downloadsSlice";
 
 export function createStore(dependencies: Dependencies) {
   const epicMiddleware = createEpicMiddleware<
-    Action<any>,
-    Action<any>,
+    DownloadAction,
+    DownloadAction,
     RootState
   >({ dependencies });
 
   const rootEpic = combineEpics(downloadPlaylistEpics);
 
-  const store = configureStore<RootState, Action<any>, Middleware[]>({
+  const store = configureStore<RootState, DownloadAction, Middleware[]>({
     reducer: rootReducer,
     middleware: [/*logger*/ epicMiddleware],
   });
@@ -23,3 +24,5 @@ export function createStore(dependencies: Dependencies) {
 
   return store;
 }
+
+export type Store = ReturnType<typeof createStore>;

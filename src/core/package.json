@@ -1,16 +1,16 @@
 {
-  "name": "core",
+  "name": "@hls-downloader/core",
   "version": "1.0.0",
   "author": "puemos",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
-    "dist"
+    "lib"
   ],
   "scripts": {
     "build": "tsc",
-    "prebuild": "rm -rf dist"
+    "prebuild": "rm -rf lib"
   },
   "devDependencies": {
     "typescript": "3.8.3"
