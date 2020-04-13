@@ -7,6 +7,7 @@ import * as serviceWorker from "./serviceWorker";
 import { CryptoDecryptor } from "./services/CryptoDecryptor";
 import { InMemoryFS } from "./services/InMemoryFS";
 import { Fetch } from "./services/Fetch";
+import { M3u8Parser } from "./services/M3u8Parser";
 
 ReactDOM.render(
   <Provider
@@ -15,7 +16,7 @@ ReactDOM.render(
       decryptor: CryptoDecryptor,
       fs: InMemoryFS,
       loader: Fetch,
-      parser: M3u8Parser
+      parser: M3u8Parser,
     })}
   >
     <React.StrictMode>
