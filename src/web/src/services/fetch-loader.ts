@@ -6,7 +6,7 @@ export function fetchArrayBuffer(url: string) {
   return fetch(url).then((res) => res.arrayBuffer());
 }
 
-export const Fetch = {
+export const FetchLoader = {
   fetchText,
   fetchArrayBuffer,
 };

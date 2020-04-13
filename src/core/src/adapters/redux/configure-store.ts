@@ -1,8 +1,8 @@
 import { configureStore, Middleware } from "@reduxjs/toolkit";
 import { createEpicMiddleware } from "redux-observable";
-import { createRootEpic } from "../../controller/root-epic";
+import { createRootEpic } from "../../controllers/root-epic";
 import { Dependencies } from "../../services";
-import { DownloadAction } from "./downloads-slice";
+import { DownloadAction } from "./slices";
 import { rootReducer, RootState } from "./root-reducer";
 
 export function createStore(dependencies: Dependencies) {

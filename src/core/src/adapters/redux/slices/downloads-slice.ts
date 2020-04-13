@@ -1,11 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ActionType } from "typesafe-actions";
-import { Fragment, Playlist, PlaylistStatus } from "../../entities";
+import { Fragment, Playlist, PlaylistStatus } from "../../../entities";
 
 export interface IDownloadsState {
   playlists: Record<string, Playlist>;
   playlistsStatus: Record<string, PlaylistStatus>;
 }
+const initialDownloadsState: IDownloadsState = {
+  playlistsStatus: {},
+  playlists: {},
+};
+
 export interface IFetchPlaylistFragmentsDetailsPayload {
   playlistID: string;
   fragments: Fragment[];
@@ -13,17 +18,18 @@ export interface IFetchPlaylistFragmentsDetailsPayload {
 export interface IDownloadPlaylistPayload {
   playlist: Playlist;
 }
-export interface IFinishDownloadPayload {
+export interface IFinishPlaylistDownloadPayload {
   playlistID: string;
 }
-export interface IIncStatusPayload {
+export interface IIncPlaylistDownloadStatusPayload {
   playlistID: string;
 }
-
-const initialDownloadsState: IDownloadsState = {
-  playlistsStatus: {},
-  playlists: {},
-};
+export interface ISavePlaylistToFilePayload {
+  playlistID: string;
+}
+export interface ISavePlaylistToFileSuccessPayload {
+  playlistID: string;
+}
 
 export const downloadsSlice = createSlice({
   name: "downloads",
@@ -46,22 +52,46 @@ export const downloadsSlice = createSlice({
         status: "init",
       };
     },
-    finishDownload(state, action: PayloadAction<IFinishDownloadPayload>) {
+    finishPlaylistDownload(
+      state,
+      action: PayloadAction<IFinishPlaylistDownloadPayload>
+    ) {
       const { playlistID } = action.payload;
       const playlistStatus = state.playlistsStatus[playlistID];
 
       playlistStatus.done = playlistStatus.total;
-      playlistStatus.status = "merging";
+      playlistStatus.status = "ready";
     },
-    incDownloadStatus(state, action: PayloadAction<IIncStatusPayload>) {
+    incPlaylistDownloadStatus(
+      state,
+      action: PayloadAction<IIncPlaylistDownloadStatusPayload>
+    ) {
       const { playlistID } = action.payload;
       const playlistStatus = state.playlistsStatus[playlistID];
-      
+
       playlistStatus.status = "downloading";
       playlistStatus.done++;
     },
-    saveDownload() {},
+    savePlaylistToFile(
+      state,
+      action: PayloadAction<ISavePlaylistToFilePayload>
+    ) {
+      const { playlistID } = action.payload;
+      const playlistStatus = state.playlistsStatus[playlistID];
+
+      playlistStatus.status = "saving";
+    },
+    savePlaylistToFileSuccess(
+      state,
+      action: PayloadAction<ISavePlaylistToFileSuccessPayload>
+    ) {
+      const { playlistID } = action.payload;
+      const playlistStatus = state.playlistsStatus[playlistID];
+
+      playlistStatus.status = "done";
+    },
   },
 });
 
 export type DownloadAction = ActionType<typeof downloadsSlice.actions>;
+export const downloadsActions = downloadsSlice.actions;

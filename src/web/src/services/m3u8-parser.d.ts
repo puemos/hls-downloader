@@ -1,11 +1,11 @@
 declare module "m3u8-parser" {
-  declare var Parser: Parser;
-  interface Parser {
-    new (): Parser;
+  var Parser: M3U8Parser;
+  interface M3U8Parser {
+    new (): M3U8Parser;
     manifest: Manifest;
     push(chunk: string): void;
   }
-  type Segment = {
+  type M3U8Segment = {
     byterange: {
       length: number;
       offset: number;
@@ -33,7 +33,7 @@ declare module "m3u8-parser" {
     custom: {};
   };
 
-  type Playlist = {
+  type M3U8Playlist = {
     uri: string;
     attributes: {
       "PROGRAM-ID"?: number;
@@ -52,8 +52,8 @@ declare module "m3u8-parser" {
     discontinuitySequence: number;
     playlistType: string;
     custom: {};
-    playlists?: Playlist[];
-    segments: Segment[];
+    playlists?: M3U8Playlist[];
+    segments: M3U8Segment[];
     mediaGroups: {
       AUDIO: {
         "GROUP-ID": {

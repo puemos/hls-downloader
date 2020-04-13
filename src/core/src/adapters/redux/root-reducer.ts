@@ -1,5 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import { downloadsSlice } from "./downloads-slice";
+import { downloadsSlice } from "./slices";
 
 export const rootReducer = combineReducers({
   downloads: downloadsSlice.reducer,

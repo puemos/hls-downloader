@@ -1,5 +1,7 @@
+type PlaylistStatusType = "downloading" | "done" | "ready" | "init" | "saving";
+
 export interface PlaylistStatus {
-  status: "downloading" | "done" | "merging" | "init";
+  status: PlaylistStatusType;
   total: number;
   done: number;
 }

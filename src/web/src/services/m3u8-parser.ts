@@ -1,9 +1,11 @@
-import { IParser } from "@hls-downloader/core/lib/services/Parser";
-import { Fragment } from "@hls-downloader/core/lib/entities/fragment";
-import { Playlist } from "@hls-downloader/core/lib/entities/playlist";
-import { Parser } from "m3u8-parser";
+/// <reference path="m3u8-parser.d.ts" />
+
+import { Fragment, Playlist } from "@hls-downloader/core/lib/entities";
+import { IParser } from "@hls-downloader/core/lib/services";
 import { buildAbsoluteURL } from "url-toolkit";
 import { v4 } from "uuid";
+import { Parser } from "m3u8-parser";
+
 export const M3u8Parser: IParser = {
   parseLevelPlaylist(
     string: string,
