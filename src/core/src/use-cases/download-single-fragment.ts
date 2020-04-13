@@ -1,5 +1,5 @@
-import { Fragment } from "../entities/fragment";
-import { ILoader } from "../services/Loader";
+import { Fragment } from "../entities";
+import { ILoader } from "../services";
 
 export const downloadSingleFragmentFactory = (loader: ILoader) => {
   const run = async (

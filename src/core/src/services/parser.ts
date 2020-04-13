@@ -1,5 +1,4 @@
-import { Fragment } from "../entities/fragment";
-import { Playlist } from "../entities/playlist";
+import { Fragment, Playlist } from "../entities";
 
 export interface IParser {
   parseMasterPlaylist(string: string, baseurl: string): Playlist[];

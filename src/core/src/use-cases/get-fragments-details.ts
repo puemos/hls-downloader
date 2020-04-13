@@ -1,7 +1,5 @@
-import { IParser } from "../services/Parser";
-import { Playlist } from "../entities/playlist";
-import { Fragment } from "../entities/fragment";
-import { ILoader } from "../services/Loader";
+import { Fragment, Playlist } from "../entities";
+import { ILoader, IParser } from "../services";
 
 export const getFragmentsDetailsFactory = (
   loader: ILoader,

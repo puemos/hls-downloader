@@ -1,4 +1,4 @@
-import { IFS } from "../services/FS";
+import { IFS } from "../services";
 
 export const writeToBucketFactory = (fs: IFS) => {
   const run = async (

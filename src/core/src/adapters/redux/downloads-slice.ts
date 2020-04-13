@@ -1,16 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ActionType } from "typesafe-actions";
-import { Playlist } from "../../../entities/playlist";
-import { Fragment } from "../../../entities/fragment";
+import { Fragment, Playlist, PlaylistStatus } from "../../entities";
 
 export interface IDownloadsState {
   playlists: Record<string, Playlist>;
   playlistsStatus: Record<string, PlaylistStatus>;
-}
-export interface PlaylistStatus {
-  status: "downloading" | "done" | "merging" | "init";
-  total: number;
-  done: number;
 }
 export interface IFetchPlaylistFragmentsDetailsPayload {
   playlistID: string;

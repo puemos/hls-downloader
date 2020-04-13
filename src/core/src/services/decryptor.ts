@@ -1,5 +1,3 @@
-import { Key } from "../entities/key";
-
 export interface IDecryptor {
   decrypt(
     data: ArrayBuffer,

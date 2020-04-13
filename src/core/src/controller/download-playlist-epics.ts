@@ -1,18 +1,20 @@
-import { combineEpics, Epic } from "redux-observable";
+import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
 import {
   DownloadAction,
   downloadsSlice,
-} from "../adapters/redux/downloads/downloadsSlice";
-import { RootState } from "../adapters/redux/rootReducer";
-import { Dependencies } from "../services/Dependencies";
-import { downloadSingleFragmentFactory } from "../useCases/downloadSingleFragment";
-import { getFragmentsDetailsFactory } from "../useCases/getFragmentsDetails";
-import { mergeBucketFactory } from "../useCases/mergeBucket";
-import { writeToBucketFactory } from "../useCases/writeToBucket";
-import { writeToFileFactory } from "../useCases/writeToFile";
-import { createBucketFactory } from "../useCases/createBucketFactory";
+} from "../adapters/redux/downloads-slice";
+import { RootState } from "../adapters/redux/root-reducer";
+import { Dependencies } from "../services";
+import {
+  createBucketFactory,
+  downloadSingleFragmentFactory,
+  getFragmentsDetailsFactory,
+  mergeBucketFactory,
+  writeToBucketFactory,
+  writeToFileFactory,
+} from "../use-cases";
 
 export const fetchPlaylistFragmentsDetailsEpic: Epic<
   DownloadAction,
@@ -47,7 +49,7 @@ export const downloadPlaylistFragmentsEpic: Epic<
   DownloadAction,
   RootState,
   Dependencies
-> = (action$, _store, { fs, loader }) => {
+> = (action$, _store, { fs, loader, config }) => {
   return action$.pipe(
     filter(downloadsSlice.actions.fetchPlaylistFragmentsDetails.match),
     map((action) => action.payload),
@@ -67,7 +69,8 @@ export const downloadPlaylistFragmentsEpic: Epic<
             fragment,
             data,
             playlistID,
-          })
+          }),
+          config.concurrency
         )
       )
     ),
@@ -128,10 +131,3 @@ export const finishPlaylistFragmentsEpic: Epic<
     mergeMap(() => of(downloadsSlice.actions.saveDownload()))
   );
 };
-
-export const downloadPlaylistEpics = combineEpics(
-  fetchPlaylistFragmentsDetailsEpic,
-  downloadPlaylistFragmentsEpic,
-  incDownloadStatusEpic,
-  finishPlaylistFragmentsEpic
-);

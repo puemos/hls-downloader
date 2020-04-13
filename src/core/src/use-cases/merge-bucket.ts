@@ -1,4 +1,4 @@
-import { IFS } from "../services/FS";
+import { IFS } from "../services";
 
 export const mergeBucketFactory = (fs: IFS) => {
   const run = async (bucketID: string): Promise<ArrayBuffer> => {

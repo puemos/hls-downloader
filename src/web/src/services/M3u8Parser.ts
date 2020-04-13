@@ -14,10 +14,15 @@ export const M3u8Parser: IParser = {
     parser.push(string);
     return parser.manifest.segments.map((segment, index) => ({
       index,
-      key: {
-        iv: segment.key.iv,
-        uri: buildAbsoluteURL(baseurl, segment.key.uri),
-      },
+      key: segment.key
+        ? {
+            iv: segment.key.iv,
+            uri: buildAbsoluteURL(baseurl, segment.key.uri),
+          }
+        : {
+            iv: null,
+            uri: null,
+          },
       uri: buildAbsoluteURL(baseurl, segment.uri),
     }));
   },

@@ -1,6 +1,5 @@
-import { IParser } from "../services/Parser";
-import { Playlist } from "../entities/playlist";
-import { ILoader } from "../services/Loader";
+import { Playlist } from "../entities";
+import { ILoader, IParser } from "../services";
 
 export const getLevelsFactory = (loader: ILoader, parser: IParser) => {
   const run = async (masterPlaylistURI: string): Promise<Playlist[]> => {

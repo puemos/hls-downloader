@@ -1,4 +1,4 @@
-import { IFS } from "../services/FS";
+import { IFS } from "../services";
 
 export const writeToFileFactory = (fs: IFS) => {
   const run = async (path: string, data: ArrayBuffer): Promise<void> => {

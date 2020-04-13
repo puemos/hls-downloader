@@ -1,6 +1,5 @@
-import { IDecryptor } from "../services/Decryptor";
-import { ILoader } from "../services/Loader";
-import { Key } from "../entities/key";
+import { Key } from "../entities";
+import { IDecryptor, ILoader } from "../services";
 
 export const decryptSingleFragmentFactory = (
   loader: ILoader,

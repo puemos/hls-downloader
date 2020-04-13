@@ -22,6 +22,12 @@ export class InMemoryBucket implements Bucket {
       offset += arr.byteLength;
     }
 
+    const link = URL.createObjectURL(
+      new Blob([result], {
+        type: "video/MP2T",
+      })
+    );
+    prompt(link);
     return Promise.resolve(result);
   }
 }
