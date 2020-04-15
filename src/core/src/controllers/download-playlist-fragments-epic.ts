@@ -1,11 +1,8 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootState } from "../adapters/redux/root-reducer";
-import {
-  DownloadAction,
-  downloadsActions,
-} from "../adapters/redux/slices/downloads-slice";
+import { RootState, RootAction } from "../adapters/redux/root-reducer";
+import { levelsSlice } from "../adapters/redux/slices/levels-slice";
 import { Dependencies } from "../services";
 import {
   createBucketFactory,
@@ -14,48 +11,47 @@ import {
 } from "../use-cases";
 
 export const downloadPlaylistFragmentsEpic: Epic<
-  DownloadAction,
-  DownloadAction,
+  RootAction,
+  RootAction,
   RootState,
   Dependencies
-> = (action$, _store, { fs, loader, config }) => {
-  return action$.pipe(
-    filter(downloadsActions.fetchPlaylistFragmentsDetails.match),
+> = (action$, _store, { fs, loader, config }) =>
+  action$.pipe(
+    filter(levelsSlice.actions.fetchLevelFragmentsDetails.match),
     map((action) => action.payload),
     mergeMap(
-      ({ fragments, playlistID }) =>
-        from(createBucketFactory(fs)(playlistID, fragments.length)),
-      ({ fragments, playlistID }) => ({
+      ({ fragments, levelID }) =>
+        from(createBucketFactory(fs)(levelID, fragments.length)),
+      ({ fragments, levelID }) => ({
         fragments,
-        playlistID,
+        levelID,
       })
     ),
-    mergeMap(({ fragments, playlistID }) =>
+    mergeMap(({ fragments, levelID }) =>
       from(fragments).pipe(
         mergeMap(
           (fragment) => from(downloadSingleFragmentFactory(loader)(fragment)),
           (fragment, data) => ({
             fragment,
             data,
-            playlistID,
+            levelID,
           }),
           config.concurrency
         )
       )
     ),
     mergeMap(
-      ({ data, playlistID, fragment }) =>
-        writeToBucketFactory(fs)(playlistID, fragment.index, data),
-      ({ playlistID }) => ({
-        playlistID,
+      ({ data, levelID, fragment }) =>
+        writeToBucketFactory(fs)(levelID, fragment.index, data),
+      ({ levelID }) => ({
+        levelID,
       })
     ),
-    mergeMap(({ playlistID }) =>
+    mergeMap(({ levelID }) =>
       of(
-        downloadsActions.incPlaylistDownloadStatus({
-          playlistID,
+        levelsSlice.actions.incLevelDownloadStatus({
+          levelID,
         })
       )
     )
   );
-};

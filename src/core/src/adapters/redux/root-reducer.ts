@@ -1,8 +1,14 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import { downloadsSlice } from "./slices";
+import { ActionType } from "typesafe-actions";
+
+import { levelsSlice, playlistsSlice } from "./slices";
 
 export const rootReducer = combineReducers({
-  downloads: downloadsSlice.reducer,
+  playlists: playlistsSlice.reducer,
+  levels: levelsSlice.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
+export type RootAction =
+  | ActionType<typeof levelsSlice.actions>
+  | ActionType<typeof playlistsSlice.actions>;

@@ -1,34 +1,30 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootState } from "../adapters/redux/root-reducer";
-import {
-  DownloadAction,
-  downloadsActions,
-} from "../adapters/redux/slices/downloads-slice";
+import { RootState, RootAction } from "../adapters/redux/root-reducer";
+import { levelsSlice } from "../adapters/redux/slices/levels-slice";
 import { Dependencies } from "../services";
 import { mergeBucketFactory, writeToFileFactory } from "../use-cases";
 
 export const savePlaylistToFileEpic: Epic<
-  DownloadAction,
-  DownloadAction,
+  RootAction,
+  RootAction,
   RootState,
   Dependencies
-> = (action$, _store$, { fs }) => {
-  return action$.pipe(
-    filter(downloadsActions.savePlaylistToFile.match),
-    map((action) => action.payload.playlistID),
+> = (action$, _store$, { fs }) =>
+  action$.pipe(
+    filter(levelsSlice.actions.saveLevelToFile.match),
+    map((action) => action.payload.levelID),
     mergeMap(
-      (playlistID) => from(mergeBucketFactory(fs)(playlistID)),
-      (playlistID, data) => ({ playlistID, data })
+      (levelID) => from(mergeBucketFactory(fs)(levelID)),
+      (levelID, data) => ({ levelID, data })
     ),
     mergeMap(
-      ({ playlistID, data }) =>
-        from(writeToFileFactory(fs)(`${playlistID}.mp4`, data)),
-      ({ playlistID }) => ({ playlistID })
+      ({ levelID, data }) =>
+        from(writeToFileFactory(fs)(`${levelID}.mp4`, data)),
+      ({ levelID }) => ({ levelID })
     ),
-    mergeMap(({ playlistID }) =>
-      of(downloadsActions.savePlaylistToFileSuccess({ playlistID }))
+    mergeMap(({ levelID }) =>
+      of(levelsSlice.actions.saveLevelToFileSuccess({ levelID: levelID }))
     )
   );
-};

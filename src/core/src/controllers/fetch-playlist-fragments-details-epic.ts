@@ -1,38 +1,33 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootState } from "../adapters/redux/root-reducer";
-import {
-  DownloadAction,
-  downloadsActions,
-} from "../adapters/redux/slices/downloads-slice";
+import { RootState, RootAction } from "../adapters/redux/root-reducer";
+import { levelsSlice } from "../adapters/redux/slices/levels-slice";
 import { Dependencies } from "../services";
 import { getFragmentsDetailsFactory } from "../use-cases";
 
 export const fetchPlaylistFragmentsDetailsEpic: Epic<
-  DownloadAction,
-  DownloadAction,
+  RootAction,
+  RootAction,
   RootState,
   Dependencies
-> = (action$, _store, { loader, parser, fs }) => {
-  return action$.pipe(
-    filter(downloadsActions.downloadPlaylist.match),
-    map((action) => action.payload.playlist),
+> = (action$, _store, { loader, parser }) =>
+  action$.pipe(
+    filter(levelsSlice.actions.downloadLevel.match),
+    map((action) => action.payload.level),
     mergeMap(
-      (playlist) =>
-        from(getFragmentsDetailsFactory(loader, parser)(playlist)).pipe(),
-      (playlist, fragments) => ({
+      (level) => from(getFragmentsDetailsFactory(loader, parser)(level)).pipe(),
+      (level, fragments) => ({
         fragments,
-        playlist,
+        level,
       })
     ),
-    mergeMap(({ fragments, playlist }) =>
+    mergeMap(({ fragments, level }) =>
       of(
-        downloadsActions.fetchPlaylistFragmentsDetails({
+        levelsSlice.actions.fetchLevelFragmentsDetails({
           fragments: fragments,
-          playlistID: playlist.id,
+          levelID: level.id,
         })
       )
     )
   );
-};

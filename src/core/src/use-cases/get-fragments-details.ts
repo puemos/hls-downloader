@@ -1,4 +1,4 @@
-import { Fragment, Playlist } from "../entities";
+import { Fragment, Level } from "../entities";
 import { ILoader, IParser } from "../services";
 
 export const getFragmentsDetailsFactory = (
@@ -6,7 +6,7 @@ export const getFragmentsDetailsFactory = (
   parser: IParser
 ) => {
   const run = async (
-    playlist: Playlist
+    playlist: Level
   ): Promise<Fragment[]> => {
     const levelPlaylistText = await loader.fetchText(playlist.uri);
     const fragments = parser.parseLevelPlaylist(

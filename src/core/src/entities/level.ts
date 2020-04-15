@@ -1,4 +1,4 @@
-export class Playlist {
+export class Level {
   constructor(
     readonly id: string,
     readonly uri: string,
