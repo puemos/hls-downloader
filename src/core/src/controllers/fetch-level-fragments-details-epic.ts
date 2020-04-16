@@ -6,17 +6,19 @@ import { levelsSlice } from "../adapters/redux/slices/levels-slice";
 import { Dependencies } from "../services";
 import { getFragmentsDetailsFactory } from "../use-cases";
 
-export const fetchPlaylistFragmentsDetailsEpic: Epic<
+export const fetchLevelFragmentsDetailsEpic: Epic<
   RootAction,
   RootAction,
   RootState,
   Dependencies
-> = (action$, _store, { loader, parser }) =>
+> = (action$, store, { loader, parser }) =>
   action$.pipe(
     filter(levelsSlice.actions.downloadLevel.match),
-    map((action) => action.payload.level),
+    map((action) => action.payload.levelID),
+    map((levelID) => store.value.levels.levels[levelID]),
+    map((level) => level!),
     mergeMap(
-      (level) => from(getFragmentsDetailsFactory(loader, parser)(level)).pipe(),
+      (level) => from(getFragmentsDetailsFactory(loader, parser)(level)),
       (level, fragments) => ({
         fragments,
         level,

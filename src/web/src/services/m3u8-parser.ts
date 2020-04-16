@@ -1,17 +1,13 @@
 /// <reference path="m3u8-parser.d.ts" />
 
-import { Fragment, Playlist } from "@hls-downloader/core/lib/entities";
+import { Fragment, Level } from "@hls-downloader/core/lib/entities";
 import { IParser } from "@hls-downloader/core/lib/services";
+import { Parser } from "m3u8-parser";
 import { buildAbsoluteURL } from "url-toolkit";
 import { v4 } from "uuid";
-import { Parser } from "m3u8-parser";
 
 export const M3u8Parser: IParser = {
-  parseLevelPlaylist(
-    string: string,
-    baseurl: string,
-    index: number
-  ): Fragment[] {
+  parseLevelPlaylist(string: string, baseurl: string): Fragment[] {
     const parser = new Parser();
     parser.push(string);
     return parser.manifest.segments.map((segment, index) => ({
@@ -28,13 +24,14 @@ export const M3u8Parser: IParser = {
       uri: buildAbsoluteURL(baseurl, segment.uri),
     }));
   },
-  parseMasterPlaylist(string: string, baseurl: string): Playlist[] {
+  parseMasterPlaylist(string: string, baseurl: string): Level[] {
     const parser = new Parser();
     parser.push(string);
     const playlists = parser.manifest?.playlists ?? [];
     return playlists.map((playlist, index) => ({
       index,
       id: v4(),
+      playlistID: baseurl,
       bitrate: playlist.attributes.BANDWIDTH,
       height: playlist.attributes.RESOLUTION?.height,
       width: playlist.attributes.RESOLUTION?.width,

@@ -6,7 +6,7 @@ import { levelsSlice } from "../adapters/redux/slices/levels-slice";
 import { Dependencies } from "../services";
 import { mergeBucketFactory, writeToFileFactory } from "../use-cases";
 
-export const savePlaylistToFileEpic: Epic<
+export const saveLevelToFileEpic: Epic<
   RootAction,
   RootAction,
   RootState,
