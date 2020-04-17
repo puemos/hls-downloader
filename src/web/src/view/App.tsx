@@ -1,7 +1,8 @@
+import { Box, Button, Input, Stack } from "@chakra-ui/core";
+import { playlistsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import PlaylistView from "./PlaylistView";
-import { playlistsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 
 function App() {
   const dispatch = useDispatch();
@@ -20,13 +21,14 @@ function App() {
     );
   }
   return (
-    <div className="App">
-      <input type="text" onChange={onURIInputChange} value={uri} />
-      <button onClick={() => onDownloadPlaylistClick()}>
-        Download Playlist
-      </button>
+    <Box bg="gray.800" m="2rem">
+      <Stack isInline>
+        <Input type="text" onChange={onURIInputChange} value={uri} />
+        <Button onClick={() => onDownloadPlaylistClick()}>Fetch</Button>
+      </Stack>
+      <Box h="3rem"></Box>
       <PlaylistView id={uri} />
-    </div>
+    </Box>
   );
 }
 

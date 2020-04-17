@@ -1,8 +1,6 @@
+import { Box, SimpleGrid, Spinner } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
-import {
-  PlaylistStatus,
-  Level,
-} from "@hls-downloader/core/lib/entities";
+import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
 import React from "react";
 import { useSelector } from "react-redux";
 import { LevelView } from "./LevelView";
@@ -21,17 +19,21 @@ const PlaylistView = (props: { id: string }) => {
     return null;
   }
   if (status.status === "fetching") {
-    return <div className="Playlist">Fetching</div>;
+    return (
+      <Box>
+        <Spinner />
+      </Box>
+    );
   }
   if (status.status === "ready") {
     return (
-      <div className="Playlist">
-        <div>
-          {playlistLevels.map((level) => (
+      <SimpleGrid columns={3} spacing="0.5rem">
+        {playlistLevels.map((level) => (
+          <Box>
             <LevelView level={level!} />
-          ))}
-        </div>
-      </div>
+          </Box>
+        ))}
+      </SimpleGrid>
     );
   }
 

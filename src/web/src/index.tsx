@@ -8,8 +8,7 @@ import { CryptoDecryptor } from "./services/crypto-decryptor";
 import { InMemoryFS } from "./services/in-memory-fs";
 import { FetchLoader } from "./services/fetch-loader";
 import { M3u8Parser } from "./services/m3u8-parser";
-
-
+import { ThemeProvider, CSSReset, ColorModeProvider } from "@chakra-ui/core";
 
 ReactDOM.render(
   <Provider
@@ -22,7 +21,12 @@ ReactDOM.render(
     })}
   >
     <React.StrictMode>
-      <App />
+      <ColorModeProvider value="dark">
+        <ThemeProvider>
+          <CSSReset></CSSReset>
+          <App />
+        </ThemeProvider>
+      </ColorModeProvider>
     </React.StrictMode>
   </Provider>,
   document.getElementById("root")

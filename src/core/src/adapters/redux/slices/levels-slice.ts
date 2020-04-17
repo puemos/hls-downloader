@@ -20,6 +20,9 @@ export interface IDownloadLevelPayload {
 export interface IAddLevelsPayload {
   levels: Level[];
 }
+export interface IRemovePlaylistLevelsPayload {
+  playlistID: string;
+}
 export interface IFinishLevelDownloadPayload {
   levelID: string;
 }
@@ -47,6 +50,18 @@ export const levelsSlice = createSlice({
           status: "init",
         };
       });
+    },
+    removePlaylistLevels(state, action: PayloadAction<IRemovePlaylistLevelsPayload>) {
+      const { playlistID } = action.payload;
+      for (const id in state.levels) {
+        if (state.levels.hasOwnProperty(id)) {
+          const level = state.levels[id];
+          if (level?.playlistID === playlistID) {
+            state.levels[id] = null;
+            state.levelsStatus[id] = null;
+          }
+        }
+      }
     },
     downloadLevel(_state, _action: PayloadAction<IDownloadLevelPayload>) {},
     fetchLevelFragmentsDetails(
