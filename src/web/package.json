@@ -1,5 +1,5 @@
 {
-  "name": "@hls-downloader/chrome",
+  "name": "@hls-downloader/web",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
