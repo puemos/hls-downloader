@@ -15,7 +15,7 @@ export const downloadPlaylistFragmentsEpic: Epic<
   RootAction,
   RootState,
   Dependencies
-> = (action$, _store, { fs, loader, config }) =>
+> = (action$, store, { fs, loader }) =>
   action$.pipe(
     filter(levelsSlice.actions.fetchLevelFragmentsDetails.match),
     map((action) => action.payload),
@@ -36,7 +36,7 @@ export const downloadPlaylistFragmentsEpic: Epic<
             data,
             levelID,
           }),
-          config.concurrency
+          store.value.config.concurrency
         )
       )
     ),

@@ -1,8 +1,7 @@
 import {
   Box,
-  Button,
-  ButtonGroup,
   Grid,
+  IconButton,
   SimpleGrid,
   Stack,
   Text,
@@ -55,29 +54,27 @@ export const LevelView = (props: { level: Level }) => {
         </Box>
       </Stack>
       <Stack justify="space-between">
-        <ButtonGroup>
-          <Button>Copy</Button>
+        <Stack isInline justifyContent="flex-end">
+          <IconButton aria-label="copy" icon="copy" />
           {["ready", "done", "saving"].includes(status?.status!) && (
-            <Button
-              width="6rem"
+            <IconButton
+              aria-label="save"
+              icon="download"
               isDisabled={status?.status === "saving"}
               onClick={onSaveLevelClick}
-            >
-              Save
-            </Button>
+            />
           )}
 
           {["init", "downloading"].includes(status?.status!) && (
-            <Button
-              width="6rem"
+            <IconButton
+              icon="arrow-forward"
+              aria-label="download"
               isDisabled={status?.status === "downloading"}
               isLoading={status?.status === "downloading"}
               onClick={onDownloadLevelClick}
-            >
-              Download
-            </Button>
+            />
           )}
-        </ButtonGroup>
+        </Stack>
 
         <Box p="2px">
           {["ready", "done", "saving", "downloading"].includes(

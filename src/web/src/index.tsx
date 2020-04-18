@@ -13,7 +13,6 @@ import { ThemeProvider, CSSReset, ColorModeProvider } from "@chakra-ui/core";
 ReactDOM.render(
   <Provider
     store={createStore({
-      config: { concurrency: 3 },
       decryptor: CryptoDecryptor,
       fs: InMemoryFS,
       loader: FetchLoader,

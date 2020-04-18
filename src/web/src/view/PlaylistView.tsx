@@ -1,43 +1,35 @@
-import { Box, SimpleGrid, Spinner } from "@chakra-ui/core";
-import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
-import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import React from "react";
-import { useSelector } from "react-redux";
-import { LevelView } from "./LevelView";
+import { Box, Button, Input, Stack } from "@chakra-ui/core";
+import { playlistsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import PlaylistLevelsView from "./PlaylistLevelsView";
 
-const PlaylistView = (props: { id: string }) => {
-  const status = useSelector<RootState, PlaylistStatus | null>(
-    (state) => state.playlists.playlistsStatus[props.id]
+const PlaylistView = () => {
+  const dispatch = useDispatch();
+  const [uri, setURI] = useState(
+    "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
   );
-  const levels = useSelector<RootState, (Level | null)[]>((state) =>
-    Object.values(state.levels.levels)
-  );
-  const playlistLevels = levels
-    .filter(Boolean)
-    .filter((l) => l?.playlistID === props.id);
-  if (!status) {
-    return null;
+  function onURIInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setURI(e.target.value);
   }
-  if (status.status === "fetching") {
-    return (
-      <Box>
-        <Spinner />
-      </Box>
+  function onDownloadPlaylistClick() {
+    dispatch(
+      playlistsSlice.actions.fetchPlaylistLevels({
+        playlistID: uri,
+        uri,
+      })
     );
   }
-  if (status.status === "ready") {
-    return (
-      <SimpleGrid columns={3} spacing="0.5rem">
-        {playlistLevels.map((level) => (
-          <Box>
-            <LevelView level={level!} />
-          </Box>
-        ))}
-      </SimpleGrid>
-    );
-  }
-
-  return null;
+  return (
+    <Box>
+      <Stack isInline>
+        <Input type="text" onChange={onURIInputChange} value={uri} />
+        <Button onClick={() => onDownloadPlaylistClick()}>Fetch</Button>
+      </Stack>
+      <Box h="3rem"></Box>
+      <PlaylistLevelsView id={uri} />
+    </Box>
+  );
 };
 
 export default PlaylistView;
