@@ -17,29 +17,7 @@ import { ThemeProvider, CSSReset, ColorModeProvider } from "@chakra-ui/core";
         <ColorModeProvider value="dark">
           <ThemeProvider>
             <CSSReset></CSSReset>
-            <style>
-              {`
-              html {
-                --scrollbarBG: #1A202C;
-                --thumbBG: #2c323d;
-              }
-              .App::-webkit-scrollbar {
-                width: 1rem;
-              }
-              .App {
-                scrollbar-width: thin;
-                scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-              }
-              .App::-webkit-scrollbar-track {
-                background: var(--scrollbarBG);
-              }
-              .App::-webkit-scrollbar-thumb {
-                background-color: var(--thumbBG) ;
-                border-radius: 1rem;
-                border: 5px solid var(--scrollbarBG);
-              }
-              `}
-            </style>
+
             <App />
           </ThemeProvider>
         </ColorModeProvider>

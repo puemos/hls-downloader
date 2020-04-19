@@ -17,6 +17,7 @@ export function Navbar() {
     >
       <Box>
         <Button
+          variant="outline"
           onClick={() => push("/")}
           outline="0px"
           bg={
@@ -31,6 +32,7 @@ export function Navbar() {
 
       <Box>
         <Button
+          variant="outline"
           onClick={() => push("/settings")}
           leftIcon="settings"
           bg={pathname === "/settings" ? "pink.800" : "gray.900"}

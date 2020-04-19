@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import PlaylistLevelsView from "./PlaylistLevelsView";
 import { PlaylistRowView } from "./PlaylistRowView";
 
-const PlaylistView = () => {
+const PlaylistsView = () => {
   const [id, setId] = useState("");
   const [filter, setFilter] = useState("");
   const playlistsObj = useSelector<RootState, Record<string, Playlist | null>>(
@@ -83,4 +83,4 @@ const PlaylistView = () => {
   );
 };
 
-export default PlaylistView;
+export default PlaylistsView;
