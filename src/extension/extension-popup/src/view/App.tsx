@@ -34,17 +34,10 @@ function App() {
               }
               `}
           </style>
-          <Box
-            overflowY="scroll"
-            className="Main"
-            height={500 - 72}
-            pl="2rem"
-            pr="1rem"
-            pb="2rem"
-          >
+          <Box overflowY="scroll" className="Main" height={500 - 72}>
             <Switch>
               <Route path="/settings">
-                <SettingsView></SettingsView>
+                <SettingsView />
               </Route>
               <Route path="/">
                 <PlaylistsView />

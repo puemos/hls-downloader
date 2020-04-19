@@ -9,11 +9,7 @@ export const LevelProgressView = (props: {
   return (
     <Stack>
       <Box>
-        <Progress
-          value={
-            Number((props.status.done / props.status.total).toFixed(0)) * 100
-          }
-        ></Progress>
+        <Progress max={props.status.total} value={props.status.done}></Progress>
       </Box>
       <Box textAlign="right">
         <Text>

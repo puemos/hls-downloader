@@ -35,7 +35,7 @@ const SettingsView = () => {
   }
 
   return (
-    <Stack spacing="1rem">
+    <Stack spacing="1rem" p="2rem">
       <Stack isInline justifyContent="space-between" alignItems="center">
         <Box>
           <Text fontSize="md" fontWeight="semibold">

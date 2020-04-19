@@ -47,7 +47,7 @@ const PlaylistsView = () => {
     .filter(playlistFilter);
 
   return (
-    <Stack spacing="1rem">
+    <Stack spacing="1rem" pl="2rem" pr="1rem" pb="2rem">
       {id === "" && (
         <Stack>
           <Input
