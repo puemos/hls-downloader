@@ -1,0 +1,32 @@
+{
+  "name": "@hls-downloader/extension-background",
+  "version": "1.0.0",
+  "author": "puemos",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "webpack",
+    "prebuild": "rm -rf lib"
+  },
+  "devDependencies": {
+    "terser-webpack-plugin": "^2.3.5",
+    "typescript": "3.8.3"
+  },
+  "dependencies": {
+    "@hls-downloader/core": "../core",
+    "@types/uuid": "^7.0.2",
+    "@videojs/vhs-utils": "^1.3.0",
+    "m3u8-parser": "^4.4.0",
+    "ts-loader": "^7.0.0",
+    "url-toolkit": "^2.1.6",
+    "uuid": "^7.0.3",
+    "webext-redux": "2.1.6",
+    "webextension-polyfill": "^0.6.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
