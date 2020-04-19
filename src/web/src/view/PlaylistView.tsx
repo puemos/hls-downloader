@@ -14,9 +14,14 @@ const PlaylistView = () => {
   }
   function onDownloadPlaylistClick() {
     dispatch(
-      playlistsSlice.actions.fetchPlaylistLevels({
+      playlistsSlice.actions.addPlaylist({
         playlistID: uri,
         uri,
+      })
+    );
+    dispatch(
+      playlistsSlice.actions.fetchPlaylistLevels({
+        playlistID: uri,
       })
     );
   }

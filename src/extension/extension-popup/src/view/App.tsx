@@ -7,11 +7,17 @@ import SettingsView from "./SettingsView";
 
 function App() {
   return (
-    <Box bg="gray.800">
+    <Box
+      className="App"
+      bg="gray.800"
+      width="500px"
+      height="500px"
+      overflowY="scroll"
+    >
       <Router>
         <Flex direction="column">
           <Navbar></Navbar>
-          <Box m="2rem">
+          <Box mb="2rem" ml="2rem" mr="1rem">
             <Switch>
               <Route path="/settings">
                 <SettingsView></SettingsView>

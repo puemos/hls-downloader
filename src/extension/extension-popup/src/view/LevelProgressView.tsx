@@ -1,4 +1,4 @@
-import { Box, Progress } from "@chakra-ui/core";
+import { Box, Progress, Text, Stack } from "@chakra-ui/core";
 import { LevelStatus } from "@hls-downloader/core/lib/entities";
 import React from "react";
 
@@ -7,15 +7,19 @@ export const LevelProgressView = (props: {
   levelID: string;
 }) => {
   return (
-    <Box>
+    <Stack>
       <Box>
         <Progress
-          value={(props.status.done / props.status.total) * 100}
+          value={
+            Number((props.status.done / props.status.total).toFixed(0)) * 100
+          }
         ></Progress>
       </Box>
       <Box textAlign="right">
-        {props.status.done} / {props.status.total}
+        <Text>
+          {props.status.done} / {props.status.total}
+        </Text>
       </Box>
-    </Box>
+    </Stack>
   );
 };

@@ -1,41 +1,40 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Fragment, Level, LevelStatus } from "../../../entities";
 
-export interface ILevelsState {
+export type ILevelsState = {
   levels: Record<string, Level | null>;
   levelsStatus: Record<string, LevelStatus | null>;
-}
+};
+export type IFetchLevelFragmentsDetailsPayload = {
+  levelID: string;
+  fragments: Fragment[];
+};
+export type IDownloadLevelPayload = {
+  levelID: string;
+};
+export type IAddLevelsPayload = {
+  levels: Level[];
+};
+export type IRemovePlaylistLevelsPayload = {
+  playlistID: string;
+};
+export type IFinishLevelDownloadPayload = {
+  levelID: string;
+};
+export type IIncLevelDownloadStatusPayload = {
+  levelID: string;
+};
+export type ISaveLevelToFilePayload = {
+  levelID: string;
+};
+export type ISaveLevelToFileSuccessPayload = {
+  levelID: string;
+};
+
 const initialLevelsState: ILevelsState = {
   levelsStatus: {},
   levels: {},
 };
-
-export interface IFetchLevelFragmentsDetailsPayload {
-  levelID: string;
-  fragments: Fragment[];
-}
-export interface IDownloadLevelPayload {
-  levelID: string;
-}
-export interface IAddLevelsPayload {
-  levels: Level[];
-}
-export interface IRemovePlaylistLevelsPayload {
-  playlistID: string;
-}
-export interface IFinishLevelDownloadPayload {
-  levelID: string;
-}
-export interface IIncLevelDownloadStatusPayload {
-  levelID: string;
-}
-export interface ISaveLevelToFilePayload {
-  levelID: string;
-}
-export interface ISaveLevelToFileSuccessPayload {
-  levelID: string;
-}
-
 export const levelsSlice = createSlice({
   name: "levels",
   initialState: initialLevelsState,
@@ -51,7 +50,10 @@ export const levelsSlice = createSlice({
         };
       });
     },
-    removePlaylistLevels(state, action: PayloadAction<IRemovePlaylistLevelsPayload>) {
+    removePlaylistLevels(
+      state,
+      action: PayloadAction<IRemovePlaylistLevelsPayload>
+    ) {
       const { playlistID } = action.payload;
       for (const id in state.levels) {
         if (state.levels.hasOwnProperty(id)) {

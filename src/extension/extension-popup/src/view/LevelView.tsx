@@ -1,11 +1,4 @@
-import {
-  Box,
-  Grid,
-  IconButton,
-  SimpleGrid,
-  Stack,
-  Text,
-} from "@chakra-ui/core";
+import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { levelsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import { Level, LevelStatus } from "@hls-downloader/core/lib/entities";
@@ -30,32 +23,39 @@ export const LevelView = (props: { level: Level }) => {
       boxShadow="md"
       rounded="lg"
       p="1rem"
-      templateColumns="repeat(2, 1fr)"
+      templateColumns="minmax(0, 1fr) 60px"
       gap={6}
       bg="gray.900"
-      height="8rem"
     >
       <Stack>
         <Box>
-          <SimpleGrid columns={2}>
+          <Input isReadOnly value={props.level.uri} />
+        </Box>
+        <Stack isInline spacing="0.5rem">
+          <Box pl="1.1rem">
             <Text>Resolution</Text>
-            <Text fontFamily="monospace" lineHeight="1.5rem" textAlign="right">
+            <Text>
               {props.level.width}×{props.level.height}
             </Text>
-          </SimpleGrid>
-        </Box>
-        <Box>
-          <SimpleGrid columns={2}>
+          </Box>
+          <Box pl="1.1rem">
             <Text>Bitrate</Text>
-            <Text fontFamily="monospace" lineHeight="1.5rem" textAlign="right">
-              {props.level.bitrate}
-            </Text>
-          </SimpleGrid>
-        </Box>
+            <Text>{props.level.bitrate}</Text>{" "}
+          </Box>
+          <Box width="100%">
+            {["ready", "done", "saving", "downloading"].includes(
+              status?.status!
+            ) && (
+              <LevelProgressView
+                status={status!}
+                levelID={props.level.id}
+              ></LevelProgressView>
+            )}
+          </Box>
+        </Stack>
       </Stack>
       <Stack justify="space-between">
         <Stack isInline justifyContent="flex-end">
-          <IconButton aria-label="copy" icon="copy" />
           {["ready", "done", "saving"].includes(status?.status!) && (
             <IconButton
               aria-label="save"
@@ -75,17 +75,6 @@ export const LevelView = (props: { level: Level }) => {
             />
           )}
         </Stack>
-
-        <Box p="2px">
-          {["ready", "done", "saving", "downloading"].includes(
-            status?.status!
-          ) && (
-            <LevelProgressView
-              status={status!}
-              levelID={props.level.id}
-            ></LevelProgressView>
-          )}
-        </Box>
       </Stack>
     </Grid>
   );

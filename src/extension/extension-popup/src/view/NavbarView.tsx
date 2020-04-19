@@ -7,13 +7,23 @@ export function Navbar() {
   const { push } = useHistory();
 
   return (
-    <Stack isInline bg="gray.800" p="1rem" pl="2rem" pr="2rem">
+    <Stack
+      isInline
+      bg="gray.800"
+      p="1rem"
+      pl="2rem"
+      pr="1rem"
+      justifyContent="space-between"
+    >
       <Box>
         <Button
           onClick={() => push("/")}
           outline="0px"
-          leftIcon="search"
-          bg={pathname === "/" ? "pink.800" : "gray.800"}
+          bg={
+            pathname === "/" || pathname === "/index.html"
+              ? "pink.800"
+              : "gray.900"
+          }
         >
           Home
         </Button>
@@ -23,7 +33,7 @@ export function Navbar() {
         <Button
           onClick={() => push("/settings")}
           leftIcon="settings"
-          bg={pathname === "/settings" ? "pink.800" : "gray.800"}
+          bg={pathname === "/settings" ? "pink.800" : "gray.900"}
         >
           Settings
         </Button>

@@ -12,26 +12,33 @@ export const fetchPlaylistLevelsEpic: Epic<
   RootAction,
   RootState,
   Dependencies
-> = (action$, _store, { loader, parser }) =>
+> = (action$, store, { loader, parser }) =>
   action$.pipe(
     filter(playlistsSlice.actions.fetchPlaylistLevels.match),
-    map((action) => action.payload),
+    map((action) => action.payload.playlistID),
+    map((playlistID) => store.value.playlists.playlists[playlistID]!),
     mergeMap(
       ({ uri }) => from(getLevelsFactory(loader, parser)(uri)),
-      ({ playlistID }, levels) => ({
+      ({ id }, levels) => ({
         levels,
-        playlistID,
+        playlistID: id,
       })
     ),
-    mergeMap(({ playlistID, levels }) =>
-      of(
+    mergeMap(({ playlistID, levels }) => {
+      if (levels.length === 0) {
+        return of(
+          playlistsSlice.actions.fetchPlaylistLevelsFailed({
+            playlistID,
+          })
+        );
+      }
+      return of(
         playlistsSlice.actions.fetchPlaylistLevelsSuccess({
           playlistID,
-          levels,
         }),
         levelsSlice.actions.addLevels({
           levels,
         })
-      )
-    )
+      );
+    })
   );

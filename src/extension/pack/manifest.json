@@ -9,15 +9,15 @@
   },
   "version": "2.0.0",
   "background": {
-    "scripts": ["static/js/background.js"],
+    "scripts": ["background.js"],
     "persistent": true
   },
   "web_accessible_resources": ["assets/**/*"],
   "permissions": [
     "webRequest",
     "tabs",
-    "http://**/*.m3u8*",
-    "https://**/*.m3u8*"
+    "http://*/*",
+    "https://*/*"
   ],
   "icons": {
     "16": "assets/icons/16.png",
