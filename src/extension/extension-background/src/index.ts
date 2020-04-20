@@ -5,40 +5,52 @@ import { FetchLoader } from "./services/fetch-loader";
 import { M3u8Parser } from "./services/m3u8-parser";
 import { createStore } from "@hls-downloader/core/lib/adapters/redux/configure-store";
 import { wrapStore } from "webext-redux";
-import { playlistsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
+import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
+import { subscribeListeners } from "./subscribeListeners";
+import { LevelStatus } from "@hls-downloader/core/lib/entities";
 
-const store = createStore({
-  decryptor: CryptoDecryptor,
-  fs: InMemoryFS,
-  loader: FetchLoader,
-  parser: M3u8Parser,
-});
-
-wrapStore(store);
-
-browser.webRequest.onResponseStarted.addListener(
-  async (details) => {
-    console.log(details);
-    if (details.tabId < 0) {
-      return;
-    }
-    const tab = await browser.tabs.get(details.tabId);
-    store.dispatch(
-      playlistsSlice.actions.addPlaylist({
-        id: details.url,
-        uri: details.url,
-        initiator: tab.url,
-        pageTitle: tab.title,
-      })
-    );
-  },
-  {
-    types: ["xmlhttprequest"],
-    urls: [
-      "http://*/*.m3u8",
-      "https://*/*.m3u8",
-      "http://*/*.m3u8?*",
-      "https://*/*.m3u8?*",
-    ],
+async function saveState(state: RootState) {
+  if (!state) {
+    return;
   }
-);
+  await browser.storage.local.set({ state });
+}
+async function getState(): Promise<RootState | undefined> {
+  const res = await browser.storage.local.get(["state"]);
+  const state: RootState = res.state;
+  if (!state) {
+    return;
+  }
+  return {
+    config: state.config,
+    playlists: {
+      playlists: {},
+      playlistsStatus: {},
+    },
+    levels: {
+      levels: {},
+      levelsStatus: {},
+    },
+  };
+}
+
+(async () => {
+  const state = await getState();
+  const store = createStore(
+    {
+      decryptor: CryptoDecryptor,
+      fs: InMemoryFS,
+      loader: FetchLoader,
+      parser: M3u8Parser,
+    },
+    state
+  );
+
+  wrapStore(store);
+
+  store.subscribe(() => {
+    saveState(store.getState());
+  });
+
+  subscribeListeners(store);
+})();

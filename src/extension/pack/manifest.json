@@ -15,6 +15,7 @@
   "web_accessible_resources": ["assets/**/*"],
   "permissions": [
     "webRequest",
+    "storage",
     "tabs",
     "http://*/*",
     "https://*/*"
