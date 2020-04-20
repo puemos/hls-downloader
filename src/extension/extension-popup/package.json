@@ -23,7 +23,8 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "typescript": "~3.7.2",
-    "webext-redux": "^2.1.6"
+    "webext-redux": "^2.1.6",
+    "webextension-polyfill-ts": "^0.14.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -20,12 +20,11 @@ export const LevelView = (props: { level: Level }) => {
   }
   return (
     <Grid
-      boxShadow="md"
       rounded="lg"
       p="1rem"
       templateColumns="minmax(0, 1fr) 60px"
       gap={6}
-      bg="gray.900"
+      bg="gray.800"
     >
       <Stack>
         <Box>
@@ -33,14 +32,18 @@ export const LevelView = (props: { level: Level }) => {
         </Box>
         <Stack isInline spacing="0.5rem">
           <Box pl="1.1rem">
-            <Text>Resolution</Text>
+            <Text color="gray.400" fontWeight="semibold">
+              Resolution
+            </Text>
             <Text>
               {props.level.width}×{props.level.height}
             </Text>
           </Box>
           <Box pl="1.1rem">
-            <Text>Bitrate</Text>
-            <Text>{props.level.bitrate}</Text>{" "}
+            <Text color="gray.400" fontWeight="semibold">
+              Bitrate
+            </Text>
+            <Text>{props.level.bitrate}</Text>
           </Box>
           <Box width="100%">
             {["ready", "done", "saving", "downloading"].includes(

@@ -8,22 +8,25 @@ export function PlaylistRowView(props: {
 }): JSX.Element {
   return (
     <Grid
-      boxShadow="md"
       rounded="lg"
+      bg="gray.800"
       p="1rem"
       templateColumns="minmax(0, 1fr) 60px"
       gap={6}
-      bg="gray.900"
     >
       <Stack>
         <Box>
           <Input isReadOnly value={props.playlist.uri} />
         </Box>
         <Box pl="1.1rem">
-          <Text isTruncated>{props.playlist.pageTitle}</Text>
+          <Text fontWeight="semibold" isTruncated>
+            {props.playlist.pageTitle}
+          </Text>
         </Box>
         <Box pl="1.1rem">
-          <Text isTruncated>Initiator: {props.playlist.initiator}</Text>
+          <Text color="gray.400" fontWeight="semibold" isTruncated>
+            Initiator: {props.playlist.initiator}
+          </Text>
         </Box>
       </Stack>
       <Stack justify="space-between">

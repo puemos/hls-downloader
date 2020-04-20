@@ -9,10 +9,10 @@ export function Navbar() {
   return (
     <Stack
       isInline
-      bg="gray.800"
+      bg="gray.900"
       p="1rem"
-      pl="2rem"
-      pr="2rem"
+      pl="1rem"
+      pr="1rem"
       justifyContent="space-between"
     >
       <Box>
@@ -22,7 +22,7 @@ export function Navbar() {
           outline="0px"
           bg={
             pathname === "/" || pathname === "/index.html"
-              ? "teal.500"
+              ? "#5666f3"
               : "gray.900"
           }
         >
@@ -35,7 +35,7 @@ export function Navbar() {
           variant="outline"
           onClick={() => push("/settings")}
           leftIcon="settings"
-          bg={pathname === "/settings" ? "teal.500" : "gray.900"}
+          bg={pathname === "/settings" ? "#5666f3" : "gray.900"}
         >
           Settings
         </Button>

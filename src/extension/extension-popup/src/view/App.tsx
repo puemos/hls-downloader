@@ -7,15 +7,15 @@ import SettingsView from "./SettingsView";
 
 function App() {
   return (
-    <Box bg="gray.800" width="500px" height="500px">
+    <Box bg="gray.900" width="500px" height="500px">
       <Router>
         <Flex direction="column">
           <Navbar></Navbar>
           <style>
             {`
               html {
-                --scrollbarBG: #1A202C;
-                --thumbBG: #2c323d;
+                --scrollbarBG: #272730;
+                --thumbBG: #303038;
               }
               .Main::-webkit-scrollbar {
                 width: 1rem;

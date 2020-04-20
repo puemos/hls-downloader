@@ -35,41 +35,59 @@ const SettingsView = () => {
   }
 
   return (
-    <Stack spacing="1rem" p="2rem">
-      <Stack isInline justifyContent="space-between" alignItems="center">
+    <Stack spacing="1rem" p="1rem" pr="0rem">
+      <Stack
+        p="1rem"
+        rounded="lg"
+        bg="gray.800"
+        isInline
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Box>
           <Text fontSize="md" fontWeight="semibold">
             Concurrency
           </Text>
         </Box>
         <Stack isInline>
+          <IconButton
+            icon="add"
+            size="sm"
+            aria-label="increase concurrency"
+            onClick={onConcurrencyIncrease}
+            bg="#5666f3"
+          ></IconButton>
           <Flex
-            width="5rem"
-            height="2.5rem"
+            width="2rem"
+            height="2rem"
             pl="16px"
             pr="16px"
             justifyContent="center"
             alignItems="center"
             borderRadius="0.25rem"
-            bg="gray.700"
+            bg="gray.600"
           >
             <Text fontSize="md" fontWeight="semibold">
               {concurrency}
             </Text>
           </Flex>
           <IconButton
-            icon="add"
-            aria-label="increase concurrency"
-            onClick={onConcurrencyIncrease}
-          ></IconButton>
-          <IconButton
+            size="sm"
             icon="minus"
             aria-label="decrease concurrency"
+            bg="#5666f3"
             onClick={onConcurrencyDecrease}
           ></IconButton>
         </Stack>
       </Stack>
-      <Stack isInline justifyContent="space-between" alignItems="center">
+      <Stack
+        p="1rem"
+        rounded="lg"
+        bg="gray.800"
+        isInline
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Box>
           <Text fontSize="md" fontWeight="semibold">
             Enable auto save?

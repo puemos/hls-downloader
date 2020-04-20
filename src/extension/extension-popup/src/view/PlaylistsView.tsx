@@ -6,48 +6,55 @@ import { useSelector } from "react-redux";
 import PlaylistLevelsView from "./PlaylistLevelsView";
 import { PlaylistRowView } from "./PlaylistRowView";
 
+const playlistFilter = (filter: string) => (p: Playlist): boolean => {
+  const filterLowerCase = filter.toLocaleLowerCase();
+  if (filterLowerCase === "") {
+    return true;
+  }
+  if (p.uri.toLocaleLowerCase().includes(filterLowerCase)) {
+    return true;
+  }
+  if (p.pageTitle?.toLocaleLowerCase().includes(filterLowerCase)) {
+    return true;
+  }
+  if (p.initiator?.toLocaleLowerCase().includes(filterLowerCase)) {
+    return true;
+  }
+  return false;
+};
+
 const PlaylistsView = () => {
   const [id, setId] = useState("");
   const [filter, setFilter] = useState("");
-  const playlistsObj = useSelector<RootState, Record<string, Playlist | null>>(
-    (state) => state.playlists.playlists
-  );
-  const playlistsStatusObj = useSelector<
+
+  const playlistsRecord = useSelector<
+    RootState,
+    Record<string, Playlist | null>
+  >((state) => state.playlists.playlists);
+  const playlistsStatusRecord = useSelector<
     RootState,
     Record<string, PlaylistStatus | null>
   >((state) => state.playlists.playlistsStatus);
+
   function onFilterInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFilter(e.target.value);
   }
   function onSelectPlaylistClick(playlistID: string) {
     setId(playlistID);
   }
-  function playlistFilter(p: Playlist): boolean {
-    const filterLowerCase = filter.toLocaleLowerCase();
-    if (filterLowerCase === "") {
-      return true;
-    }
-    if (p.uri.toLocaleLowerCase().includes(filterLowerCase)) {
-      return true;
-    }
-    if (p.pageTitle?.toLocaleLowerCase().includes(filterLowerCase)) {
-      return true;
-    }
-    if (p.initiator?.toLocaleLowerCase().includes(filterLowerCase)) {
-      return true;
-    }
-    return false;
-  }
+
   function isPlaylist(playlist: Playlist | null): playlist is Playlist {
     return playlist !== null;
   }
-  const playlists = Object.values(playlistsObj)
+  const playlists = Object.values(playlistsRecord)
     .filter(isPlaylist)
-    .filter((playlist) => playlistsStatusObj[playlist.id]?.status === "ready")
-    .filter(playlistFilter);
+    .filter(
+      (playlist) => playlistsStatusRecord[playlist.id]?.status === "ready"
+    )
+    .filter(playlistFilter(filter));
 
   return (
-    <Stack spacing="1rem" pl="2rem" pr="1rem" pb="2rem">
+    <Stack spacing="1rem" pl="1rem" pr="0rem" pb="2rem">
       {id === "" && (
         <Stack>
           <Input
