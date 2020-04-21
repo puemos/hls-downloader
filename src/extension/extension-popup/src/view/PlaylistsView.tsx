@@ -1,4 +1,4 @@
-import { Box, IconButton, Input, Stack } from "@chakra-ui/core";
+import { Box, IconButton, Input, Stack, Heading, Text } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { Playlist, PlaylistStatus } from "@hls-downloader/core/lib/entities";
 import React, { useState } from "react";
@@ -58,12 +58,25 @@ const PlaylistsView = () => {
     <Stack spacing="1rem" pl="1rem" pr="0rem" pb="2rem">
       {id === "" && (
         <Stack>
-          <Input
-            placeholder="Filter..."
-            onChange={onFilterInputChange}
-            value={filter}
-          ></Input>
-
+          <Stack isInline alignItems="center" justifyContent="space-between">
+            <Box>
+              <Heading lineHeight={1} size="md">
+                Playlists
+              </Heading>
+            </Box>
+            <Box width={1 / 3}>
+              <Input
+                placeholder="Filter..."
+                onChange={onFilterInputChange}
+                value={filter}
+              />
+            </Box>
+          </Stack>
+          {playlists.length === 0 && (
+            <Box>
+              <Text>No playlist were found</Text>
+            </Box>
+          )}
           {playlists.map((playlist) => (
             <Box>
               <PlaylistRowView
@@ -76,12 +89,16 @@ const PlaylistsView = () => {
       )}
       {id !== "" && (
         <Stack>
-          <Stack isInline>
+          <Stack isInline alignItems="center">
             <IconButton
+              variant="ghost"
               aria-label="close"
               icon="arrow-back"
               onClick={() => setId("")}
             ></IconButton>
+            <Heading lineHeight={1} size="md">
+              {playlistsRecord[id]?.pageTitle}
+            </Heading>
           </Stack>
 
           <PlaylistLevelsView id={id} />

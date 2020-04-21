@@ -1,4 +1,5 @@
 import { Bucket, IFS } from "@hls-downloader/core/lib/services";
+import { browser } from "webextension-polyfill-ts";
 
 const buckets: Record<string, Bucket> = {};
 
@@ -38,19 +39,19 @@ const getBucket: IFS["getBucket"] = function (id: string) {
   return buckets[id];
 };
 
-const write: IFS["write"] = function (path: string, data: Uint8Array) {
+const write: IFS["write"] = async function (path: string, data: Uint8Array) {
   window.URL = window.URL || window.webkitURL;
   const blob = new Blob([data], {
     type: "video/MP2T",
   });
-  const linkURL = URL.createObjectURL(blob);
-  const linkElem = document.createElement("a");
-  linkElem.href = linkURL;
-  linkElem.download = "";
-  document.body.appendChild(linkElem);
-  linkElem.click();
-  document.body.removeChild(linkElem);
-  URL.revokeObjectURL(linkURL);
+  const url = URL.createObjectURL(blob);
+  await browser.downloads.download({
+    url,
+    saveAs: true,
+    conflictAction: "uniquify",
+    filename: "steam.mp4",
+  });
+  URL.revokeObjectURL(url);
   return Promise.resolve();
 };
 

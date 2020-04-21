@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Navbar } from "./NavbarView";
 import PlaylistsView from "./PlaylistsView";
 import SettingsView from "./SettingsView";
+import AboutView from "./AboutView";
 
 function App() {
   return (
@@ -34,10 +35,13 @@ function App() {
               }
               `}
           </style>
-          <Box overflowY="scroll" className="Main" height={500 - 72}>
+          <Box overflowY="scroll" className="Main" height={500 - 72} pt="1rem">
             <Switch>
               <Route path="/settings">
                 <SettingsView />
+              </Route>
+              <Route path="/about">
+                <AboutView />
               </Route>
               <Route path="/">
                 <PlaylistsView />

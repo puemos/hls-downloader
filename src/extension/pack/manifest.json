@@ -16,6 +16,7 @@
   "permissions": [
     "webRequest",
     "storage",
+    "downloads",
     "tabs",
     "http://*/*",
     "https://*/*"
