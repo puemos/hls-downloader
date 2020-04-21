@@ -53,6 +53,7 @@ const PlaylistsView = () => {
     )
     .filter(playlistFilter(filter));
 
+  playlists.sort((a, b) => b.createdAt - a.createdAt);
   return (
     <Stack spacing="1rem" pl="1rem" pr="0rem" pb="2rem">
       {id === "" && (
