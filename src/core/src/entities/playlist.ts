@@ -4,6 +4,7 @@ export class Playlist {
     readonly uri: string,
     readonly pageTitle?: string,
     readonly initiator?: string,
+    readonly createdAt?: number,
     readonly tabId?: number,
   ) {}
 }

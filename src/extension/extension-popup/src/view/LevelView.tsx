@@ -22,29 +22,24 @@ export const LevelView = (props: { level: Level }) => {
     <Grid
       rounded="lg"
       p="1rem"
-      templateColumns="minmax(0, 1fr) 60px"
+      templateColumns="minmax(0, 1fr) 2.5rem"
       gap={6}
       bg="gray.800"
     >
       <Stack>
-        <Box>
-          <Input isReadOnly value={props.level.uri} />
-        </Box>
-        <Stack isInline spacing="0.5rem">
-          <Box pl="1.1rem">
-            <Text color="gray.400" fontWeight="semibold">
-              Resolution
-            </Text>
-            <Text>
-              {props.level.width}×{props.level.height}
-            </Text>
-          </Box>
-          <Box pl="1.1rem">
-            <Text color="gray.400" fontWeight="semibold">
-              Bitrate
-            </Text>
-            <Text>{props.level.bitrate}</Text>
-          </Box>
+        <Stack isInline spacing="1rem">
+          <Stack isInline spacing="0.2rem" width="24rem">
+            <Text color="#99a3ff">Resolution</Text>
+            {props.level.width && (
+              <Text color="gray.400">
+                {props.level.width}×{props.level.height}
+              </Text>
+            )}
+          </Stack>
+          <Stack isInline spacing="0.2rem">
+            <Text color="#99a3ff">Bitrate</Text>
+            <Text color="gray.400">{props.level.bitrate}</Text>
+          </Stack>
           <Box width="100%">
             {["ready", "done", "saving", "downloading"].includes(
               status?.status!
@@ -56,28 +51,34 @@ export const LevelView = (props: { level: Level }) => {
             )}
           </Box>
         </Stack>
+        <Box>
+          <Input
+            size="sm"
+            borderColor="#99a3ff45"
+            isReadOnly
+            value={props.level.uri}
+          />
+        </Box>
       </Stack>
       <Stack justify="space-between">
-        <Stack isInline justifyContent="flex-end">
-          {["ready", "done", "saving"].includes(status?.status!) && (
-            <IconButton
-              aria-label="save"
-              icon="download"
-              isDisabled={status?.status === "saving"}
-              onClick={onSaveLevelClick}
-            />
-          )}
+        {["ready", "done", "saving"].includes(status?.status!) && (
+          <IconButton
+            aria-label="save"
+            icon="download"
+            isDisabled={status?.status === "saving"}
+            onClick={onSaveLevelClick}
+          />
+        )}
 
-          {["init", "downloading"].includes(status?.status!) && (
-            <IconButton
-              icon="arrow-forward"
-              aria-label="download"
-              isDisabled={status?.status === "downloading"}
-              isLoading={status?.status === "downloading"}
-              onClick={onDownloadLevelClick}
-            />
-          )}
-        </Stack>
+        {["init", "downloading"].includes(status?.status!) && (
+          <IconButton
+            icon="arrow-forward"
+            aria-label="download"
+            isDisabled={status?.status === "downloading"}
+            isLoading={status?.status === "downloading"}
+            onClick={onDownloadLevelClick}
+          />
+        )}
       </Stack>
     </Grid>
   );

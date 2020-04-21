@@ -25,6 +25,7 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
           uri: details.url,
           initiator: tab.url,
           pageTitle: tab.title,
+          createdAt: Date.now(),
         })
       );
     },

@@ -25,8 +25,8 @@ import {
               ...theme,
               fonts: {
                 ...theme.fonts,
-                body: "'Lato', sans-serif;",
-                heading: "'Lato', sans-serif;",
+                body: "'Noto Sans JP', sans-serif;",
+                heading: "'Noto Sans JP', sans-serif;",
               },
               colors: {
                 ...theme.colors,

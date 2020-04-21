@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton, Stack, Text, Input } from "@chakra-ui/core";
+import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/core";
 import { Playlist } from "@hls-downloader/core/lib/entities";
 import React from "react";
 
@@ -11,22 +11,27 @@ export function PlaylistRowView(props: {
       rounded="lg"
       bg="gray.800"
       p="1rem"
-      templateColumns="minmax(0, 1fr) 60px"
+      templateColumns="minmax(0, 1fr) 2.5rem"
       gap={6}
     >
       <Stack>
-        <Box>
-          <Input isReadOnly value={props.playlist.uri} />
-        </Box>
-        <Box pl="1.1rem">
-          <Text fontWeight="semibold" isTruncated>
+        <Stack isInline>
+          <Text color="#99a3ff" isTruncated mr="4px">
             {props.playlist.pageTitle}
           </Text>
-        </Box>
-        <Box pl="1.1rem">
-          <Text color="gray.400" fontWeight="semibold" isTruncated>
-            Initiator: {props.playlist.initiator}
+          <Text width="9rem" color="gray.400" isTruncated>
+            {"· "}
+            {new Date(props.playlist.createdAt!).toLocaleString()}
           </Text>
+        </Stack>
+
+        <Box>
+          <Input
+            size="sm"
+            borderColor="#99a3ff45"
+            isReadOnly
+            value={props.playlist.uri}
+          />
         </Box>
       </Stack>
       <Stack justify="space-between">
