@@ -1,6 +1,4 @@
-<p align="center">
-<img src="./store_assets/png/sceenshot-1.png" width="450">
-</p>
+<img src="./src/extension/store-assets/png/sceenshot-1.png" width="450">
 
 # HLS-downloader
 
