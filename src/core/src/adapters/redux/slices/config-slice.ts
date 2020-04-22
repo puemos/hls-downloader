@@ -3,17 +3,17 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface ISetConcurrencyPayload {
   concurrency: number;
 }
-export interface ISetAutoSavePayload {
-  autoSave: boolean;
+export interface ISetSaveDialogPayload {
+  saveDialog: boolean;
 }
 
 export interface IConfigState {
   concurrency: number;
-  autoSave: boolean;
+  saveDialog: boolean;
 }
 const initialConfigState: IConfigState = {
   concurrency: 2,
-  autoSave: false,
+  saveDialog: false,
 };
 
 export const configSlice = createSlice({
@@ -23,8 +23,8 @@ export const configSlice = createSlice({
     setConcurrency(state, action: PayloadAction<ISetConcurrencyPayload>) {
       state.concurrency = action.payload.concurrency;
     },
-    setAutosave(state, action: PayloadAction<ISetAutoSavePayload>) {
-      state.autoSave = action.payload.autoSave;
+    setSaveDialog(state, action: PayloadAction<ISetSaveDialogPayload>) {
+      state.saveDialog = action.payload.saveDialog;
     },
   },
 });

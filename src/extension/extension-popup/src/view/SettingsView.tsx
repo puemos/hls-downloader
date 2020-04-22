@@ -9,8 +9,8 @@ const SettingsView = () => {
   const concurrency = useSelector<RootState, number>(
     (state) => state.config.concurrency
   );
-  const autoSave = useSelector<RootState, boolean>(
-    (state) => state.config.autoSave
+  const saveDialog = useSelector<RootState, boolean>(
+    (state) => state.config.saveDialog
   );
   function onConcurrencyIncrease() {
     dispatch(
@@ -26,10 +26,10 @@ const SettingsView = () => {
       })
     );
   }
-  function onAutoSave() {
+  function onSaveDialogClick() {
     dispatch(
-      configSlice.actions.setAutosave({
-        autoSave: !autoSave,
+      configSlice.actions.setSaveDialog({
+        saveDialog: !saveDialog,
       })
     );
   }
@@ -90,11 +90,11 @@ const SettingsView = () => {
       >
         <Box>
           <Text fontSize="md" fontWeight="semibold">
-            Enable auto save?
+            Enable save dialog?
           </Text>
         </Box>
         <Box>
-          <Switch onClick={onAutoSave} isChecked={autoSave} size="lg" />
+          <Switch onClick={onSaveDialogClick} isChecked={saveDialog} size="lg" />
         </Box>
       </Stack>
     </Stack>

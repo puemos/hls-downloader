@@ -18,18 +18,11 @@ export const incDownloadStatusEpic: Epic<
     filter(({ status }) => Boolean(status)),
     filter(({ status }) => status!.done === status!.total),
     mergeMap(({ id }) => {
-      if (store$.value.config.autoSave) {
-        return of(
-          levelsSlice.actions.finishLevelDownload({
-            levelID: id,
-          }),
-          levelsSlice.actions.saveLevelToFile({
-            levelID: id,
-          })
-        );
-      }
       return of(
         levelsSlice.actions.finishLevelDownload({
+          levelID: id,
+        }),
+        levelsSlice.actions.saveLevelToFile({
           levelID: id,
         })
       );

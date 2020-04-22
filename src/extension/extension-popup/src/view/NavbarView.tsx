@@ -1,11 +1,8 @@
-import { Box, Heading, Link, Stack } from "@chakra-ui/core";
+import { Stack, Box } from "@chakra-ui/core";
 import React from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { NavLink } from "./NavLink";
 
 export function Navbar() {
-  const { pathname } = useLocation();
-  const { push } = useHistory();
-
   return (
     <Stack
       isInline
@@ -17,43 +14,13 @@ export function Navbar() {
     >
       <Stack isInline spacing="2rem">
         <Box>
-          <Link
-            _hover={{
-              textDecoration: "none",
-            }}
-            onClick={() => push("/")}
-            color={
-              pathname === "/" || pathname === "/index.html"
-                ? "#adff7b"
-                : "white"
-            }
-          >
-            <Heading size="sm">Home</Heading>
-          </Link>
+          <NavLink width="3rem" path="/" label="Home"></NavLink>
         </Box>
         <Box>
-          <Link
-            _hover={{
-              textDecoration: "none",
-            }}
-            onClick={() => push("/about")}
-            color={pathname === "/about" ? "#adff7b" : "white"}
-          >
-            <Heading size="sm">About</Heading>
-          </Link>
+          <NavLink width="3rem" path="/about" label="About"></NavLink>
         </Box>
       </Stack>
-      <Box>
-        <Link
-          _hover={{
-            textDecoration: "none",
-          }}
-          onClick={() => push("/settings")}
-          color={pathname === "/settings" ? "#adff7b" : "white"}
-        >
-          <Heading size="sm">Settings</Heading>
-        </Link>
-      </Box>
+      <NavLink width="4rem" path="/settings" label="Settings"></NavLink>
     </Stack>
   );
 }

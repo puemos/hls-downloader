@@ -6,3 +6,4 @@ export * from "./get-levels";
 export * from "./merge-bucket";
 export * from "./write-to-bucket";
 export * from "./write-to-file";
+export * from "./generate-file-name";

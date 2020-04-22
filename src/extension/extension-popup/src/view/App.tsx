@@ -1,6 +1,11 @@
 import { Box, Flex } from "@chakra-ui/core";
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from "react-router-dom";
 import { Navbar } from "./NavbarView";
 import PlaylistsView from "./PlaylistsView";
 import SettingsView from "./SettingsView";
@@ -37,6 +42,7 @@ function App() {
           </style>
           <Box overflowY="scroll" className="Main" height={500 - 72} pt="1rem">
             <Switch>
+              <Redirect from="/index.html" to="/" />
               <Route path="/settings">
                 <SettingsView />
               </Route>

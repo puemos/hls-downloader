@@ -4,7 +4,6 @@ import { levelsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import { Level, LevelStatus } from "@hls-downloader/core/lib/entities";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { LevelProgressView } from "./LevelProgressView";
 
 export const LevelView = (props: { level: Level }) => {
   const status = useSelector<RootState, LevelStatus | null>(
@@ -27,8 +26,8 @@ export const LevelView = (props: { level: Level }) => {
       bg="gray.800"
     >
       <Stack>
-        <Stack isInline spacing="1rem">
-          <Stack isInline spacing="0.2rem" width="24rem">
+        <Grid gridTemplateColumns="1.3fr 1fr 1fr" gridTemplateRows="1fr">
+          <Stack isInline spacing="0.4rem">
             <Text color="#99a3ff">Resolution</Text>
             {props.level.width && (
               <Text color="gray.400">
@@ -36,21 +35,21 @@ export const LevelView = (props: { level: Level }) => {
               </Text>
             )}
           </Stack>
-          <Stack isInline spacing="0.2rem">
+          <Stack isInline spacing="0.4rem">
             <Text color="#99a3ff">Bitrate</Text>
             <Text color="gray.400">{props.level.bitrate}</Text>
           </Stack>
-          <Box width="100%">
-            {["ready", "done", "saving", "downloading"].includes(
-              status?.status!
-            ) && (
-              <LevelProgressView
-                status={status!}
-                levelID={props.level.id}
-              ></LevelProgressView>
-            )}
-          </Box>
-        </Stack>
+          {["ready", "done", "saving", "downloading"].includes(
+            status?.status!
+          ) && (
+            <Stack isInline spacing="0.4rem">
+              <Text color="#99a3ff">Progress</Text>
+              <Text textAlign="right" color="gray.400">{`${Number(
+                (100 * status!.done) / status!.total
+              ).toFixed(0)}%`}</Text>
+            </Stack>
+          )}
+        </Grid>
         <Box>
           <Input
             size="sm"
@@ -69,15 +68,15 @@ export const LevelView = (props: { level: Level }) => {
             onClick={onSaveLevelClick}
           />
         )}
-
         {["init", "downloading"].includes(status?.status!) && (
           <IconButton
-            icon="arrow-forward"
+            icon="download"
             aria-label="download"
             isDisabled={status?.status === "downloading"}
             isLoading={status?.status === "downloading"}
             onClick={onDownloadLevelClick}
           />
+        )}
         )}
       </Stack>
     </Grid>
