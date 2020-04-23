@@ -5,9 +5,11 @@
 >This extension is completely free and published under the MIT license. However, if you are using it and enjoy it, you are welcome to [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url
 ) of your choice.
 
-Google Chrome Extension for sniffing and downloading [HTTP Live streams (HLS)](https://en.wikipedia.org/wiki/HTTP_Live_Streaming)
+Web Extension for sniffing and downloading [HTTP Live streams (HLS)](https://en.wikipedia.org/wiki/HTTP_Live_Streaming)
 
+[![Firefox Addons](https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png)](https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/)
 [![Chrome Web Store](https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_206x58.png)](https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej)
+
 
 [![style: styled-components](https://img.shields.io/badge/style-%F0%9F%92%85%20styled--components-orange.svg?colorB=daa357&colorA=db748e)](https://github.com/styled-components/styled-components)
 
