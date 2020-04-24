@@ -8,6 +8,7 @@ import {
   createBucketFactory,
   downloadSingleFragmentFactory,
   writeToBucketFactory,
+  decryptSingleFragmentFactory,
 } from "../use-cases";
 
 export const downloadPlaylistFragmentsEpic: Epic<
@@ -15,7 +16,7 @@ export const downloadPlaylistFragmentsEpic: Epic<
   RootAction,
   RootState,
   Dependencies
-> = (action$, store, { fs, loader }) =>
+> = (action$, store, { fs, loader, decryptor }) =>
   action$.pipe(
     filter(levelsSlice.actions.fetchLevelFragmentsDetails.match),
     map((action) => action.payload),
@@ -39,6 +40,15 @@ export const downloadPlaylistFragmentsEpic: Epic<
           store.value.config.concurrency
         )
       )
+    ),
+    mergeMap(
+      ({ data, fragment }) =>
+        decryptSingleFragmentFactory(loader, decryptor)(fragment.key, data),
+      ({ levelID, fragment }, data) => ({
+        levelID,
+        data,
+        fragment,
+      })
     ),
     mergeMap(
       ({ data, levelID, fragment }) =>
