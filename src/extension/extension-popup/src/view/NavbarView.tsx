@@ -17,6 +17,9 @@ export function Navbar() {
           <NavLink width="3rem" path="/" label="Home"></NavLink>
         </Box>
         <Box>
+          <NavLink width="5.5rem" path="/downloads" label="Downloads"></NavLink>
+        </Box>
+        <Box>
           <NavLink width="3rem" path="/about" label="About"></NavLink>
         </Box>
       </Stack>

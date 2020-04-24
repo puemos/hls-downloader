@@ -10,6 +10,7 @@ import { Navbar } from "./NavbarView";
 import PlaylistsView from "./PlaylistsView";
 import SettingsView from "./SettingsView";
 import AboutView from "./AboutView";
+import DownloadsView from "./DownloadsView";
 
 function App() {
   return (
@@ -45,6 +46,9 @@ function App() {
               <Redirect from="/index.html" to="/" />
               <Route path="/settings">
                 <SettingsView />
+              </Route>
+              <Route path="/downloads">
+                <DownloadsView />
               </Route>
               <Route path="/about">
                 <AboutView />

@@ -10,10 +10,11 @@ export const addPlaylistEpic: Epic<
   RootAction,
   RootState,
   Dependencies
-> = (action$) =>
+> = (action$, state$) =>
   action$.pipe(
     filter(playlistsSlice.actions.addPlaylist.match),
     map((action) => action.payload),
+    filter(({ id }) => Boolean(state$.value.playlists.playlists[id])),
     mergeMap(({ id }) =>
       of(
         playlistsSlice.actions.fetchPlaylistLevels({

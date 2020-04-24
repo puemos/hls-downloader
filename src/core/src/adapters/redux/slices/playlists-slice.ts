@@ -26,6 +26,10 @@ export const playlistsSlice = createSlice({
   name: "playlists",
   initialState: initialPlaylistsState,
   reducers: {
+    clearPlaylists(state) {
+      state.playlists = initialPlaylistsState.playlists
+      state.playlistsStatus = initialPlaylistsState.playlistsStatus
+    },
     addPlaylist(state, action: PayloadAction<IAddPlaylistPayload>) {
       const playlist = action.payload;
       state.playlistsStatus[playlist.id] = {

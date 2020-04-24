@@ -39,6 +39,10 @@ export const levelsSlice = createSlice({
   name: "levels",
   initialState: initialLevelsState,
   reducers: {
+    clearLevels(state) {
+      state.levels = initialLevelsState.levels;
+      state.levelsStatus = initialLevelsState.levelsStatus;
+    },
     addLevels(state, action: PayloadAction<IAddLevelsPayload>) {
       const { levels } = action.payload;
       levels.forEach((level) => {

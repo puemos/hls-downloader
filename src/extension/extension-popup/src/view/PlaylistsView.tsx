@@ -1,10 +1,22 @@
-import { Box, IconButton, Input, Stack, Heading, Text } from "@chakra-ui/core";
+import {
+  Box,
+  IconButton,
+  Input,
+  Stack,
+  Heading,
+  Text,
+  Button,
+} from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { Playlist, PlaylistStatus } from "@hls-downloader/core/lib/entities";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import PlaylistLevelsView from "./PlaylistLevelsView";
 import { PlaylistRowView } from "./PlaylistRowView";
+import {
+  playlistsSlice,
+  levelsSlice,
+} from "@hls-downloader/core/lib/adapters/redux/slices";
 
 const playlistFilter = (filter: string) => (p: Playlist): boolean => {
   const filterLowerCase = filter.toLocaleLowerCase();
@@ -26,7 +38,7 @@ const playlistFilter = (filter: string) => (p: Playlist): boolean => {
 const PlaylistsView = () => {
   const [id, setId] = useState("");
   const [filter, setFilter] = useState("");
-
+  const dispatch = useDispatch();
   const playlistsRecord = useSelector<
     RootState,
     Record<string, Playlist | null>
@@ -42,7 +54,10 @@ const PlaylistsView = () => {
   function onSelectPlaylistClick(playlistID: string) {
     setId(playlistID);
   }
-
+  function onClearClick() {
+    dispatch(levelsSlice.actions.clearLevels());
+    dispatch(playlistsSlice.actions.clearPlaylists());
+  }
   function isPlaylist(playlist: Playlist | null): playlist is Playlist {
     return playlist !== null;
   }
@@ -64,12 +79,15 @@ const PlaylistsView = () => {
                 Playlists
               </Heading>
             </Box>
-            <Box width={1 / 3}>
+            <Box>
               <Input
                 placeholder="Filter..."
                 onChange={onFilterInputChange}
                 value={filter}
               />
+            </Box>
+            <Box>
+              <Button onClick={onClearClick}>Clear</Button>
             </Box>
           </Stack>
           {playlists.length === 0 && (
