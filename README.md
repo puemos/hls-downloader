@@ -1,18 +1,19 @@
-# HLS-downloader
+<div align="center">
+<br>
+<img height="150px" src="https://github.com/puemos/hls-downloader-web-extension/blob/master/src/extension/store-assets/png/Small-Promo-Tile.png?raw=true">
+<h3>📸 HLS Downloader</h3>
+ <p>Capture and download <a href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming">HTTP Live streams (HLS)</a> from your browser</p>
+<img src="https://img.shields.io/github/issues/puemos/hls-downloader-web-extension" alt="GitHub issues">
+  <p>
+This extension is completely free and published under the MIT license. However, if you are using it and enjoy it, you are welcome to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url">making a donation</a> of your choice.
+</p>
 
->This extension is completely free and published under the MIT license. However, if you are using it and enjoy it, you are welcome to [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url
-) of your choice.
-
-Web Extension for sniffing and downloading [HTTP Live streams (HLS)](https://en.wikipedia.org/wiki/HTTP_Live_Streaming)
-
-<img src="./src/extension/store-assets/png/1.png" width="350">
+</div>
 
 
 [![Firefox Addons](https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png)](https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/)
 [![Chrome Web Store](https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_206x58.png)](https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej)
 
-
-[![style: styled-components](https://img.shields.io/badge/style-%F0%9F%92%85%20styled--components-orange.svg?colorB=daa357&colorA=db748e)](https://github.com/styled-components/styled-components)
 
 **Table of Contents**
 - [Installation](#installation)
