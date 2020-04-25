@@ -1,7 +1,6 @@
 <div align="center">
     <br>
     <img height="150px" src="https://github.com/puemos/hls-downloader-web-extension/blob/master/src/extension/store-assets/png/Small-Promo-Tile.png?raw=true">
-    <h3>📼 HLS Downloader</h3>
     <p>Capture and download <a href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming">HTTP Live streams (HLS)</a> from your browser</p>
     <img src="https://img.shields.io/github/issues/puemos/hls-downloader-web-extension" alt="GitHub issues">
     <br>
@@ -9,7 +8,7 @@
     <br>
     <a href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/"><img height="50px" src="https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png" alt="Firefox Addons"></a>
     <a href="https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej"><img height="50px" src="https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_206x58.png" alt="Chrome Web Store"></a>
-    <br>
+    <br><br><br><br>
 </div>
 
 
