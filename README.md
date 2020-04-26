@@ -5,6 +5,7 @@
     <img src="https://img.shields.io/github/issues/puemos/hls-downloader-web-extension" alt="GitHub issues">
     <br>
     <p>This extension is completely free and published under the MIT license. However, if you are using it and enjoy it, you are welcome to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url">making a donation</a> of your choice.</p>
+    <a href="https://www.buymeacoffee.com/puemos" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" width="100px" ></a>
     <br>
     <a href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/"><img height="50px" src="https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png" alt="Firefox Addons"></a>
     <a href="https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej"><img height="50px" src="https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_206x58.png" alt="Chrome Web Store"></a>
