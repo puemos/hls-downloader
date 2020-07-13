@@ -5,16 +5,12 @@
 <br>
 <p>This extension is completely free and published under the MIT license. However, if you are using it and enjoy it, you are welcome to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url">making a donation</a> of your choice.</p>
 <a href="https://www.buymeacoffee.com/puemos" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" width="100px" ></a>
-<br><br><br><br><br>
+<br>
 
-<a margin-right="5" href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/"><img height="50px" src="https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png" alt="Firefox Addons"></a>
-
-<a href="https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej"><img height="50px" src="https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_206x58.png" alt="Chrome Web Store"></a>
-
-<a href="https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc"><img height="50px" src="https://upload.wikimedia.org/wikipedia/en/thumb/9/98/Microsoft_Edge_logo_%282019%29.svg/1200px-Microsoft_Edge_logo_%282019%29.svg.png" alt="Edge Add-ons"></a>
 
 
 **Table of Contents**
+- [Get it](#get-it)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -22,6 +18,11 @@
 - [Credits](#credits)
 - [License](#license)
 
+## Get it
+
+<img src="https://pluspng.com/img-png/mozilla-png-file-mozilla-firefox-3-5-logo-256-png-256.png" width="12"> <a margin-right="5" href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/">Firefox Addons</a> | 
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Chrome_icon_%28September_2014%29.svg/128px-Google_Chrome_icon_%28September_2014%29.svg.png" width="12"> <a href="https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej">Chrome Web Store</a> | 
+<img src="https://upload.wikimedia.org/wikipedia/en/9/98/Microsoft_Edge_logo_%282019%29.svg" width="12"> <a href="https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc">Edge Add-ons</a>
 
 ## Installation
 
