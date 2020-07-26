@@ -9,6 +9,9 @@ export type IFetchLevelFragmentsDetailsPayload = {
   levelID: string;
   fragments: Fragment[];
 };
+export type IFetchLevelFragmentsDetailsCancelPayload = {
+  levelID: string;
+};
 export type IDownloadLevelPayload = {
   levelID: string;
 };
@@ -80,6 +83,18 @@ export const levelsSlice = createSlice({
         done: 0,
         total: fragments.length,
         status: "downloading",
+      };
+    },
+    fetchLevelFragmentsDetailsCancel(
+      state,
+      action: PayloadAction<IFetchLevelFragmentsDetailsCancelPayload>
+    ) {
+      const { levelID } = action.payload;
+
+      state.levelsStatus[levelID] = {
+        done: 0,
+        total: 0,
+        status: "init",
       };
     },
     finishLevelDownload(
