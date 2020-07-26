@@ -14,6 +14,10 @@ export const LevelView = (props: { level: Level }) => {
   function onDownloadLevelClick() {
     dispatch(levelsSlice.actions.downloadLevel({ levelID: props.level.id }));
   }
+
+  function onCancelDownloadLevelClick() {
+    dispatch(levelsSlice.actions.fetchLevelFragmentsDetailsCancel({ levelID: props.level.id }));
+  }
   function onSaveLevelClick() {
     dispatch(levelsSlice.actions.saveLevelToFile({ levelID: props.level.id }));
   }
@@ -77,6 +81,12 @@ export const LevelView = (props: { level: Level }) => {
             onClick={onDownloadLevelClick}
           />
         )}
+        {["downloading"].includes(status?.status!) && (
+          <IconButton
+            icon="delete"
+            aria-label="canccel"
+            onClick={onCancelDownloadLevelClick}
+          />
         )}
       </Stack>
     </Grid>
