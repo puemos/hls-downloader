@@ -1,5 +1,12 @@
 # HLS downloader changelog
 
+## 2.2.0
+
+### Add
+
+- Cancel a download
+
+
 ## 1.7.2
 
 ### Fix

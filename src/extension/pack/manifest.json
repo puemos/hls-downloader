@@ -7,7 +7,7 @@
     "default_popup": "index.html",
     "default_title": "HLS Downloader"
   },
-  "version": "2.1.1",
+  "version": "2.2.0",
   "background": {
     "scripts": ["background.js"],
     "persistent": true
