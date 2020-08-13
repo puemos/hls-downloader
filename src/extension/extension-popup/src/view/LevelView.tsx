@@ -84,7 +84,7 @@ export const LevelView = (props: { level: Level }) => {
         {["downloading"].includes(status?.status!) && (
           <IconButton
             icon="delete"
-            aria-label="canccel"
+            aria-label="cancel"
             onClick={onCancelDownloadLevelClick}
           />
         )}
