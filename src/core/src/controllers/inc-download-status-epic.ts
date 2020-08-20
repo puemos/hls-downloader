@@ -22,7 +22,7 @@ export const incDownloadStatusEpic: Epic<
         levelsSlice.actions.finishLevelDownload({
           levelID: id,
         }),
-        levelsSlice.actions.saveLevelToFile({
+        levelsSlice.actions.saveAsLevel({
           levelID: id,
         })
       );

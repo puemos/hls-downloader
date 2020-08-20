@@ -19,7 +19,7 @@ export const LevelView = (props: { level: Level }) => {
     dispatch(levelsSlice.actions.fetchLevelFragmentsDetailsCancel({ levelID: props.level.id }));
   }
   function onSaveLevelClick() {
-    dispatch(levelsSlice.actions.saveLevelToFile({ levelID: props.level.id }));
+    dispatch(levelsSlice.actions.saveAsLevel({ levelID: props.level.id }));
   }
   return (
     <Grid

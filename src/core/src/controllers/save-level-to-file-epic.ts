@@ -5,49 +5,49 @@ import { RootState, RootAction } from "../adapters/redux/root-reducer";
 import { levelsSlice } from "../adapters/redux/slices/levels-slice";
 import { Dependencies } from "../services";
 import {
-  mergeBucketFactory,
-  writeToFileFactory,
+  getLinkBucketFactory,
+  saveAsFactory,
   generateFileName,
 } from "../use-cases";
 
-export const saveLevelToFileEpic: Epic<
+export const saveAsLevelEpic: Epic<
   RootAction,
   RootAction,
   RootState,
   Dependencies
 > = (action$, store$, { fs }) =>
   action$.pipe(
-    filter(levelsSlice.actions.saveLevelToFile.match),
+    filter(levelsSlice.actions.saveAsLevel.match),
     map((action) => action.payload.levelID),
     mergeMap(
-      (levelID) => from(mergeBucketFactory(fs)(levelID)),
-      (levelID, data) => ({ levelID, data })
+      (levelID) => from(getLinkBucketFactory(fs)(levelID)),
+      (levelID, link) => ({ levelID, link })
     ),
-    map(({ levelID, data }) => ({
+    map(({ levelID, link }) => ({
       level: store$.value.levels.levels[levelID]!,
-      data,
+      link,
     })),
-    map(({ level, data }) => ({
+    map(({ level, link }) => ({
       level,
       playlist: store$.value.playlists.playlists[level.playlistID]!,
-      data,
+      link,
     })),
-    map(({ level, data, playlist }) => ({
+    map(({ level, link, playlist }) => ({
       level,
       filename: generateFileName()(playlist, level),
       dialog: store$.value.config.saveDialog,
-      data,
+      link,
     })),
     mergeMap(
-      ({ dialog, filename, data }) =>
+      ({ dialog, filename, link }) =>
         from(
-          writeToFileFactory(fs)(filename, data, {
+          saveAsFactory(fs)(filename, link, {
             dialog,
           })
         ),
       ({ level }) => ({ level })
     ),
     mergeMap(({ level }) =>
-      of(levelsSlice.actions.saveLevelToFileSuccess({ levelID: level.id }))
+      of(levelsSlice.actions.saveAsLevelSuccess({ levelID: level.id }))
     )
   );

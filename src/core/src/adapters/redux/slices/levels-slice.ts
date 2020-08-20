@@ -27,10 +27,10 @@ export type IFinishLevelDownloadPayload = {
 export type IIncLevelDownloadStatusPayload = {
   levelID: string;
 };
-export type ISaveLevelToFilePayload = {
+export type ISaveAsLevelPayload = {
   levelID: string;
 };
-export type ISaveLevelToFileSuccessPayload = {
+export type ISaveAsLevelSuccessPayload = {
   levelID: string;
 };
 
@@ -116,15 +116,15 @@ export const levelsSlice = createSlice({
 
       levelStatus.done++;
     },
-    saveLevelToFile(state, action: PayloadAction<ISaveLevelToFilePayload>) {
+    saveAsLevel(state, action: PayloadAction<ISaveAsLevelPayload>) {
       const { levelID } = action.payload;
       const levelStatus = state.levelsStatus[levelID]!;
 
       levelStatus.status = "saving";
     },
-    saveLevelToFileSuccess(
+    saveAsLevelSuccess(
       state,
-      action: PayloadAction<ISaveLevelToFileSuccessPayload>
+      action: PayloadAction<ISaveAsLevelSuccessPayload>
     ) {
       const { levelID: levelID } = action.payload;
       const levelStatus = state.levelsStatus[levelID]!;
