@@ -1,10 +1,10 @@
-import { Heading, Stack, Text, Box } from "@chakra-ui/core";
+import { Stack } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { Job } from "@hls-downloader/core/lib/entities";
 import React from "react";
 import { useSelector } from "react-redux";
-import { JobView } from "./JobView";
 import { EmptyState } from "./EmptyState";
+import { JobView } from "./JobView";
 
 const DownloadsView = () => {
   const jobs = useSelector<RootState, (Job | null)[]>((state) =>

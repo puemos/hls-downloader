@@ -1,23 +1,22 @@
 import {
   Box,
+  Button,
+  Heading,
   IconButton,
   Input,
   Stack,
-  Heading,
-  Text,
-  Button,
 } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
+import {
+  levelsSlice,
+  playlistsSlice,
+} from "@hls-downloader/core/lib/adapters/redux/slices";
 import { Playlist, PlaylistStatus } from "@hls-downloader/core/lib/entities";
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { EmptyState } from "./EmptyState";
 import PlaylistLevelsView from "./PlaylistLevelsView";
 import { PlaylistRowView } from "./PlaylistRowView";
-import {
-  playlistsSlice,
-  levelsSlice,
-} from "@hls-downloader/core/lib/adapters/redux/slices";
-import { EmptyState } from "./EmptyState";
 
 const playlistFilter = (filter: string) => (p: Playlist): boolean => {
   const filterLowerCase = filter.toLocaleLowerCase();

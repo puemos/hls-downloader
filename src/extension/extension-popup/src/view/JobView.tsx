@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/core";
+import { Grid, IconButton, Stack, Text } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { jobsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import { Job, JobStatus } from "@hls-downloader/core/lib/entities";
