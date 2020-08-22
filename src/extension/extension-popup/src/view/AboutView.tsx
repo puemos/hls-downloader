@@ -53,7 +53,7 @@ const AboutView = () => {
             color="#0070ba"
             isExternal
           >
-            with PayPal
+            PayPal
           </Link>
         </Box>
       </Stack>
@@ -79,7 +79,7 @@ const AboutView = () => {
             href="https://github.com/puemos/hls-downloader-chrome-extension/issues"
             color="red.500"
           >
-            open a bug
+            Open an issue
           </Link>
         </Box>
       </Stack>
@@ -109,7 +109,7 @@ const AboutView = () => {
             color="blue.500"
             href="https://github.com/puemos/hls-downloader-chrome-extension"
           >
-            github
+            Github
           </Link>
         </Box>
       </Stack>

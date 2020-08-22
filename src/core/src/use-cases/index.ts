@@ -7,3 +7,5 @@ export * from "./get-link-bucket";
 export * from "./write-to-bucket";
 export * from "./write-to-file";
 export * from "./generate-file-name";
+export * from "./delete-bucket";
+export * from "./fs-cleanup";

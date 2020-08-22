@@ -30,6 +30,10 @@ export class IndexedDBBucket implements Bucket {
   constructor(readonly length: number, readonly id: string) {}
 
   async deleteDB() {
+    if (!this.db) {
+      throw Error();
+    }
+    this.db.close();
     await deleteDB(this.id);
     return;
   }
@@ -111,17 +115,33 @@ export class IndexedDBBucket implements Bucket {
   }
 }
 
+const cleanup: IFS["cleanup"] = async function () {
+  const dbsString = localStorage.getItem("dbs");
+  if (!dbsString) {
+    return;
+  }
+  const dbNames: string[] = JSON.parse(dbsString);
+  for (const dbName of dbNames) {
+    const db = await openDB(dbName, 1);
+    db.close();
+    await deleteDB(dbName);
+  }
+};
+
 const createBucket: IFS["createBucket"] = async function (
   id: string,
   length: number
 ) {
   buckets[id] = new IndexedDBBucket(length, id);
+
+  localStorage.setItem("dbs", JSON.stringify(Object.keys(buckets)));
   return Promise.resolve();
 };
 
 const deleteBucket: IFS["deleteBucket"] = async function (id: string) {
   await buckets[id].deleteDB();
   delete buckets[id];
+  localStorage.setItem("dbs", JSON.stringify(Object.keys(buckets)));
   return Promise.resolve();
 };
 
@@ -152,4 +172,5 @@ export const IndexedDBFS: IFS = {
   createBucket,
   deleteBucket,
   saveAs,
+  cleanup,
 };

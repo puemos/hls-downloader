@@ -61,4 +61,5 @@ export const InMemoryFS: IFS = {
   createBucket,
   deleteBucket,
   saveAs,
+  cleanup: () => Promise.resolve(),
 };

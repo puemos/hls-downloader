@@ -5,6 +5,8 @@ import { Dependencies } from "../../services";
 import { rootReducer, RootState, RootAction } from "./root-reducer";
 import logger from "redux-logger";
 
+const _dummy: Middleware = () => (next) => (action) => next(action);
+
 export function createStore(
   dependencies: Dependencies,
   preloadedState: RootState = rootReducer(undefined, { type: "init" })
@@ -24,7 +26,9 @@ export function createStore(
   });
 
   epicMiddleware.run(rootEpic);
-
+  store.dispatch({
+    type: "init/start",
+  });
   return store;
 }
 

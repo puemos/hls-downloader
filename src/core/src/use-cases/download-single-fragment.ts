@@ -1,7 +1,7 @@
 import { Fragment } from "../entities";
 import { ILoader } from "../services";
 
-export const downloadSingleFragmentFactory = (loader: ILoader) => {
+export const downloadSingleFactory = (loader: ILoader) => {
   const run = async (
     fragment: Fragment
   ): Promise<ArrayBuffer> => {
