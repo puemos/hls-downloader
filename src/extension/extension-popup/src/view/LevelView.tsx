@@ -1,26 +1,19 @@
 import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/core";
-import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { levelsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
-import { Level, LevelStatus } from "@hls-downloader/core/lib/entities";
+import { Level } from "@hls-downloader/core/lib/entities";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 export const LevelView = (props: { level: Level }) => {
-  const status = useSelector<RootState, LevelStatus | null>(
-    (state) => state.levels.levelsStatus[props.level.id]
-  );
   const dispatch = useDispatch();
+  const { push } = useHistory();
 
   function onDownloadLevelClick() {
-    dispatch(levelsSlice.actions.downloadLevel({ levelID: props.level.id }));
+    dispatch(levelsSlice.actions.download({ levelID: props.level.id }));
+    push("/downloads");
   }
 
-  function onCancelDownloadLevelClick() {
-    dispatch(levelsSlice.actions.fetchLevelFragmentsDetailsCancel({ levelID: props.level.id }));
-  }
-  function onSaveLevelClick() {
-    dispatch(levelsSlice.actions.saveLevelToFile({ levelID: props.level.id }));
-  }
   return (
     <Grid
       rounded="lg"
@@ -43,16 +36,6 @@ export const LevelView = (props: { level: Level }) => {
             <Text color="#99a3ff">Bitrate</Text>
             <Text color="gray.400">{props.level.bitrate}</Text>
           </Stack>
-          {["ready", "done", "saving", "downloading"].includes(
-            status?.status!
-          ) && (
-            <Stack isInline spacing="0.4rem">
-              <Text color="#99a3ff">Progress</Text>
-              <Text textAlign="right" color="gray.400">{`${Number(
-                (100 * status!.done) / status!.total
-              ).toFixed(0)}%`}</Text>
-            </Stack>
-          )}
         </Grid>
         <Box>
           <Input
@@ -64,30 +47,11 @@ export const LevelView = (props: { level: Level }) => {
         </Box>
       </Stack>
       <Stack justify="space-between">
-        {["ready", "done", "saving"].includes(status?.status!) && (
-          <IconButton
-            aria-label="save"
-            icon="download"
-            isDisabled={status?.status === "saving"}
-            onClick={onSaveLevelClick}
-          />
-        )}
-        {["init", "downloading"].includes(status?.status!) && (
-          <IconButton
-            icon="download"
-            aria-label="download"
-            isDisabled={status?.status === "downloading"}
-            isLoading={status?.status === "downloading"}
-            onClick={onDownloadLevelClick}
-          />
-        )}
-        {["downloading"].includes(status?.status!) && (
-          <IconButton
-            icon="delete"
-            aria-label="canccel"
-            onClick={onCancelDownloadLevelClick}
-          />
-        )}
+        <IconButton
+          icon="download"
+          aria-label="download"
+          onClick={onDownloadLevelClick}
+        />
       </Stack>
     </Grid>
   );

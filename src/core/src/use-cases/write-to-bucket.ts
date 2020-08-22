@@ -6,7 +6,7 @@ export const writeToBucketFactory = (fs: IFS) => {
     index: number,
     data: ArrayBuffer
   ): Promise<void> => {
-    const bucket = fs.getBucket(bucketID);
+    const bucket = await fs.getBucket(bucketID);
     await bucket.write(index, data);
   };
   return run;

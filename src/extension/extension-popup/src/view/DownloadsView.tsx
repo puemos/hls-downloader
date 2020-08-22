@@ -1,54 +1,25 @@
-import { Box, Stack, Text, Heading } from "@chakra-ui/core";
+import { Stack } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
-import {
-  Level,
-  LevelStatus,
-  Playlist,
-} from "@hls-downloader/core/lib/entities";
+import { Job } from "@hls-downloader/core/lib/entities";
 import React from "react";
 import { useSelector } from "react-redux";
-import { LevelView } from "./LevelView";
+import { EmptyState } from "./EmptyState";
+import { JobView } from "./JobView";
 
 const DownloadsView = () => {
-  const levels = useSelector<RootState, (Level | null)[]>((state) =>
-    Object.values(state.levels.levels)
+  const jobs = useSelector<RootState, (Job | null)[]>((state) =>
+    Object.values(state.jobs.jobs)
   );
-  const playlists = useSelector<RootState, Record<string, Playlist | null>>(
-    (state) => state.playlists.playlists
-  );
-  const levelsStatus = useSelector<
-    RootState,
-    Record<string, LevelStatus | null>
-  >((state) => state.levels.levelsStatus);
-  const activeLevels = levels
-    .filter(Boolean)
-    .filter((l) => levelsStatus[l?.id!]?.status !== "init");
-
-  const getPlaylistCreatedAt = (l: Level) => playlists[l.playlistID]!.createdAt;
-  const getPlaylistTitle = (l: Level) => playlists[l.playlistID]!.pageTitle;
-
-  activeLevels.sort(
-    (a, b) => getPlaylistCreatedAt(b!) - getPlaylistCreatedAt(a!)
-  );
+  jobs.sort((a, b) => b!.createdAt - a!.createdAt);
 
   return (
     <Stack spacing="1rem" pl="1rem" pr="0rem" pb="2rem">
-      <Stack isInline alignItems="center" justifyContent="space-between">
-        <Box>
-          <Heading lineHeight={1} size="md">
-            Active downloads
-          </Heading>
-        </Box>
-      </Stack>
-      {activeLevels.length === 0 && (
-        <Box>
-          <Text>No active downlaods</Text>
-        </Box>
+      {jobs.length === 0 && (
+        <EmptyState caption="You don't have any downloads" />
       )}
-      {activeLevels.map((level) => (
+      {jobs.map((job) => (
         <Stack>
-          <Text>{getPlaylistTitle(level!)}</Text>
-          <LevelView level={level!} />
+          <JobView job={job!} />
         </Stack>
       ))}
     </Stack>

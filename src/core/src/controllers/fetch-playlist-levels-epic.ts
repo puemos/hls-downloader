@@ -1,11 +1,11 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
-import { filter, map, mergeMap, mapTo, mergeMapTo } from "rxjs/operators";
-import { RootState, RootAction } from "../adapters/redux/root-reducer";
+import { filter, map, mergeMap } from "rxjs/operators";
+import { RootAction, RootState } from "../adapters/redux/root-reducer";
+import { playlistsSlice } from "../adapters/redux/slices";
 import { levelsSlice } from "../adapters/redux/slices/levels-slice";
 import { Dependencies } from "../services";
 import { getLevelsFactory } from "../use-cases";
-import { playlistsSlice } from "../adapters/redux/slices";
 
 export const fetchPlaylistLevelsEpic: Epic<
   RootAction,
@@ -36,7 +36,7 @@ export const fetchPlaylistLevelsEpic: Epic<
         playlistsSlice.actions.fetchPlaylistLevelsSuccess({
           playlistID,
         }),
-        levelsSlice.actions.addLevels({
+        levelsSlice.actions.add({
           levels,
         })
       );

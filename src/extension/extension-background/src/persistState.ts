@@ -20,9 +20,12 @@ export async function getState(): Promise<RootState | undefined> {
       playlists: {},
       playlistsStatus: {},
     },
+    jobs: {
+      jobs: {},
+      jobsStatus: {},
+    },
     levels: {
       levels: {},
-      levelsStatus: {},
     },
     tabs: {
       current: {

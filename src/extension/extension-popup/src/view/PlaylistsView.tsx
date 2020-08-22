@@ -1,22 +1,22 @@
 import {
   Box,
+  Button,
+  Heading,
   IconButton,
   Input,
   Stack,
-  Heading,
-  Text,
-  Button,
 } from "@chakra-ui/core";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
+import {
+  levelsSlice,
+  playlistsSlice,
+} from "@hls-downloader/core/lib/adapters/redux/slices";
 import { Playlist, PlaylistStatus } from "@hls-downloader/core/lib/entities";
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { EmptyState } from "./EmptyState";
 import PlaylistLevelsView from "./PlaylistLevelsView";
 import { PlaylistRowView } from "./PlaylistRowView";
-import {
-  playlistsSlice,
-  levelsSlice,
-} from "@hls-downloader/core/lib/adapters/redux/slices";
 
 const playlistFilter = (filter: string) => (p: Playlist): boolean => {
   const filterLowerCase = filter.toLocaleLowerCase();
@@ -36,7 +36,7 @@ const playlistFilter = (filter: string) => (p: Playlist): boolean => {
 };
 
 const PlaylistsView = () => {
-  const [id, setId] = useState("");
+  const [id, setId] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
   const dispatch = useDispatch();
   const playlistsRecord = useSelector<
@@ -55,7 +55,7 @@ const PlaylistsView = () => {
     setId(playlistID);
   }
   function onClearClick() {
-    dispatch(levelsSlice.actions.clearLevels());
+    dispatch(levelsSlice.actions.clear());
     dispatch(playlistsSlice.actions.clearPlaylists());
   }
   function isPlaylist(playlist: Playlist | null): playlist is Playlist {
@@ -71,7 +71,7 @@ const PlaylistsView = () => {
   playlists.sort((a, b) => b.createdAt - a.createdAt);
   return (
     <Stack spacing="1rem" pl="1rem" pr="0rem" pb="2rem">
-      {id === "" && (
+      {id === null && (
         <Stack>
           <Stack isInline alignItems="center" justifyContent="space-between">
             <Box>
@@ -79,21 +79,23 @@ const PlaylistsView = () => {
                 Playlists
               </Heading>
             </Box>
-            <Box>
-              <Input
-                placeholder="Filter..."
-                onChange={onFilterInputChange}
-                value={filter}
-              />
-            </Box>
-            <Box>
-              <Button onClick={onClearClick}>Clear</Button>
-            </Box>
+            {playlists.length !== 0 && (
+              <>
+                <Box>
+                  <Input
+                    placeholder="Filter..."
+                    onChange={onFilterInputChange}
+                    value={filter}
+                  />
+                </Box>
+                <Box>
+                  <Button onClick={onClearClick}>Clear</Button>
+                </Box>
+              </>
+            )}
           </Stack>
           {playlists.length === 0 && (
-            <Box>
-              <Text>No playlist were found</Text>
-            </Box>
+            <EmptyState caption="Sorry, I coun't find any playlists" />
           )}
           {playlists.map((playlist) => (
             <Box>
@@ -105,7 +107,7 @@ const PlaylistsView = () => {
           ))}
         </Stack>
       )}
-      {id !== "" && (
+      {id && (
         <Stack>
           <Stack isInline alignItems="center">
             <IconButton

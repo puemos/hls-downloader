@@ -1,6 +1,7 @@
 import { Bucket, IFS } from "@hls-downloader/core/lib/services";
 import { browser } from "webextension-polyfill-ts";
 import sanitize from "sanitize-filename";
+
 const buckets: Record<string, Bucket> = {};
 
 export class InMemoryBucket implements Bucket {
@@ -10,12 +11,13 @@ export class InMemoryBucket implements Bucket {
     this.store[index] = new Blob([new Uint8Array(data)]);
     return Promise.resolve();
   }
-  async merge(): Promise<Uint8Array> {
-    const all = new Blob(Object.values(this.store), {
+  async getLink(): Promise<string> {
+    const blob = new Blob(Object.values(this.store), {
       type: "video/mp2t",
     });
-    const ab = await all.arrayBuffer();
-    return new Uint8Array(ab);
+    const url = URL.createObjectURL(blob);
+
+    return url;
   }
 }
 
@@ -24,38 +26,40 @@ const createBucket: IFS["createBucket"] = function (
   length: number
 ) {
   buckets[id] = new InMemoryBucket(length);
-  return buckets[id];
+  return Promise.resolve();
+};
+
+const deleteBucket: IFS["deleteBucket"] = function (id: string) {
+  delete buckets[id];
+  return Promise.resolve();
 };
 
 const getBucket: IFS["getBucket"] = function (id: string) {
-  return buckets[id];
+  return Promise.resolve(buckets[id]);
 };
 
-const write: IFS["write"] = async function (
+const saveAs: IFS["saveAs"] = async function (
   path: string,
-  data: Uint8Array,
+  link: string,
   { dialog }
 ) {
   window.URL = window.URL || window.webkitURL;
-  const blob = new Blob([data], {
-    type: "video/MP2T",
-  });
-  const url = URL.createObjectURL(blob);
   const filename = sanitize(path ?? "steam.mp4");
-  console.log({ filename });
 
   await browser.downloads.download({
-    url,
+    url: link,
     saveAs: dialog,
     conflictAction: "uniquify",
     filename,
   });
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(link);
   return Promise.resolve();
 };
 
 export const InMemoryFS: IFS = {
   getBucket,
   createBucket,
-  write,
+  deleteBucket,
+  saveAs,
+  cleanup: () => Promise.resolve(),
 };

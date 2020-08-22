@@ -1,8 +1,8 @@
 import { Epic } from "redux-observable";
 import { of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootState, RootAction } from "../adapters/redux/root-reducer";
-import { levelsSlice } from "../adapters/redux/slices/levels-slice";
+import { RootAction, RootState } from "../adapters/redux/root-reducer";
+import { jobsSlice } from "../adapters/redux/slices";
 import { Dependencies } from "../services";
 
 export const incDownloadStatusEpic: Epic<
@@ -12,18 +12,18 @@ export const incDownloadStatusEpic: Epic<
   Dependencies
 > = (action$, store$) =>
   action$.pipe(
-    filter(levelsSlice.actions.incLevelDownloadStatus.match),
-    map((action) => action.payload.levelID),
-    map((id) => ({ id, status: store$.value.levels.levelsStatus[id] })),
+    filter(jobsSlice.actions.incDownloadStatus.match),
+    map((action) => action.payload.jobId),
+    map((id) => ({ id, status: store$.value.jobs.jobsStatus[id] })),
     filter(({ status }) => Boolean(status)),
     filter(({ status }) => status!.done === status!.total),
     mergeMap(({ id }) => {
       return of(
-        levelsSlice.actions.finishLevelDownload({
-          levelID: id,
+        jobsSlice.actions.finishDownload({
+          jobId: id,
         }),
-        levelsSlice.actions.saveLevelToFile({
-          levelID: id,
+        jobsSlice.actions.saveAs({
+          jobId: id,
         })
       );
     })

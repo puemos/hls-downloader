@@ -1,12 +1,12 @@
 import { IFS } from "../services";
 
-export const writeToFileFactory = (fs: IFS) => {
+export const saveAsFactory = (fs: IFS) => {
   const run = async (
     path: string,
-    data: ArrayBuffer,
+    link: string,
     options: { dialog: boolean }
   ): Promise<void> => {
-    await fs.write(path, data, options);
+    await fs.saveAs(path, link, options);
   };
   return run;
 };
