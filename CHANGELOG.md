@@ -1,11 +1,20 @@
 # HLS downloader changelog
 
+## 3.0.0
+
+### Add
+
+- Unlimited Storage permission
+- Use IndexedDB for storing chunks
+- Downloads are seperated as Jobs
+- New empty status design
+- Download progress UI
+
 ## 2.2.0
 
 ### Add
 
 - Cancel a download
-
 
 ## 1.7.2
 
