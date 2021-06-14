@@ -19,9 +19,9 @@
 
 ## Get it
 
-<img src="https://pluspng.com/img-png/mozilla-png-file-mozilla-firefox-3-5-logo-256-png-256.png" width="12"> <a margin-right="5" href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/">Firefox Addons</a> | 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Chrome_icon_%28September_2014%29.svg/128px-Google_Chrome_icon_%28September_2014%29.svg.png" width="12"> <a href="https://chrome.google.com/webstore/detail/hls-downloader/apomkbibleomoihlhhdbeghnfioffbej">Chrome Web Store</a> | 
-<img src="https://upload.wikimedia.org/wikipedia/en/9/98/Microsoft_Edge_logo_%282019%29.svg" width="12"> <a href="https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc">Edge Add-ons</a>
+Google just removed the extension from the store due to a claim
+
+> Globo Comunicação e Participações SA informs that the denounced extension is practicing and/or supporting the practice of illegal activities related to Globo's Copyright Law. This extension allows full and high resolution downloads of Globo content from the Globoplay streaming platform. The disclosure and sale of clandestine services puts the safety of consumers at risk and contributes to organized crime.
 
 ## Installation
 
