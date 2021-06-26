@@ -2,8 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { Store } from "webext-redux";
-import { Theme } from "./view/Theme";
 import App from "./view/App";
+import { ColorModeScript, ChakraProvider } from "@chakra-ui/react";
+import theme from "./theme";
 
 (async () => {
   const store = new Store();
@@ -13,9 +14,10 @@ import App from "./view/App";
   ReactDOM.render(
     <Provider store={store}>
       <React.StrictMode>
-        <Theme>
+        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+        <ChakraProvider theme={theme}>
           <App />
-        </Theme>
+        </ChakraProvider>
       </React.StrictMode>
     </Provider>,
     document.getElementById("root")

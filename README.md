@@ -25,7 +25,7 @@ Google just removed the extension from the store due to a claim
 
 ## Installation
 
-TODO: Write installation instructions
+1. `./build.sh`
 
 ## Usage
  

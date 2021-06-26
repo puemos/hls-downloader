@@ -12,6 +12,9 @@ export type IFetchPlaylistLevelsPayload = {
   playlistID: string;
 };
 export type IAddPlaylistPayload = Playlist;
+export type IRemovePlaylistPayload = {
+  playlistID: string;
+};
 export type IPlaylistsState = {
   playlistsStatus: Record<string, PlaylistStatus | null>;
   playlists: Record<string, Playlist | null>;
@@ -27,8 +30,8 @@ export const playlistsSlice = createSlice({
   initialState: initialPlaylistsState,
   reducers: {
     clearPlaylists(state) {
-      state.playlists = initialPlaylistsState.playlists
-      state.playlistsStatus = initialPlaylistsState.playlistsStatus
+      state.playlists = initialPlaylistsState.playlists;
+      state.playlistsStatus = initialPlaylistsState.playlistsStatus;
     },
     addPlaylist(state, action: PayloadAction<IAddPlaylistPayload>) {
       const playlist = action.payload;
@@ -36,6 +39,11 @@ export const playlistsSlice = createSlice({
         status: "init",
       };
       state.playlists[playlist.id] = playlist;
+    },
+    removePlaylist(state, action: PayloadAction<IRemovePlaylistPayload>) {
+      const playlistID = action.payload.playlistID;
+      delete state.playlistsStatus[playlistID];
+      delete state.playlists[playlistID];
     },
     fetchPlaylistLevels(
       state,

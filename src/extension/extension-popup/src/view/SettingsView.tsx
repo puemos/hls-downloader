@@ -1,8 +1,9 @@
-import { Box, Flex, IconButton, Stack, Switch, Text } from "@chakra-ui/core";
+import { Box, Flex, IconButton, Stack, Switch, Text } from "@chakra-ui/react";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { configSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
 const SettingsView = () => {
   const dispatch = useDispatch();
@@ -46,12 +47,12 @@ const SettingsView = () => {
       >
         <Box>
           <Text fontSize="md" fontWeight="semibold">
-            Concurrency
+            Chunks Concurrency
           </Text>
         </Box>
         <Stack isInline>
           <IconButton
-            icon="add"
+            icon={<AddIcon />}
             size="sm"
             aria-label="increase concurrency"
             onClick={onConcurrencyIncrease}
@@ -73,7 +74,7 @@ const SettingsView = () => {
           </Flex>
           <IconButton
             size="sm"
-            icon="minus"
+            icon={<MinusIcon />}
             aria-label="decrease concurrency"
             bg="#5666f3"
             onClick={onConcurrencyDecrease}
@@ -94,7 +95,11 @@ const SettingsView = () => {
           </Text>
         </Box>
         <Box>
-          <Switch onClick={onSaveDialogClick} isChecked={saveDialog} size="lg" />
+          <Switch
+            onClick={onSaveDialogClick}
+            isChecked={saveDialog}
+            size="lg"
+          />
         </Box>
       </Stack>
     </Stack>

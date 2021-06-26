@@ -1,4 +1,4 @@
-import { Stack } from "@chakra-ui/core";
+import { Stack } from "@chakra-ui/react";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { Job } from "@hls-downloader/core/lib/entities";
 import React from "react";

@@ -1,6 +1,7 @@
-import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/core";
+import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/react";
 import { Playlist } from "@hls-downloader/core/lib/entities";
 import React from "react";
+import { ArrowForwardIcon } from "@chakra-ui/icons";
 
 export function PlaylistRowView(props: {
   onSelectPlaylistClick: (playlistID: string) => void;
@@ -37,7 +38,7 @@ export function PlaylistRowView(props: {
       <Stack justify="space-between">
         <Stack isInline justifyContent="flex-end">
           <IconButton
-            icon="arrow-forward"
+            icon={<ArrowForwardIcon/>}
             aria-label="download"
             onClick={() => props.onSelectPlaylistClick(props.playlist.id)}
           />

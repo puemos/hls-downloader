@@ -1,3 +1,3 @@
-(cd extension-background && yarn build) 
+(cd extension-background && yarn && yarn build) 
 
 (cp -r extension-background/lib/* ./dist/)

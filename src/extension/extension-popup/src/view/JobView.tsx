@@ -1,4 +1,5 @@
-import { Grid, IconButton, Stack, Text } from "@chakra-ui/core";
+import { Grid, IconButton, Stack, Text } from "@chakra-ui/react";
+import { DownloadIcon, DeleteIcon } from "@chakra-ui/icons";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { jobsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import { Job, JobStatus } from "@hls-downloader/core/lib/entities";
@@ -71,7 +72,7 @@ export const JobView = (props: { job: Job }) => {
         {["ready", "done", "saving"].includes(status?.status!) && (
           <IconButton
             aria-label="save"
-            icon="download"
+            icon={<DownloadIcon />}
             isLoading={status?.status === "saving"}
             isDisabled={status?.status === "saving"}
             onClick={onSaveJobClick}
@@ -79,21 +80,21 @@ export const JobView = (props: { job: Job }) => {
         )}
         {["init"].includes(status?.status!) && (
           <IconButton
-            icon="download"
+            icon={<DownloadIcon />}
             aria-label="download"
             onClick={onDownloadJobClick}
           />
         )}
         {["downloading"].includes(status?.status!) && (
           <IconButton
-            icon="delete"
+            icon={<DeleteIcon />}
             aria-label="delete"
             onClick={onCancelClick}
           />
         )}
         {["ready", "done", "saving"].includes(status?.status!) && (
           <IconButton
-            icon="delete"
+            icon={<DeleteIcon />}
             aria-label="delete"
             onClick={onDeleteClick}
           />

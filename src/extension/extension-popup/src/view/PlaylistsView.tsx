@@ -5,7 +5,7 @@ import {
   IconButton,
   Input,
   Stack,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import {
   levelsSlice,
@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { EmptyState } from "./EmptyState";
 import PlaylistLevelsView from "./PlaylistLevelsView";
 import { PlaylistRowView } from "./PlaylistRowView";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 
 const playlistFilter = (filter: string) => (p: Playlist): boolean => {
   const filterLowerCase = filter.toLocaleLowerCase();
@@ -86,6 +87,7 @@ const PlaylistsView = () => {
                     placeholder="Filter..."
                     onChange={onFilterInputChange}
                     value={filter}
+                    size="sm"
                   />
                 </Box>
                 <Box>
@@ -113,7 +115,7 @@ const PlaylistsView = () => {
             <IconButton
               variant="ghost"
               aria-label="close"
-              icon="arrow-back"
+              icon={<ArrowBackIcon/>}
               onClick={() => setId("")}
             ></IconButton>
             <Heading lineHeight={1} size="md">

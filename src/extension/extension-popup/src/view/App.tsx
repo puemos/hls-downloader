@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/core";
+import { Box, Flex } from "@chakra-ui/react";
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -11,6 +11,7 @@ import PlaylistsView from "./PlaylistsView";
 import SettingsView from "./SettingsView";
 import AboutView from "./AboutView";
 import DownloadsView from "./DownloadsView";
+import DirectUrlView from "./DirectUrlView";
 
 function App() {
   return (
@@ -18,30 +19,29 @@ function App() {
       <Router>
         <Flex direction="column">
           <Navbar></Navbar>
-          <style>
-            {`
-              html {
-                --scrollbarBG: #272730;
-                --thumbBG: #303038;
-              }
-              .Main::-webkit-scrollbar {
-                width: 1rem;
-              }
-              .Main {
-                scrollbar-width: thin;
-                scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-              }
-              .Main::-webkit-scrollbar-track {
-                background: var(--scrollbarBG);
-              }
-              .Main::-webkit-scrollbar-thumb {
-                background-color: var(--thumbBG) ;
-                border-radius: 1rem;
-                border: 5px solid var(--scrollbarBG);
-              }
-              `}
-          </style>
-          <Box overflowY="scroll" className="Main" height={500 - 72} pt="1rem">
+          <Box
+            overflowY="scroll"
+            className="Main"
+            height={500 - 72}
+            pt="1rem"
+            css={{
+              "&::-webkit-scrollbar": {
+                width: "1rem",
+              },
+              "&": {
+                "scrollbar-width": "thin",
+                "scrollbar-color": "#303038 var(--chakra-colors-gray-900)",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "var(--chakra-colors-gray-900)",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#303038",
+                borderRadius: "1rem",
+                border: "5px solid var(--chakra-colors-gray-900)",
+              },
+            }}
+          >
             <Switch>
               <Redirect from="/index.html" to="/" />
               <Route path="/settings">
@@ -52,6 +52,9 @@ function App() {
               </Route>
               <Route path="/about">
                 <AboutView />
+              </Route>
+              <Route path="/direct">
+                <DirectUrlView />
               </Route>
               <Route path="/">
                 <PlaylistsView />

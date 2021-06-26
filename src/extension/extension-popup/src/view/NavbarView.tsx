@@ -1,4 +1,4 @@
-import { Stack, Box } from "@chakra-ui/core";
+import { Stack, Box } from "@chakra-ui/react";
 import React from "react";
 import { NavLink } from "./NavLink";
 
@@ -12,18 +12,21 @@ export function Navbar() {
       pr="1rem"
       justifyContent="space-between"
     >
-      <Stack isInline spacing="2rem">
-        <Box>
-          <NavLink width="3rem" path="/" label="Home"></NavLink>
-        </Box>
-        <Box>
-          <NavLink width="5.5rem" path="/downloads" label="Downloads"></NavLink>
-        </Box>
-        <Box>
-          <NavLink width="3rem" path="/about" label="About"></NavLink>
-        </Box>
-      </Stack>
-      <NavLink width="4rem" path="/settings" label="Settings"></NavLink>
+      <Box>
+        <NavLink path="/" label="Home"></NavLink>
+      </Box>
+      <Box>
+        <NavLink path="/downloads" label="Downloads"></NavLink>
+      </Box>
+      <Box>
+        <NavLink path="/direct" label="Direct"></NavLink>
+      </Box>
+      <Box>
+        <NavLink path="/about" label="About"></NavLink>
+      </Box>
+      <Box>
+        <NavLink path="/settings" label="Settings"></NavLink>
+      </Box>
     </Stack>
   );
 }

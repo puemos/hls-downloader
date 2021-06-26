@@ -1,4 +1,4 @@
-import { Box, Progress, Text, Stack } from "@chakra-ui/core";
+import { Box, Progress, Text, Stack } from "@chakra-ui/react";
 import { LevelStatus } from "@hls-downloader/core/lib/entities";
 import React from "react";
 

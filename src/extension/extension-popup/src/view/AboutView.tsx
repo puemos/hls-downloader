@@ -1,4 +1,4 @@
-import { Box, Link, Stack, Text } from "@chakra-ui/core";
+import { Box, Link, Stack, Text } from "@chakra-ui/react";
 import React from "react";
 import { browser } from "webextension-polyfill-ts";
 

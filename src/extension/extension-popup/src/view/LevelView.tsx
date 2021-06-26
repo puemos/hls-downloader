@@ -1,9 +1,10 @@
-import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/core";
+import { Box, Grid, IconButton, Input, Stack, Text } from "@chakra-ui/react";
 import { levelsSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import { Level } from "@hls-downloader/core/lib/entities";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 export const LevelView = (props: { level: Level }) => {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ export const LevelView = (props: { level: Level }) => {
       </Stack>
       <Stack justify="space-between">
         <IconButton
-          icon="download"
+          icon={<DownloadIcon />}
           aria-label="download"
           onClick={onDownloadLevelClick}
         />

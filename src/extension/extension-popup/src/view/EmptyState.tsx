@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from "@chakra-ui/core";
+import { Box, Stack, Text } from "@chakra-ui/react";
 import React from "react";
 
 export function EmptyState(props: { caption: string }) {
