@@ -23,6 +23,10 @@
 
 https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/ - release in progress
 
+### Microsoft Edge
+
+https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc
+
 ### Google
 
 Google just removed the extension from the store due to a claim
