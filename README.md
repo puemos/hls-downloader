@@ -8,20 +8,34 @@
 
 **Table of Contents**
 - [Get it](#get-it)
+- [Build](#build)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Contributor Covenant Code of Conduct](#contributor-covenant-code-of-conduct)
-- [Credits](#credits)
 - [License](#license)
 
 <br>
 
 ## Get it
 
+### Firefox
+
+https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/ - release in progress
+
+### Google
+
 Google just removed the extension from the store due to a claim
 
 > Globo Comunicação e Participações SA informs that the denounced extension is practicing and/or supporting the practice of illegal activities related to Globo's Copyright Law. This extension allows full and high resolution downloads of Globo content from the Globoplay streaming platform. The disclosure and sale of clandestine services puts the safety of consumers at risk and contributes to organized crime.
+
+## Build
+
+1. Clone the repo
+2. Ensure you have node, yarn installed
+3. Run `sh ./build.sh`
+4. Raw files will be at `./src/extension/dist/`
+5. The zip will be in `./extension-archive.zip`
 
 ## Installation
 
@@ -47,11 +61,7 @@ TODO: Write usage instructions
 
 ## Contributor Covenant Code of Conduct
 
-[Code of Conduct guideline](./CODE_OF_CONDUCT.md)
- 
-## Credits
- 
-Lead Developer - Shy Alter (@puemos)
+[Code of Conduct guideline](./CODE_OF_CONDUCT.md) 
 
  
 ## License
