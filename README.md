@@ -21,11 +21,16 @@
 
 ### Firefox
 
-https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/ - release in progress
+<a href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/" target="_blank">
+ <img src="https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png" alt="Firefox" height="50px" >
+</a>
 
 ### Microsoft Edge
 
-https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc
+<a href="https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc" target="_blank">
+ <img src="https://developer.microsoft.com/store/badges/images/English_get-it-from-MS.png" alt="Microsoft Edge" height="50px" >
+</a>
+
 
 ### Google
 
