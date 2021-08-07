@@ -44,16 +44,16 @@ const AboutView = () => {
             >
               🍺
             </span>
-            Donation
+            Donate
           </Text>
         </Box>
         <Box>
           <Link
-            href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url"
+            href="https://github.com/sponsors/puemos"
             color="#0070ba"
             isExternal
           >
-            PayPal
+            GitHub Sponsors
           </Link>
         </Box>
       </Stack>

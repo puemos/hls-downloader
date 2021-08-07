@@ -1,5 +1,21 @@
 # HLS downloader changelog
 
+## 3.1.1
+
+### Change
+
+- Paypal -> GitHub Sponsors
+
+## 3.1.0
+
+### Add
+
+- Direct download
+
+### Fix
+
+- Several UI fixes
+
 ## 3.0.0
 
 ### Add
