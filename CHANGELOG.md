@@ -1,5 +1,11 @@
 # HLS downloader changelog
 
+## 3.1.2
+
+### Change
+
+- Yarn to NPM
+
 ## 3.1.1
 
 ### Change

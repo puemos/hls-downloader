@@ -1,6 +1,6 @@
 {
   "name": "@hls-downloader/extension-popup",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "private": true,
   "dependencies": {
     "@chakra-ui/icons": "^1.0.13",
@@ -8,7 +8,7 @@
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "@hls-downloader/core": "../../core",
+    "@hls-downloader/core": "file:../../core",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -23,7 +23,7 @@
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.3",
+    "react-scripts": "^4.0.3",
     "typescript": "^4.0.2",
     "webext-redux": "^2.1.6",
     "webextension-polyfill-ts": "^0.19.0"

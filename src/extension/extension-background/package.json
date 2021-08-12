@@ -1,6 +1,6 @@
 {
   "name": "@hls-downloader/extension-background",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "author": "puemos",
   "license": "MIT",
   "main": "lib/index.js",
@@ -17,7 +17,7 @@
     "typescript": "3.8.3"
   },
   "dependencies": {
-    "@hls-downloader/core": "../../core",
+    "@hls-downloader/core": "file:../../core",
     "@types/uuid": "^7.0.2",
     "@videojs/vhs-utils": "^1.3.0",
     "idb": "^5.0.4",
@@ -28,7 +28,7 @@
     "uuid": "^7.0.3",
     "webext-redux": "2.1.6",
     "webextension-polyfill-ts": "^0.19.0",
-    "webpack": "^4.44.1",
+    "webpack": "^5.50.0",
     "webpack-cli": "3.3.12"
   }
 }

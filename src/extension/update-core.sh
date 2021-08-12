@@ -1,6 +1,6 @@
-(cd ../core && yarn && yarn build)
+(cd ../core && npm i -ci && npm run build)
 
-(cd extension-background && yarn add ../../core) &
-(cd extension-popup && yarn add ../../core)
+(cd extension-background && npm i ../../core) &
+(cd extension-popup && npm i ../../core)
 
 wait
