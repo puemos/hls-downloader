@@ -18,7 +18,7 @@ export const fetchPlaylistLevelsEpic: Epic<
     map((action) => action.payload.playlistID),
     map((playlistID) => store.value.playlists.playlists[playlistID]!),
     mergeMap(
-      ({ uri }) => from(getLevelsFactory(loader, parser)(uri)),
+      ({ uri }) => from(getLevelsFactory(loader, parser)(uri, store.value.config.fetchAttempts)),
       ({ id }, levels) => ({
         levels,
         playlistID: id,

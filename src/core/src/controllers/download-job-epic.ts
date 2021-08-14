@@ -41,7 +41,7 @@ export const downloadJobEpic: Epic<
         mergeMap(
           (fragment) =>
             from(
-              downloadSingleFactory(loader)(fragment).then((data) => ({
+              downloadSingleFactory(loader)(fragment, store.value.config.fetchAttempts).then((data) => ({
                 fragment,
                 data,
                 id,
@@ -53,7 +53,8 @@ export const downloadJobEpic: Epic<
         mergeMap(({ data, fragment, id }) =>
           decryptSingleFragmentFactory(loader, decryptor)(
             fragment.key,
-            data
+            data,
+            store.value.config.fetchAttempts
           ).then((data) => ({
             fragment,
             data,
