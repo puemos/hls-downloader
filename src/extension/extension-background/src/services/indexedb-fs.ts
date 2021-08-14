@@ -52,6 +52,8 @@ export class IndexedDBBucket implements Bucket {
   }
 
   async write(index: number, data: ArrayBuffer): Promise<void> {
+    console.log({ index, data });
+
     if (!this.db) {
       await this.openDB();
     }
