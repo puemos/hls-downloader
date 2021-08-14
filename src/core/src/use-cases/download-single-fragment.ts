@@ -6,7 +6,7 @@ export const downloadSingleFactory = (loader: ILoader) => {
     fragment: Fragment,
     fetchAttempts: number
   ): Promise<ArrayBuffer> => {
-    const data = await loader.tryFetchArrayBuffer(fragment.uri, fetchAttempts);
+    const data = await loader.fetchArrayBuffer(fragment.uri, fetchAttempts);
     return data;
   };
   return run;

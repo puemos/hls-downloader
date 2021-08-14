@@ -1,11 +1,20 @@
-import { Box, Flex, IconButton, Input, Stack, Switch, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  IconButton,
+  Input,
+  Stack,
+  Switch,
+  Text,
+} from "@chakra-ui/react";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 import { configSlice } from "@hls-downloader/core/lib/adapters/redux/slices";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const value2infinity = 10000;
+const MAX_FETCH_ATTEMPTS = 10000;
+const MIN_FETCH_ATTEMPTS = 1;
 
 const SettingsView = () => {
   const dispatch = useDispatch();
@@ -40,31 +49,26 @@ const SettingsView = () => {
     );
   }
   function onFetchAttemptsIncrease() {
-    if (fetchAttempts !== -1)
-      dispatch(
-        configSlice.actions.setFetchAttempts({
-          fetchAttempts: fetchAttempts < value2infinity - 1 ? fetchAttempts + 1 : -1
-        })
-      );
+    dispatch(
+      configSlice.actions.setFetchAttempts({
+        fetchAttempts: Math.min(fetchAttempts + 1, MAX_FETCH_ATTEMPTS),
+      })
+    );
   }
   function onFetchAttemptsDecrease() {
     dispatch(
       configSlice.actions.setFetchAttempts({
-        fetchAttempts: fetchAttempts === -1 ? value2infinity - 1 : Math.max(1, fetchAttempts - 1),
+        fetchAttempts: Math.max(fetchAttempts - 1, MIN_FETCH_ATTEMPTS),
       })
     );
   }
   function onFetchAttemptsChange(event: React.ChangeEvent<HTMLInputElement>) {
     const strFetchAttempts = event.currentTarget.value;
-    let fetchAttempts = strFetchAttempts === "\u221E" ? Infinity : Math.floor(+strFetchAttempts);
-    if (fetchAttempts >= value2infinity || fetchAttempts < 0)
-      fetchAttempts = -1;
-    if (fetchAttempts === 0)
-      fetchAttempts = 1;
-    if (fetchAttempts !== NaN)
+    const fetchAttempts = Math.floor(Number(strFetchAttempts));
+
     dispatch(
       configSlice.actions.setFetchAttempts({
-        fetchAttempts: fetchAttempts
+        fetchAttempts: fetchAttempts,
       })
     );
   }
@@ -147,7 +151,9 @@ const SettingsView = () => {
             <Input
               pl="0px"
               pr="0px"
-              value={fetchAttempts === -1 ? "∞" : fetchAttempts}
+              max={MAX_FETCH_ATTEMPTS}
+              min={MIN_FETCH_ATTEMPTS}
+              value={fetchAttempts}
               onChange={onFetchAttemptsChange}
               variant="filled"
               textAlign="center"

@@ -1,20 +1,10 @@
-export function fetchText(url: string) {
-  return fetch(url).then((res) => res.text());
-}
-
-export function fetchArrayBuffer(url: string) {
-  return fetch(url).then((res) => res.arrayBuffer());
-}
-
-export async function tryFetchArrayBuffer(url: string, attempts: number) {
-  if (attempts === -1)
-    attempts = Infinity;
-  if (attempts < 1)
+export async function fetchText(url: string, attempts: number = 1) {
+  if (attempts < 1) {
     throw new Error("Attempts less then 1");
-  attempts = Math.floor(attempts);
+  }
   while (attempts--) {
     try {
-      return await fetchArrayBuffer(url);
+      return await fetch(url).then((res) => res.text());
     } catch (e) {
       console.warn(e);
     }
@@ -22,15 +12,13 @@ export async function tryFetchArrayBuffer(url: string, attempts: number) {
   throw new Error("Fetch error");
 }
 
-export async function tryFetchText(url: string, attempts: number) {
-  if (attempts === -1)
-    attempts = Infinity;
-  if (attempts < 1)
+export async function fetchArrayBuffer(url: string, attempts: number = 1) {
+  if (attempts < 1) {
     throw new Error("Attempts less then 1");
-  attempts = Math.floor(attempts);
+  }
   while (attempts--) {
     try {
-      return await fetchText(url);
+      return await fetch(url).then((res) => res.arrayBuffer());
     } catch (e) {
       console.warn(e);
     }
@@ -41,6 +29,4 @@ export async function tryFetchText(url: string, attempts: number) {
 export const FetchLoader = {
   fetchText,
   fetchArrayBuffer,
-  tryFetchText,
-  tryFetchArrayBuffer,
 };
