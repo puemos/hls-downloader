@@ -1,7 +1,7 @@
 
-<img height="150px" src="https://github.com/puemos/hls-downloader-web-extension/blob/master/src/extension/store-assets/png/Small-Promo-Tile.png?raw=true">
+<img height="150px" src="https://github.com/puemos/hls-downloader/blob/master/src/extension/store-assets/png/Small-Promo-Tile.png?raw=true">
 <p>Capture and download <a href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming">HTTP Live streams (HLS)</a> from your browser</p>
-<img src="https://img.shields.io/github/issues/puemos/hls-downloader-web-extension" alt="GitHub issues">
+<img src="https://img.shields.io/github/issues/puemos/hls-downloader" alt="GitHub issues">
 <p>This extension is completely free and published under the MIT license. However, if you are using it and enjoy it, you are welcome to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url">making a donation</a> of your choice.</p>
 <a href="https://www.buymeacoffee.com/puemos" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" width="100px" ></a>
 <br><br><br>
@@ -51,7 +51,7 @@ Google just removed the extension from the store due to a claim
 
 ## Installation
 
-1. Download the `crx` file from the latest release (https://github.com/puemos/hls-downloader-web-extension/releases)
+1. Download the `crx` file from the latest release (https://github.com/puemos/hls-downloader/releases)
 2. Open `chrome://extensions/`
 3. Drop the `crx` file into the page
 4. Enjoy :)
