@@ -4,7 +4,7 @@
 
 ### Add
 
-- The extention will rety failed download attemps
+- The extension will retry failed download attempts
 
 ## 3.1.2
 
