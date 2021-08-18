@@ -1,5 +1,11 @@
 # HLS downloader changelog
 
+## 3.2.0
+
+### Add
+
+- The extention will rety failed download attemps
+
 ## 3.1.2
 
 ### Change
