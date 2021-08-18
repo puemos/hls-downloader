@@ -64,7 +64,10 @@ const SettingsView = () => {
   }
   function onFetchAttemptsChange(event: React.ChangeEvent<HTMLInputElement>) {
     const strFetchAttempts = event.currentTarget.value;
-    const fetchAttempts = Math.floor(Number(strFetchAttempts));
+    const fetchAttempts = Math.min(
+      Math.floor(Number(strFetchAttempts)),
+      MIN_FETCH_ATTEMPTS
+    );
 
     dispatch(
       configSlice.actions.setFetchAttempts({
@@ -153,6 +156,7 @@ const SettingsView = () => {
               pr="0px"
               max={MAX_FETCH_ATTEMPTS}
               min={MIN_FETCH_ATTEMPTS}
+              pattern="^[1-9][0-9]*$"
               value={fetchAttempts}
               onChange={onFetchAttemptsChange}
               variant="filled"
