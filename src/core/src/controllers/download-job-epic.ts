@@ -1,30 +1,22 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
-import {
-  filter,
-  map,
-  mergeMap,
-  takeUntil,
-  flatMap,
-  take,
-} from "rxjs/operators";
-import { RootState, RootAction } from "../adapters/redux/root-reducer";
-import { levelsSlice } from "../adapters/redux/slices/levels-slice";
+import { filter, map, mergeMap, takeUntil } from "rxjs/operators";
+import { RootAction, RootState } from "../adapters/redux/root-reducer";
+import { jobsSlice } from "../adapters/redux/slices";
 import { Dependencies } from "../services";
 import {
   createBucketFactory,
+  decryptSingleFragmentFactory,
   downloadSingleFactory,
   writeToBucketFactory,
-  decryptSingleFragmentFactory,
 } from "../use-cases";
-import { jobsSlice } from "../adapters/redux/slices";
 
 export const downloadJobEpic: Epic<
   RootAction,
   RootAction,
   RootState,
   Dependencies
-> = (action$, store, { fs, loader, decryptor }) =>
+> = (action$, store$, { fs, loader, decryptor }) =>
   action$.pipe(
     filter(jobsSlice.actions.add.match),
     map((action) => action.payload.job),
@@ -41,19 +33,23 @@ export const downloadJobEpic: Epic<
         mergeMap(
           (fragment) =>
             from(
-              downloadSingleFactory(loader)(fragment).then((data) => ({
+              downloadSingleFactory(loader)(
+                fragment,
+                store$.value.config.fetchAttempts
+              ).then((data) => ({
                 fragment,
                 data,
                 id,
               }))
             ),
 
-          store.value.config.concurrency
+          store$.value.config.concurrency
         ),
         mergeMap(({ data, fragment, id }) =>
           decryptSingleFragmentFactory(loader, decryptor)(
             fragment.key,
-            data
+            data,
+            store$.value.config.fetchAttempts
           ).then((data) => ({
             fragment,
             data,

@@ -3,9 +3,10 @@ import { ILoader } from "../services";
 
 export const downloadSingleFactory = (loader: ILoader) => {
   const run = async (
-    fragment: Fragment
+    fragment: Fragment,
+    fetchAttempts: number
   ): Promise<ArrayBuffer> => {
-    const data = await loader.fetchArrayBuffer(fragment.uri);
+    const data = await loader.fetchArrayBuffer(fragment.uri, fetchAttempts);
     return data;
   };
   return run;

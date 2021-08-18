@@ -7,13 +7,19 @@ export interface ISetSaveDialogPayload {
   saveDialog: boolean;
 }
 
+export interface ISetFetchAttemptsPayload {
+  fetchAttempts: number;
+}
+
 export interface IConfigState {
   concurrency: number;
   saveDialog: boolean;
+  fetchAttempts: number;
 }
 const initialConfigState: IConfigState = {
   concurrency: 2,
   saveDialog: false,
+  fetchAttempts: 100,
 };
 
 export const configSlice = createSlice({
@@ -25,6 +31,9 @@ export const configSlice = createSlice({
     },
     setSaveDialog(state, action: PayloadAction<ISetSaveDialogPayload>) {
       state.saveDialog = action.payload.saveDialog;
+    },
+    setFetchAttempts(state, action: PayloadAction<ISetFetchAttemptsPayload>) {
+      state.fetchAttempts = action.payload.fetchAttempts;
     },
   },
 });
