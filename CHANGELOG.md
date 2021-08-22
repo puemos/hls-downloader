@@ -1,5 +1,13 @@
 # HLS downloader changelog
 
+## 3.2.1
+
+### Fix
+
+- Download fail on Firefox
+- Filter playlists
+- SaveAs dialog Switch
+
 ## 3.2.0
 
 ### Add
