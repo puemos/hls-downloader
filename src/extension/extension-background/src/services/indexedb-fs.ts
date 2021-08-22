@@ -15,7 +15,7 @@ const buckets: Record<string, IndexedDBBucket> = {};
 interface ChunksDB extends DBSchema {
   chunks: {
     value: {
-      data: ArrayBuffer;
+      data: Uint8Array;
       index: number;
     };
     key: string;
@@ -52,10 +52,15 @@ export class IndexedDBBucket implements Bucket {
   }
 
   async write(index: number, data: ArrayBuffer): Promise<void> {
+    const typedArray = new Uint8Array(data);
+
     if (!this.db) {
       await this.openDB();
     }
-    await this.db!.add(this.objectStoreName, { data, index });
+    await this.db!.add(this.objectStoreName, {
+      data: typedArray,
+      index,
+    });
     return Promise.resolve();
   }
 
@@ -83,7 +88,7 @@ export class IndexedDBBucket implements Bucket {
             if (!currentCursor) {
               controller.close();
             } else {
-              controller.enqueue(new Uint8Array(currentCursor.value.data));
+              controller.enqueue(currentCursor.value.data);
               return currentCursor.continue().then((nextCursor) => {
                 push(nextCursor);
               });
@@ -163,7 +168,7 @@ const saveAs: IFS["saveAs"] = async function (
     conflictAction: "uniquify",
     filename,
   });
-  URL.revokeObjectURL(link);
+  // URL.revokeObjectURL(link);
   return Promise.resolve();
 };
 
