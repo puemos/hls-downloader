@@ -187,7 +187,7 @@ const SettingsView = () => {
         </Box>
         <Box>
           <Switch
-            onClick={onSaveDialogClick}
+            onChange={onSaveDialogClick}
             isChecked={saveDialog}
             size="lg"
           />

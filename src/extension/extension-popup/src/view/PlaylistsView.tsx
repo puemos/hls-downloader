@@ -19,22 +19,24 @@ import PlaylistLevelsView from "./PlaylistLevelsView";
 import { PlaylistRowView } from "./PlaylistRowView";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 
-const playlistFilter = (filter: string) => (p: Playlist): boolean => {
-  const filterLowerCase = filter.toLocaleLowerCase();
-  if (filterLowerCase === "") {
-    return true;
-  }
-  if (p.uri.toLocaleLowerCase().includes(filterLowerCase)) {
-    return true;
-  }
-  if (p.pageTitle?.toLocaleLowerCase().includes(filterLowerCase)) {
-    return true;
-  }
-  if (p.initiator?.toLocaleLowerCase().includes(filterLowerCase)) {
-    return true;
-  }
-  return false;
-};
+const playlistFilter =
+  (filter: string) =>
+  (p: Playlist): boolean => {
+    const filterLowerCase = filter.toLocaleLowerCase();
+    if (filterLowerCase === "") {
+      return true;
+    }
+    if (p.uri.toLocaleLowerCase().includes(filterLowerCase)) {
+      return true;
+    }
+    if (p.pageTitle?.toLocaleLowerCase().includes(filterLowerCase)) {
+      return true;
+    }
+    if (p.initiator?.toLocaleLowerCase().includes(filterLowerCase)) {
+      return true;
+    }
+    return false;
+  };
 
 const PlaylistsView = () => {
   const [id, setId] = useState<string | null>(null);
@@ -70,24 +72,23 @@ const PlaylistsView = () => {
     .filter(playlistFilter(filter));
 
   playlists.sort((a, b) => b.createdAt - a.createdAt);
+
+  const showFilterInput = playlists.length !== 0 || filter !== "";
+
   return (
     <Stack spacing="1rem" pl="1rem" pr="0rem" pb="2rem">
       {id === null && (
         <Stack>
           <Stack isInline alignItems="center" justifyContent="space-between">
-            <Box>
-              <Heading lineHeight={1} size="md">
-                Playlists
-              </Heading>
-            </Box>
-            {playlists.length !== 0 && (
+            {showFilterInput && (
               <>
-                <Box>
+                <Box width="max-content">
                   <Input
                     placeholder="Filter..."
                     onChange={onFilterInputChange}
                     value={filter}
                     size="sm"
+                    borderRadius="md"
                   />
                 </Box>
                 <Box>
@@ -115,7 +116,7 @@ const PlaylistsView = () => {
             <IconButton
               variant="ghost"
               aria-label="close"
-              icon={<ArrowBackIcon/>}
+              icon={<ArrowBackIcon />}
               onClick={() => setId("")}
             ></IconButton>
             <Heading lineHeight={1} size="md">

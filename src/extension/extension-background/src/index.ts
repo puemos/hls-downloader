@@ -6,7 +6,6 @@ import { CryptoDecryptor } from "./services/crypto-decryptor";
 import { FetchLoader } from "./services/fetch-loader";
 import { IndexedDBFS } from "./services/indexedb-fs";
 import { M3u8Parser } from "./services/m3u8-parser";
-import { openDB, deleteDB } from "idb";
 
 (async () => {
   const state = await getState();
