@@ -1,6 +1,6 @@
 {
   "name": "@hls-downloader/extension-popup",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "private": true,
   "dependencies": {
     "@chakra-ui/icons": "^1.1.1",
