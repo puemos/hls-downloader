@@ -9,21 +9,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        uses: actions/setup-node@v2
         with:
           node-version: "14"
-      - run: ./build.sh
-      - uses: cardinalby/webext-buildtools-chrome-crx-action@v2
-        with:
-          zipFilePath: "extension-archive.zip"
-          crxFilePath: "extension-archive.crx"
-          privateKey: ${{ secrets.CHROME_CRX_PRIVATE_KEY }}
+      - name: Build
+        run: ./build.sh
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             extension-archive.zip
-            extension-archive.crx
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
