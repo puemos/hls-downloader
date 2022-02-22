@@ -1,0 +1,17 @@
+name: "Submit to Web Stores"
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2.1.2
+      - name: Build
+        run: ./build.sh
+      - name: Browser Plugin Publish
+        uses: plasmo-corp/bpp@v1
+        with:
+          artifact: extension-archive.zip
+          keys: ${{ secrets.SUBMIT_KEYS }}
