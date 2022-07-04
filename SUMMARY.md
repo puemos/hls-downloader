@@ -1,16 +1,18 @@
 # Table of contents
 
-* [HLS downloader changelog](README.md)
-* [Contributor Covenant Code of Conduct](code\_of\_conduct.md)
-* [Contributing](contributing.md)
-* [PRIVACY](privacy.md)
-* [README](readme.md)
-* [.github](.github/README.md)
-  * [ISSUE\_TEMPLATE](.github/issue\_template/README.md)
-    * [bug\_report](.github/issue\_template/bug\_report.md)
-  * [ISSUE\_TEMPLATE](.github/issue\_template-1/README.md)
-    * [feature\_request](.github/issue\_template-1/feature\_request.md)
-* [src](src/README.md)
-  * [extension](src/extension/README.md)
-    * [Welcome to your new awesome project!](src/extension/extension-background.md)
-    * [extension-popup](src/extension/extension-popup.md)
+* [HLS Downloader](README.md)
+
+## 😎 Guides
+
+* [Install the extension](guides/install-the-extension.md)
+* [Capture a steam](guides/capture-a-steam.md)
+
+## 👩💻 Development
+
+* [Build](development/build.md)
+* [Contributing](development/contributing.md)
+
+## 🏦 Legal
+
+* [Code of Conduct](legal/code\_of\_conduct.md)
+* [Privacy](legal/privacy.md)
