@@ -1,6 +1,6 @@
 # Table of contents
 
-* [HLS Downloader](README.md)
+* [About the extension](README.md)
 
 ## 😎 Guides
 
