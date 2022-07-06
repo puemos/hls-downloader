@@ -51,9 +51,9 @@ Google just removed the extension from the store due to a claim
 
 ## Installation
 
-1. Download the `crx` file from the latest release (https://github.com/puemos/hls-downloader/releases)
+1. Download the `zip` file from the latest release (https://github.com/puemos/hls-downloader/releases)
 2. Open `chrome://extensions/`
-3. Drop the `crx` file into the page
+3. Drop the `zip` file into the page
 4. Enjoy :)
 
 ## Usage
