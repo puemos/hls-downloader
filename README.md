@@ -25,7 +25,7 @@
 ### Firefox
 
 <a href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/" target="_blank">
- <img src="https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png" alt="Firefox" height="50px" >
+ <img src="https://blog.mozilla.org/addons/files/2015/11/get-the-addon.png" alt="Firefox" height="50px" >
 </a>
 
 ### Microsoft Edge
