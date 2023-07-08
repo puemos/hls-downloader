@@ -5,6 +5,5 @@ export interface IParser {
   parseLevelPlaylist(
     string: string,
     baseurl: string,
-    index: number
   ): Fragment[];
 }

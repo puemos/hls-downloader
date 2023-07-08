@@ -1,6 +1,6 @@
 /// <reference path="m3u8-parser.d.ts" />
 
-import { Fragment, Level } from "@hls-downloader/core/lib/entities";
+import { Fragment, Level, LevelType } from "@hls-downloader/core/lib/entities";
 import { IParser } from "@hls-downloader/core/lib/services";
 import { Parser } from "m3u8-parser";
 import { buildAbsoluteURL } from "url-toolkit";
@@ -28,14 +28,30 @@ export const M3u8Parser: IParser = {
     const parser = new Parser();
     parser.push(string);
     const playlists = parser.manifest?.playlists ?? [];
-    return playlists.map((playlist, index) => ({
-      index,
+    const results = playlists.map(playlist => ({
+      type: 'stream' as LevelType,
       id: v4(),
       playlistID: baseurl,
+      uri: buildAbsoluteURL(baseurl, playlist.uri),
       bitrate: playlist.attributes.BANDWIDTH,
+      fps: playlist.attributes['FRAME-RATE'],
       height: playlist.attributes.RESOLUTION?.height,
       width: playlist.attributes.RESOLUTION?.width,
-      uri: buildAbsoluteURL(baseurl, playlist.uri),
     }));
+    for (const [key, entries] of Object.entries(parser.manifest?.mediaGroups?.AUDIO ?? {})) {
+      for (const [label, entry] of Object.entries(entries)) {
+        results.push({
+          type: 'audio' as LevelType,
+          id: `${label}-${key}`,
+          playlistID: baseurl,
+          uri: buildAbsoluteURL(baseurl, entry.uri),
+          bitrate: undefined,
+          fps: undefined,
+          width: undefined,
+          height: undefined,
+        });
+      }
+    }
+    return results;
   },
 };

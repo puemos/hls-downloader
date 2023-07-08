@@ -42,6 +42,7 @@ declare module "m3u8-parser" {
         width: number;
         height: number;
       };
+      "FRAME-RATE"?: number;
     };
   };
 
