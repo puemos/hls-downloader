@@ -28,30 +28,35 @@ export const M3u8Parser: IParser = {
     const parser = new Parser();
     parser.push(string);
     const playlists = parser.manifest?.playlists ?? [];
-    const results = playlists.map(playlist => ({
-      type: 'stream' as LevelType,
+    const audioPlaylists = parser.manifest?.mediaGroups?.AUDIO ?? {};
+    const results = playlists.map((playlist) => ({
+      type: "stream" as LevelType,
       id: v4(),
       playlistID: baseurl,
       uri: buildAbsoluteURL(baseurl, playlist.uri),
       bitrate: playlist.attributes.BANDWIDTH,
-      fps: playlist.attributes['FRAME-RATE'],
+      fps: playlist.attributes["FRAME-RATE"],
       height: playlist.attributes.RESOLUTION?.height,
       width: playlist.attributes.RESOLUTION?.width,
     }));
-    for (const [key, entries] of Object.entries(parser.manifest?.mediaGroups?.AUDIO ?? {})) {
-      for (const [label, entry] of Object.entries(entries)) {
-        results.push({
-          type: 'audio' as LevelType,
-          id: `${label}-${key}`,
-          playlistID: baseurl,
-          uri: buildAbsoluteURL(baseurl, entry.uri),
-          bitrate: undefined,
-          fps: undefined,
-          width: undefined,
-          height: undefined,
+
+    const audioResults = Object.entries(audioPlaylists).flatMap(
+      ([key, entries]) => {
+        return Object.entries(entries).map(([label, entry]) => {
+          return {
+            type: "audio" as LevelType,
+            id: `${label}-${key}`,
+            playlistID: baseurl,
+            uri: buildAbsoluteURL(baseurl, entry.uri),
+            bitrate: undefined,
+            fps: undefined,
+            width: undefined,
+            height: undefined,
+          };
         });
       }
-    }
-    return results;
+    );
+
+    return results.concat(audioResults);
   },
 };

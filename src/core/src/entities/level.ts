@@ -1,12 +1,14 @@
 export type LevelType = "stream" | "audio";
 
-export type Level = {
-  type: LevelType;
-  id: string;
-  playlistID: string;
-  uri: string;
-  width?: number;
-  height?: number;
-  bitrate?: number;
-  fps?: number;
-};
+export class Level {
+  constructor(
+    readonly type: LevelType,
+    readonly id: string,
+    readonly playlistID: string,
+    readonly uri: string,
+    readonly width?: number,
+    readonly height?: number,
+    readonly bitrate?: number,
+    readonly fps?: number
+  ) {}
+}
