@@ -21,8 +21,10 @@ import { M3u8Parser } from "./services/m3u8-parser";
 
   wrapStore(store);
 
+  let bufferSaveState : number;
   store.subscribe(() => {
-    saveState(store.getState());
+    window.clearTimeout(bufferSaveState);
+    bufferSaveState = window.setTimeout(() => saveState(store.getState()), 200);
   });
 
   subscribeListeners(store);
