@@ -5,6 +5,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { DownloadIcon } from "@chakra-ui/icons";
+import { LevelMetadata } from "./LevelMetadata";
 
 export const LevelView = (props: { level: Level }) => {
   const dispatch = useDispatch();
@@ -24,20 +25,7 @@ export const LevelView = (props: { level: Level }) => {
       bg="gray.800"
     >
       <Stack>
-        <Grid gridTemplateColumns="1.3fr 1fr 1fr" gridTemplateRows="1fr">
-          <Stack isInline spacing="0.4rem">
-            <Text color="#99a3ff">Resolution</Text>
-            {props.level.width && (
-              <Text color="gray.400">
-                {props.level.width}×{props.level.height}
-              </Text>
-            )}
-          </Stack>
-          <Stack isInline spacing="0.4rem">
-            <Text color="#99a3ff">Bitrate</Text>
-            <Text color="gray.400">{props.level.bitrate}</Text>
-          </Stack>
-        </Grid>
+        <LevelMetadata level={props.level} />
         <Box>
           <Input
             size="sm"

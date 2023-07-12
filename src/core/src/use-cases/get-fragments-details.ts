@@ -13,7 +13,6 @@ export const getFragmentsDetailsFactory = (
     const fragments = parser.parseLevelPlaylist(
       levelPlaylistText,
       playlist.uri,
-      playlist.index
     );
     return fragments;
   };
