@@ -1,7 +1,8 @@
 import { browser } from "webextension-polyfill-ts";
 import { RootState } from "@hls-downloader/core/lib/adapters/redux/root-reducer";
 
-export async function saveState(state: RootState) {
+export async function saveState() {
+  const state = getState();
   if (!state) {
     return;
   }
