@@ -1,5 +1,15 @@
 # HLS downloader changelog
 
+## 3.3.0
+
+Big thanks for @mayfield!!
+
+### Add
+
+- FPS info
+- Audio-only media support
+- Improve retry backoff
+
 ## 3.2.2
 
 ### Fix
