@@ -6,6 +6,7 @@ import { CryptoDecryptor } from "./services/crypto-decryptor";
 import { FetchLoader } from "./services/fetch-loader";
 import { IndexedDBFS } from "./services/indexedb-fs";
 import { M3u8Parser } from "./services/m3u8-parser";
+import { throttle } from "@github/mini-throttle";
 
 (async () => {
   const state = await getState();
@@ -22,7 +23,7 @@ import { M3u8Parser } from "./services/m3u8-parser";
   wrapStore(store);
 
   store.subscribe(() => {
-    saveState(store.getState());
+    throttle(saveState, 100);
   });
 
   subscribeListeners(store);
