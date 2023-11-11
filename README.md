@@ -59,8 +59,9 @@ Google just removed the extension from the store due to a claim
 
 1. Download the `zip` file from the latest release (https://github.com/puemos/hls-downloader/releases)
 2. Open `chrome://extensions/`
-3. Drop the `zip` file into the page
-4. Enjoy :)
+3. Enable `Developer mode`
+4. Drop the `zip` file into the page
+5. Enjoy :)
 
 ## Usage
  
