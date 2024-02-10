@@ -1,7 +1,7 @@
 import { combineEpics, Epic } from "redux-observable";
 import { BehaviorSubject } from "rxjs";
 import { mergeMap } from "rxjs/operators";
-import { RootState } from "../adapters/redux/root-reducer";
+import { RootState } from "../store/root-reducer";
 import { Dependencies } from "../services";
 import * as epics from ".";
 
@@ -13,7 +13,7 @@ export function createRootEpic() {
   const rootEpic: Epic<any, any, RootState, Dependencies> = (
     action$,
     state$,
-    deps
+    deps,
   ) => epic$.pipe(mergeMap((epic) => epic(action$, state$, deps)));
   return rootEpic;
 }

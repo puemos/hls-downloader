@@ -1,8 +1,8 @@
 import { Epic } from "redux-observable";
 import { of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootAction, RootState } from "../adapters/redux/root-reducer";
-import { playlistsSlice } from "../adapters/redux/slices";
+import { RootAction, RootState } from "../store/root-reducer";
+import { playlistsSlice } from "../store/slices";
 import { Dependencies } from "../services";
 
 export const addPlaylistEpic: Epic<
@@ -19,7 +19,7 @@ export const addPlaylistEpic: Epic<
       of(
         playlistsSlice.actions.fetchPlaylistLevels({
           playlistID: id,
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );

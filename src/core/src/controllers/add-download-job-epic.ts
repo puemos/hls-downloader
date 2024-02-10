@@ -1,11 +1,11 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootState, RootAction } from "../adapters/redux/root-reducer";
-import { levelsSlice } from "../adapters/redux/slices/levels-slice";
+import { RootState, RootAction } from "../store/root-reducer";
+import { levelsSlice } from "../store/slices/levels-slice";
 import { Dependencies } from "../services";
 import { getFragmentsDetailsFactory, generateFileName } from "../use-cases";
-import { jobsSlice } from "../adapters/redux/slices/jobs-slice";
+import { jobsSlice } from "../store/slices/jobs-slice";
 
 export const addDownloadJobEpic: Epic<
   RootAction,
@@ -19,11 +19,17 @@ export const addDownloadJobEpic: Epic<
     map((levelID) => store$.value.levels.levels[levelID]),
     map((level) => level!),
     mergeMap(
-      (level) => from(getFragmentsDetailsFactory(loader, parser)(level, store$.value.config.fetchAttempts)),
+      (level) =>
+        from(
+          getFragmentsDetailsFactory(loader, parser)(
+            level,
+            store$.value.config.fetchAttempts,
+          ),
+        ),
       (level, fragments) => ({
         fragments,
         level,
-      })
+      }),
     ),
     map(({ level, fragments }) => ({
       level,
@@ -47,7 +53,7 @@ export const addDownloadJobEpic: Epic<
             width: level.width,
             height: level.height,
           },
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );

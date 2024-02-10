@@ -4,7 +4,7 @@ export const saveAsFactory = (fs: IFS) => {
   const run = async (
     path: string,
     link: string,
-    options: { dialog: boolean }
+    options: { dialog: boolean },
   ): Promise<void> => {
     await fs.saveAs(path, link, options);
   };

@@ -1,8 +1,8 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootAction, RootState } from "../adapters/redux/root-reducer";
-import { jobsSlice } from "../adapters/redux/slices";
+import { RootAction, RootState } from "../store/root-reducer";
+import { jobsSlice } from "../store/slices";
 import { Dependencies } from "../services";
 import { deleteBucketFactory } from "../use-cases";
 
@@ -19,7 +19,7 @@ export const deleteJobEpic: Epic<
     }),
     mergeMap(
       (jobId) => from(deleteBucketFactory(fs)(jobId)),
-      (jobId) => ({ jobId })
+      (jobId) => ({ jobId }),
     ),
-    mergeMap(({ jobId }) => of(jobsSlice.actions.deleteSuccess({ jobId })))
+    mergeMap(({ jobId }) => of(jobsSlice.actions.deleteSuccess({ jobId }))),
   );

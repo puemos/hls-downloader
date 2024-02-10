@@ -8,6 +8,7 @@ export class Job {
     readonly createdAt: number,
     readonly width?: number,
     readonly height?: number,
-    readonly bitrate?: number
+    readonly bitrate?: number,
+    readonly link?: string,
   ) {}
 }
