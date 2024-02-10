@@ -1,9 +1,9 @@
 import { Epic } from "redux-observable";
 import { from, of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootAction, RootState } from "../adapters/redux/root-reducer";
-import { playlistsSlice } from "../adapters/redux/slices";
-import { levelsSlice } from "../adapters/redux/slices/levels-slice";
+import { RootAction, RootState } from "../store/root-reducer";
+import { playlistsSlice } from "../store/slices";
+import { levelsSlice } from "../store/slices/levels-slice";
 import { Dependencies } from "../services";
 import { getLevelsFactory } from "../use-cases";
 
@@ -22,20 +22,20 @@ export const fetchPlaylistLevelsEpic: Epic<
         from(
           getLevelsFactory(loader, parser)(
             uri,
-            store$.value.config.fetchAttempts
-          )
+            store$.value.config.fetchAttempts,
+          ),
         ),
       ({ id }, levels) => ({
         levels,
         playlistID: id,
-      })
+      }),
     ),
     mergeMap(({ playlistID, levels }) => {
       if (levels.length === 0) {
         return of(
           playlistsSlice.actions.fetchPlaylistLevelsFailed({
             playlistID,
-          })
+          }),
         );
       }
       return of(
@@ -44,7 +44,7 @@ export const fetchPlaylistLevelsEpic: Epic<
         }),
         levelsSlice.actions.add({
           levels,
-        })
+        }),
       );
-    })
+    }),
   );

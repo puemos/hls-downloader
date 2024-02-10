@@ -8,7 +8,7 @@ export interface IFS {
     link: string,
     options: {
       dialog: boolean;
-    }
+    },
   ): Promise<void>;
 }
 

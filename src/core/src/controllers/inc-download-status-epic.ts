@@ -1,8 +1,8 @@
 import { Epic } from "redux-observable";
 import { of } from "rxjs";
 import { filter, map, mergeMap } from "rxjs/operators";
-import { RootAction, RootState } from "../adapters/redux/root-reducer";
-import { jobsSlice } from "../adapters/redux/slices";
+import { RootAction, RootState } from "../store/root-reducer";
+import { jobsSlice } from "../store/slices";
 import { Dependencies } from "../services";
 
 export const incDownloadStatusEpic: Epic<
@@ -24,7 +24,7 @@ export const incDownloadStatusEpic: Epic<
         }),
         jobsSlice.actions.saveAs({
           jobId: id,
-        })
+        }),
       );
-    })
+    }),
   );
