@@ -1,5 +1,20 @@
 # HLS downloader changelog
 
+## 4.0.0
+
+### Add
+
+- Videos are transformed to mp4 on the fly
+
+### Change
+
+- Using https://github.com/puemos/browser-extension-template
+- Total new design
+
+### Fix
+
+- Security updates
+
 ## 3.3.0
 
 Big thanks for @mayfield!!
