@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: "14"
       - name: Build
-        run: ./build.sh
+        run: ./scripts/build.sh
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
