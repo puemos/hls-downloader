@@ -1,18 +1,21 @@
 ### ✋ Before you fork...
+
 If you are looking for a template, check out this repo: https://github.com/puemos/browser-extension-template
 
 ---
 
+<img height="150px" src="./store-assets/png/Small-Promo-Tile.png?raw=true">
 
-<img height="150px" src="https://github.com/puemos/hls-downloader/blob/master/src/extension/store-assets/png/Small-Promo-Tile.png?raw=true">
+<img height="350px" src="store-assets/jpg/sceenshot-1.jpg?raw=true">
+<br><br><br>
+
 <p>Capture and download <a href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming">HTTP Live streams (HLS)</a> from your browser</p>
 <p>This extension is completely free and published under the MIT license. However, if you are using it and enjoy it, you are welcome to <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9KTFNHLYAJ5EE&source=url">making a donation</a> of your choice.</p>
 <a href="https://www.buymeacoffee.com/puemos" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" width="100px" ></a>
 <br><br><br>
 
-
-
 **Table of Contents**
+
 - [Get it](#get-it)
   - [Firefox](#firefox)
   - [Microsoft Edge](#microsoft-edge)
@@ -40,7 +43,6 @@ If you are looking for a template, check out this repo: https://github.com/puemo
  <img src="https://developer.microsoft.com/store/badges/images/English_get-it-from-MS.png" alt="Microsoft Edge" height="50px" >
 </a>
 
-
 ### Google
 
 Google just removed the extension from the store due to a claim
@@ -64,14 +66,15 @@ Google just removed the extension from the store due to a claim
 5. Enjoy :)
 
 ## Usage
- 
+
 TODO: Write usage instructions
- 
+
 ## Contributing
 
 [Contributing guideline](./CONTRIBUTING.md)
 
 `TL;DR`
+
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
@@ -80,11 +83,10 @@ TODO: Write usage instructions
 
 ## Contributor Covenant Code of Conduct
 
-[Code of Conduct guideline](./CODE_OF_CONDUCT.md) 
+[Code of Conduct guideline](./CODE_OF_CONDUCT.md)
 
- 
 ## License
- 
+
 The MIT License (MIT)
 
 Copyright (c) 2023 Shy Alter
