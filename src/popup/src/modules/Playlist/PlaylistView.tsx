@@ -36,7 +36,7 @@ const PlaylistView = ({ levels, status, onDownloadLevelClick }: Props) => {
   }
   if (status.status === "ready") {
     return (
-      <ScrollArea className="h-[calc(100vh-10rem)] max-w-full">
+      <ScrollArea className="h-[calc(100vh-10rem)] max-w-min">
         {levels.map((item) => (
           <div
             key={item.id}

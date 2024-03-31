@@ -62,7 +62,7 @@ const SnifferView = ({
         </div>
       )}
       {!currentPlaylistId && playlists.length > 0 && (
-        <ScrollArea className="h-[calc(100vh-10rem)] max-w-full">
+        <ScrollArea className="h-[calc(100vh-10rem)] max-w-min">
           {playlists.map((item) => (
             <div
               key={item.id}
