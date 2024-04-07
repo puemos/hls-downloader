@@ -1,6 +1,6 @@
 {
   "name": "@hls-downloader/design-system",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "author": "puemos",
   "license": "MIT",
   "main": "dist/design-system.js",
@@ -20,8 +20,8 @@
     "prettier": "2.8.7",
     "react": "18.2.0",
     "typescript": "5.0.4",
-    "vite": "5.1.7",
-    "vite-plugin-dts": "3.7.2"
+    "vite": "5.2.8",
+    "vite-plugin-dts": "3.8.1"
   },
   "dependencies": {
     "@radix-ui/react-aspect-ratio": "^1.0.3",
@@ -33,11 +33,11 @@
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-tabs": "^1.0.4",
     "autoprefixer": "10.4.14",
-    "class-variance-authority": "^0.5.3",
-    "clsx": "^1.2.1",
+    "class-variance-authority": "0.7.0",
+    "clsx": "2.1.0",
     "postcss": "^8.4.33",
-    "tailwind-merge": "^1.14.0",
-    "tailwindcss": "3.3.1",
+    "tailwind-merge": "2.2.2",
+    "tailwindcss": "3.4.3",
     "tailwindcss-animate": "^1.0.7"
   }
 }

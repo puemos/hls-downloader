@@ -1,5 +1,11 @@
 # HLS downloader changelog
 
+## 4.0.1
+
+### Change
+
+- Upgrade deps
+
 ## 4.0.0
 
 ### Add
