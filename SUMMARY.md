@@ -7,7 +7,7 @@
 * [Install the extension](guides/install-the-extension.md)
 * [Capture a steam](guides/capture-a-steam.md)
 
-## 👩💻 Development
+## 👩‍💻 Development
 
 * [Build](development/build.md)
 * [Contributing](development/contributing.md)
