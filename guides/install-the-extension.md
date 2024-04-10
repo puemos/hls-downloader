@@ -1,6 +1,6 @@
 # Install the extension
 
-The extension is available for Firefox and Microsoft Edge from the extension marketplace. In case you are using Chrome, Brave will need to download a zip file and install it manually (guide).
+The extension is available for Firefox and Microsoft Edge from the extension marketplace. In case you are using Chrome, Brave will need to download a `crx` file and install it manually (guide).
 
 {% tabs %}
 {% tab title="Chrome" %}
