@@ -1,5 +1,5 @@
 import { Job } from "@hls-downloader/core/lib/entities";
-import { RootState } from "@hls-downloader/core/lib/store";
+import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 

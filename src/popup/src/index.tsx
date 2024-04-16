@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { Store } from "webext-redux";
 import App from "./App";
 
-import { Store as IStore } from "@hls-downloader/core/lib/store";
+import { Store as IStore } from "@hls-downloader/core/lib/store/configure-store";
 
 import "./index.css";
 
@@ -20,6 +20,6 @@ import "./index.css";
       <React.StrictMode>
         <App />
       </React.StrictMode>
-    </Provider>,
+    </Provider>
   );
 })();

@@ -1,5 +1,5 @@
 import { storage } from "webextension-polyfill";
-import { RootState } from "@hls-downloader/core/lib/store";
+import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
 
 export async function saveState(state: RootState) {
   if (!state) {

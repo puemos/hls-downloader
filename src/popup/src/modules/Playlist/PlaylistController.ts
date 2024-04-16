@@ -1,5 +1,5 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import { RootState } from "@hls-downloader/core/lib/store";
+import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
 import { levelsSlice } from "@hls-downloader/core/lib/store/slices";
 import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +18,7 @@ const usePlaylistController = ({ id }: { id: string }): ReturnType => {
   const dispatch = useDispatch();
 
   const status = useSelector<RootState, PlaylistStatus | null>(
-    (state) => state.playlists.playlistsStatus[id],
+    (state) => state.playlists.playlistsStatus[id]
   );
   const levels = useSelector<RootState, Level[]>((state) => {
     const list = Object.values(state.levels.levels)

@@ -1,8 +1,8 @@
 import { Playlist, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import { RootState } from "@hls-downloader/core/lib/store";
+import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
 import {
   levelsSlice,
-  playlistsSlice
+  playlistsSlice,
 } from "@hls-downloader/core/lib/store/slices";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

@@ -1,4 +1,4 @@
-import { createStore } from "@hls-downloader/core/lib/store";
+import { createStore } from "@hls-downloader/core/lib/store/configure-store";
 import { wrapStore } from "webext-redux";
 import { subscribeListeners } from "./listeners";
 import { getState, saveState } from "./persistState";
