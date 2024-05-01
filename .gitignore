@@ -11,6 +11,8 @@
 /dist
 extension.zip
 extension-archive.zip
+dist.crx
+dist.pem
 
 # misc
 .DS_Store
