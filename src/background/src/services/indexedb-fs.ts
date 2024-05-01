@@ -54,7 +54,10 @@ export class IndexedDBBucket implements Bucket {
   private db?: IDBPDatabase<ChunksDB>;
   ffmpeg: FFmpeg;
 
-  constructor(readonly length: number, readonly id: string) {}
+  constructor(
+    readonly length: number,
+    readonly id: string,
+  ) {}
 
   async cleanup() {
     await this.deleteDB();
@@ -126,7 +129,7 @@ export class IndexedDBBucket implements Bucket {
               ["chunks"],
               "chunks",
               unknown
-            > | null
+            > | null,
           ) {
             if (!currentCursor) {
               controller.close();
@@ -143,7 +146,7 @@ export class IndexedDBBucket implements Bucket {
           }
         },
       },
-      {}
+      {},
     );
   }
 
@@ -206,7 +209,7 @@ const cleanup: IFS["cleanup"] = async function () {
 
 const createBucket: IFS["createBucket"] = async function (
   id: string,
-  length: number
+  length: number,
 ) {
   buckets[id] = new IndexedDBBucket(length, id);
 
@@ -228,7 +231,7 @@ const getBucket: IFS["getBucket"] = function (id: string) {
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
-  { dialog }
+  { dialog },
 ) {
   if (link === "") {
     return Promise.resolve();

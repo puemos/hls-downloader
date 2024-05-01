@@ -23,7 +23,7 @@ export class InMemoryBucket implements Bucket {
 
 const createBucket: IFS["createBucket"] = function (
   id: string,
-  length: number
+  length: number,
 ) {
   buckets[id] = new InMemoryBucket(length);
   return Promise.resolve();
@@ -41,7 +41,7 @@ const getBucket: IFS["getBucket"] = function (id: string) {
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
-  { dialog }
+  { dialog },
 ) {
   window.URL = window.URL || window.webkitURL;
   const filename = filenamify(path ?? "steam.mp4");

@@ -5,6 +5,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "type": "module",
   "files": [
     "lib"
   ],
@@ -21,7 +22,7 @@
     "typescript": "5.3.3",
     "url-toolkit": "^2.1.6",
     "uuid": "^7.0.3",
-    "vite": "5.1.7"
+    "vite": "5.2.10"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.10",

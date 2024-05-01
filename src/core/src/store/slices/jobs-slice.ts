@@ -67,7 +67,7 @@ export const jobsSlice = createSlice({
     },
     incDownloadStatus(
       state,
-      action: PayloadAction<IIncJobDownloadStatusPayload>
+      action: PayloadAction<IIncJobDownloadStatusPayload>,
     ) {
       const { jobId: jobId } = action.payload;
       const jobStatus = state.jobsStatus[jobId]!;

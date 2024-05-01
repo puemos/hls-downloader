@@ -36,7 +36,7 @@ const PlaylistView = ({ levels, status, onDownloadLevelClick }: Props) => {
   }
   if (status.status === "ready") {
     return (
-      <ScrollArea className="h-[calc(100vh-10rem)] max-w-min">
+      <ScrollArea className="h-[calc(100vh-10rem)] w-full">
         {levels.map((item) => (
           <div
             key={item.id}
@@ -49,7 +49,9 @@ const PlaylistView = ({ levels, status, onDownloadLevelClick }: Props) => {
                 <div className="flex items-center gap-2">
                   <div className="font-semibold">{item.id}</div>
                 </div>
-                <div className={cn("ml-auto text-xs")}>{item.type === "audio" ? "Audio" : "Video"}</div>
+                <div className={cn("ml-auto text-xs")}>
+                  {item.type === "audio" ? "Audio" : "Video"}
+                </div>
               </div>
             </div>
             <div className="text-xs break-all text-muted-foreground">

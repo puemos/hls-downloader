@@ -7,7 +7,7 @@
     "strict": true,
     "lib": ["es2015", "dom"],
     "outDir": "lib",
-    "rootDir": "src",
+    "rootDir": "src"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*"]
 }

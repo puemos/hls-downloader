@@ -32,7 +32,7 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
           initiator: tab.url,
           pageTitle: tab.title,
           createdAt: Date.now(),
-        })
+        }),
       );
     },
     {
@@ -43,6 +43,6 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
         "http://*/*.m3u8?*",
         "https://*/*.m3u8?*",
       ],
-    }
+    },
   );
 }

@@ -18,7 +18,7 @@ const usePlaylistController = ({ id }: { id: string }): ReturnType => {
   const dispatch = useDispatch();
 
   const status = useSelector<RootState, PlaylistStatus | null>(
-    (state) => state.playlists.playlistsStatus[id]
+    (state) => state.playlists.playlistsStatus[id],
   );
   const levels = useSelector<RootState, Level[]>((state) => {
     const list = Object.values(state.levels.levels)

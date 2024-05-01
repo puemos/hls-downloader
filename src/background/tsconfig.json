@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["WebWorker", "DOM", "ES2023"],
+    "lib": ["WebWorker", "DOM", "ES2023"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*"]
 }

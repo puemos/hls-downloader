@@ -16,7 +16,7 @@ import { M3u8Parser } from "./services/m3u8-parser";
       loader: FetchLoader,
       parser: M3u8Parser,
     },
-    state
+    state,
   );
 
   wrapStore(store);
