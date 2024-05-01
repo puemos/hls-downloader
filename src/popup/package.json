@@ -1,6 +1,6 @@
 {
   "name": "@hls-downloader/popup",
-  "version": "4.0.0",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "@hls-downloader/core": "file:../core",

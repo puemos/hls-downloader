@@ -1,5 +1,11 @@
 # HLS downloader changelog
 
+## 4.0.1
+
+### Fix
+
+- Security updates
+
 ## 4.0.0
 
 ### Add
