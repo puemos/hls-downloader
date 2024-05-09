@@ -21,6 +21,7 @@ const useRouterController = (): ReturnType => {
         TabOptions.DOWNLOADS,
         TabOptions.SETTINGS,
         TabOptions.SNIFTER,
+        TabOptions.DIRECT,
       ].includes(tab as Tab)
     ) {
       setTab(tab as Tab);

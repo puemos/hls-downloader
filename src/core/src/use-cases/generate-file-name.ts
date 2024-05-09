@@ -8,9 +8,9 @@ export const generateFileName = () => {
     const playlistFilenameWithoutExt = playlistFilename.split(".m3u8")[0];
 
     if (playlist.pageTitle) {
-      return `${playlist.pageTitle}-${playlistFilenameWithoutExt}.ts`;
+      return `${playlist.pageTitle}-${playlistFilenameWithoutExt}.mp4`;
     }
-    return `${playlistFilenameWithoutExt}.ts`;
+    return `${playlistFilenameWithoutExt}.mp4`;
   };
   return run;
 };

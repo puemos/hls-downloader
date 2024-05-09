@@ -11,6 +11,7 @@ import SettingsModule from "../Settings/SettingsModule";
 import SnifferModule from "../Sniffer/SnifferModule";
 import { RouterContext } from "./RouterContext";
 import { TabOptions } from "./types";
+import DirectModule from "../Direct/DirectModule";
 
 const RouterView = () => {
   const { tab, setTab } = useContext(RouterContext);
@@ -20,6 +21,7 @@ const RouterView = () => {
       <div className="flex justify-center">
         <TabsList>
           <TabsTrigger value={TabOptions.SNIFTER}>Sniffer</TabsTrigger>
+          <TabsTrigger value={TabOptions.DIRECT}>Direct</TabsTrigger>
           <TabsTrigger value={TabOptions.DOWNLOADS}>Downloads</TabsTrigger>
           <TabsTrigger value={TabOptions.SETTINGS}>Settings</TabsTrigger>
           <TabsTrigger value={TabOptions.ABOUT}>About</TabsTrigger>
@@ -27,6 +29,9 @@ const RouterView = () => {
       </div>
       <TabsContent value={TabOptions.SNIFTER}>
         <SnifferModule />
+      </TabsContent>
+      <TabsContent value={TabOptions.DIRECT}>
+        <DirectModule />
       </TabsContent>
       <TabsContent value={TabOptions.DOWNLOADS}>
         <DownloadsModule />
