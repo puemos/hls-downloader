@@ -1,5 +1,15 @@
 # HLS downloader changelog
 
+## 4.1.0
+
+### Add
+
+- Direct downloads
+
+### Fix
+
+- .ts as a file type (UI only)
+
 ## 4.0.2
 
 ### Fix
