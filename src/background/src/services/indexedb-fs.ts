@@ -7,10 +7,10 @@ import {
 } from "idb";
 
 import { Bucket, IFS } from "@hls-downloader/core/lib/services";
-import { downloads, extension } from "webextension-polyfill";
+import { downloads } from "webextension-polyfill";
 import filenamify from "filenamify";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import { fetchFile } from "@ffmpeg/util";
 
 const buckets: Record<string, IndexedDBBucket> = {};
 
@@ -54,10 +54,7 @@ export class IndexedDBBucket implements Bucket {
   private db?: IDBPDatabase<ChunksDB>;
   ffmpeg: FFmpeg;
 
-  constructor(
-    readonly length: number,
-    readonly id: string,
-  ) {}
+  constructor(readonly length: number, readonly id: string) {}
 
   async cleanup() {
     await this.deleteDB();
@@ -123,21 +120,20 @@ export class IndexedDBBucket implements Bucket {
     return new ReadableStream(
       {
         pull: (controller) => {
-          function push(
+          async function push(
             currentCursor: IDBPCursorWithValue<
               ChunksDB,
               ["chunks"],
               "chunks",
               unknown
-            > | null,
+            > | null
           ) {
             if (!currentCursor) {
               controller.close();
             } else {
               controller.enqueue(currentCursor.value.data);
-              return currentCursor.continue().then((nextCursor) => {
-                push(nextCursor);
-              });
+              const nextCursor = await currentCursor.continue();
+              push(nextCursor);
             }
           }
           if (first) {
@@ -146,7 +142,7 @@ export class IndexedDBBucket implements Bucket {
           }
         },
       },
-      {},
+      {}
     );
   }
 
@@ -209,7 +205,7 @@ const cleanup: IFS["cleanup"] = async function () {
 
 const createBucket: IFS["createBucket"] = async function (
   id: string,
-  length: number,
+  length: number
 ) {
   buckets[id] = new IndexedDBBucket(length, id);
 
@@ -231,13 +227,13 @@ const getBucket: IFS["getBucket"] = function (id: string) {
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
-  { dialog },
+  { dialog }
 ) {
   if (link === "") {
     return Promise.resolve();
   }
   window.URL = window.URL || window.webkitURL;
-  const filename = filenamify(path ?? "steam.mp4");
+  const filename = filenamify(path ?? "stream.mp4");
 
   await downloads.download({
     url: link,

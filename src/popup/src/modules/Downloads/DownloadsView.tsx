@@ -56,7 +56,7 @@ const DownloadsView = ({
         </div>
       )}
       {!currentJobId && jobs.length > 0 && (
-        <ScrollArea className="h-[calc(100vh-10rem)] w-full">
+        <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full">
           {jobs.map((item) => (
             <JobModule key={item.id} id={item.id}></JobModule>
           ))}
