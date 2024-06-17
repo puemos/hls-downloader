@@ -1,5 +1,12 @@
 # HLS downloader changelog
 
+## 4.1.1
+
+### Fix
+
+- Max width for playlists and downloads
+- Security updates
+
 ## 4.1.0
 
 ### Add
