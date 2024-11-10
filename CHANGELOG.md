@@ -1,5 +1,13 @@
 # HLS downloader changelog
 
+## 4.1.2
+
+### Fix
+
+- Width for playlists and downloads cards
+- Security updates
+
+
 ## 4.1.1
 
 ### Fix
