@@ -26,7 +26,11 @@ const DownloadsView = ({
     <div className="flex flex-col p-1 mt-4 space-y-3">
       {currentJobId && (
         <>
-          <Button onClick={() => setCurrentJobId()} size="sm" variant="outline">
+          <Button
+            onClick={() => setCurrentJobId()}
+            size="sm"
+            variant="secondary"
+          >
             Back
           </Button>
           <PlaylistModule id={currentJobId}></PlaylistModule>

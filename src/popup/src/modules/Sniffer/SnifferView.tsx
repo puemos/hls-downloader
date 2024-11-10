@@ -30,7 +30,7 @@ const SnifferView = ({
           <Button
             onClick={() => setCurrentPlaylistId()}
             size="sm"
-            variant="outline"
+            variant="secondary"
           >
             Back
           </Button>
@@ -56,7 +56,7 @@ const SnifferView = ({
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
-          <Button size={"default"} variant={"outline"} onClick={clearPlaylists}>
+          <Button size={"default"} variant="secondary" onClick={clearPlaylists}>
             Clear all
           </Button>
         </div>
@@ -88,7 +88,7 @@ const SnifferView = ({
                 <Button
                   onClick={() => setCurrentPlaylistId(item.id)}
                   size="sm"
-                  variant="outline"
+                  variant="secondary"
                 >
                   Select
                 </Button>

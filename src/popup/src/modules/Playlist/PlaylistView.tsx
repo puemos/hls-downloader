@@ -62,7 +62,7 @@ const PlaylistView = ({ levels, status, onDownloadLevelClick }: Props) => {
               <Button
                 onClick={() => onDownloadLevelClick(item.id)}
                 size="sm"
-                variant="outline"
+                variant="secondary"
               >
                 Download
               </Button>

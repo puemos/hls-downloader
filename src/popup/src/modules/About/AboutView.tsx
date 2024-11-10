@@ -28,7 +28,9 @@ const AboutView = ({ version }: Props) => {
             Report a bug
           </p>
         </div>
-        <Button size="sm">Report</Button>
+        <Button size="sm" variant="secondary">
+          Report
+        </Button>
       </div>
 
       <p className="mt-10 text-sm">

@@ -36,7 +36,7 @@ const DirectView = ({
           <Button
             onClick={() => setCurrentPlaylistId()}
             size="sm"
-            variant="outline"
+            variant="secondary"
           >
             Back
           </Button>
@@ -54,7 +54,7 @@ const DirectView = ({
           />
           <Button
             size={"default"}
-            variant={"outline"}
+            variant="secondary"
             onClick={addDirectPlaylist}
           >
             Add
@@ -98,7 +98,7 @@ const DirectView = ({
                 <Button
                   onClick={() => setCurrentPlaylistId(item.id)}
                   size="sm"
-                  variant="outline"
+                  variant="secondary"
                 >
                   Select
                 </Button>

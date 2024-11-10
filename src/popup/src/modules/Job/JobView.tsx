@@ -32,8 +32,10 @@ const JobView = ({
       )}
     >
       <div className="flex flex-col items-start justify-between w-full mb-1">
-        <div className="flex flex-col">
-          <div className="mr-1 truncate">{job.filename}</div>
+        <div className="flex flex-col w-full">
+          <div className="mr-1 truncate" title={job.filename}>
+            {job.filename}
+          </div>
           <div className="truncate text-muted-foreground">
             {new Date(job.createdAt!).toLocaleString()}
           </div>
@@ -59,22 +61,22 @@ const JobView = ({
 
       <div className="flex flex-row-reverse w-full gap-2">
         {["ready", "done", "saving"].includes(status?.status!) && (
-          <Button size="sm" variant="outline" onClick={saveAsJob}>
+          <Button size="sm" variant="secondary" onClick={saveAsJob}>
             <DownloadIcon className="w-4 h-4 mr-2" /> Save
           </Button>
         )}
         {["init"].includes(status?.status!) && (
-          <Button size="sm" variant="outline" onClick={downloadJob}>
+          <Button size="sm" variant="secondary" onClick={downloadJob}>
             <DownloadIcon className="w-4 h-4 mr-2" /> Download
           </Button>
         )}
         {["downloading"].includes(status?.status!) && (
-          <Button size="sm" variant="outline" onClick={cancelJob}>
+          <Button size="sm" variant="secondary" onClick={cancelJob}>
             <Trash2Icon className="w-4 h-4 mr-2" /> Cancel
           </Button>
         )}
         {["ready", "done", "saving"].includes(status?.status!) && (
-          <Button size="sm" variant="outline" onClick={deleteJob}>
+          <Button size="sm" variant="secondary" onClick={deleteJob}>
             <Trash2Icon className="w-4 h-4 mr-2" /> Delete
           </Button>
         )}
