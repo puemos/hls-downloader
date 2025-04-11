@@ -3,8 +3,8 @@ import { playlistsSlice } from "@hls-downloader/core/lib/store/slices";
 import {
   webRequest,
   tabs,
-  browserAction as actiobV2,
-  action as actiobV3,
+  browserAction as actionV2,
+  action as actionV3,
 } from "webextension-polyfill";
 
 export function addPlaylistListener(store: ReturnType<typeof createStore>) {
@@ -14,7 +14,7 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
         return;
       }
       const tab = await tabs.get(details.tabId);
-      const action = actiobV2 || actiobV3;
+      const action = actionV2 || actionV3;
       await action.setIcon({
         tabId: tab.id,
         path: {
