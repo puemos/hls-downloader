@@ -87,7 +87,7 @@ export class IndexedDBBucket implements Bucket {
           keyPath: "id",
           autoIncrement: true,
         });
-        store.createIndex("index", "index");
+        store.createIndex("index", "index", { unique: true });
       },
     });
 
@@ -175,21 +175,44 @@ export class IndexedDBBucket implements Bucket {
     if (!this.db) {
       throw Error();
     }
-    const videoChunks: Uint8Array[] = [];
-    const audioChunks: Uint8Array[] = [];
+
+    // Use IndexedDB efficiently: sort by index to ensure correct order
+    const videoChunks: Uint8Array[] = new Array(this.videoLength);
+    const audioChunks: Uint8Array[] = new Array(this.audioLength);
+
     const store = this.db
       .transaction(this.objectStoreName)
       .objectStore(this.objectStoreName);
-    let cursor = await store.openCursor();
+
+    // Use the index to iterate in sorted order by index
+    const indexStore = store.index("index");
+    let cursor = await indexStore.openCursor();
+
     while (cursor) {
       const chunk: Uint8Array = cursor.value.data;
-      if (cursor.key < this.videoLength) {
-        videoChunks.push(chunk);
+      const chunkIndex = cursor.value.index;
+
+      if (chunkIndex < this.videoLength) {
+        videoChunks[chunkIndex] = chunk;
       } else {
-        audioChunks.push(chunk);
+        audioChunks[chunkIndex - this.videoLength] = chunk;
       }
       cursor = await cursor.continue();
     }
+
+    // Verify all chunks are present and in correct order
+    for (let i = 0; i < this.videoLength; i++) {
+      if (!videoChunks[i]) {
+        throw new Error(`Missing video chunk at index ${i}`);
+      }
+    }
+
+    for (let i = 0; i < this.audioLength; i++) {
+      if (!audioChunks[i]) {
+        throw new Error(`Missing audio chunk at index ${i}`);
+      }
+    }
+
     if (this.videoLength > 0) {
       const videoBlob = new Blob(videoChunks, { type: "video/mp2t" });
       const videoFile = await fetchFile(videoBlob);
@@ -205,18 +228,33 @@ export class IndexedDBBucket implements Bucket {
 
     if (this.videoLength > 0 && this.audioLength > 0) {
       await this.ffmpeg.exec([
+        "-y",
+        "-fflags",
+        "+genpts",
         "-i",
         "video.ts",
         "-i",
         "audio.ts",
+        // Explicitly map one video + one audio stream
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        // Keep video, re-encode audio for MP4 compatibility & drift fix
         "-c:v",
         "copy",
         "-c:a",
-        "copy",
-        "-bsf:a",
-        "aac_adtstoasc",
+        "aac",
+        "-b:a",
+        "192k",
+        // Smooth tiny drift & reset first pts
+        "-af",
+        "aresample=async=1:first_pts=0",
+        // Stop when the shortest input ends
+        "-shortest",
+        // Make MP4 start quicker in browsers
         "-movflags",
-        "faststart",
+        "+faststart",
         outputFileName,
       ]);
       try {
@@ -227,12 +265,15 @@ export class IndexedDBBucket implements Bucket {
       }
     } else if (this.videoLength > 0) {
       await this.ffmpeg.exec([
+        "-y",
+        "-fflags",
+        "+genpts",
         "-i",
         "video.ts",
         "-c:v",
         "copy",
         "-movflags",
-        "faststart",
+        "+faststart",
         outputFileName,
       ]);
       try {
@@ -242,14 +283,19 @@ export class IndexedDBBucket implements Bucket {
       }
     } else {
       await this.ffmpeg.exec([
+        "-y",
+        "-fflags",
+        "+genpts",
         "-i",
         "audio.ts",
         "-c:a",
-        "copy",
-        "-bsf:a",
-        "aac_adtstoasc",
+        "aac",
+        "-b:a",
+        "192k",
+        "-af",
+        "aresample=async=1:first_pts=0",
         "-movflags",
-        "faststart",
+        "+faststart",
         outputFileName,
       ]);
       try {
