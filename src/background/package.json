@@ -27,7 +27,7 @@
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.10",
     "@ffmpeg/util": "^0.12.1",
-    "@hls-downloader/core": "file:../core",
+    "@hls-downloader/core": "workspace:*",
     "filenamify": "^6.0.0",
     "webext-redux": "2.1.9",
     "webextension-polyfill": "0.10.0"

@@ -1,2 +1,1 @@
-npm i --prefix src/popup -ci
-npm run --prefix src/popup build
+pnpm --filter ./src/popup run build

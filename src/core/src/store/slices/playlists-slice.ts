@@ -1,31 +1,62 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+  Slice,
+  CaseReducer,
+} from "@reduxjs/toolkit";
 import { Playlist } from "../../entities/playlist";
 import { PlaylistStatus } from "../../entities/playlist-status";
 
-export type IFetchPlaylistLevelsSuccessPayload = {
+export interface IFetchPlaylistLevelsSuccessPayload {
   playlistID: string;
-};
-export type IFetchPlaylistLevelsFailedPayload = {
+}
+export interface IFetchPlaylistLevelsFailedPayload {
   playlistID: string;
-};
-export type IFetchPlaylistLevelsPayload = {
+}
+export interface IFetchPlaylistLevelsPayload {
   playlistID: string;
-};
-export type IAddPlaylistPayload = Playlist;
-export type IRemovePlaylistPayload = {
+}
+export interface IAddPlaylistPayload extends Playlist {}
+export interface IRemovePlaylistPayload {
   playlistID: string;
-};
-export type IPlaylistsState = {
+}
+export interface IPlaylistsState {
   playlistsStatus: Record<string, PlaylistStatus | null>;
   playlists: Record<string, Playlist | null>;
-};
+}
+
+interface IPlaylistsReducers {
+  clearPlaylists: CaseReducer<IPlaylistsState, PayloadAction<undefined>>;
+  addPlaylist: CaseReducer<IPlaylistsState, PayloadAction<IAddPlaylistPayload>>;
+  removePlaylist: CaseReducer<
+    IPlaylistsState,
+    PayloadAction<IRemovePlaylistPayload>
+  >;
+  fetchPlaylistLevels: CaseReducer<
+    IPlaylistsState,
+    PayloadAction<IFetchPlaylistLevelsPayload>
+  >;
+  fetchPlaylistLevelsSuccess: CaseReducer<
+    IPlaylistsState,
+    PayloadAction<IFetchPlaylistLevelsSuccessPayload>
+  >;
+  fetchPlaylistLevelsFailed: CaseReducer<
+    IPlaylistsState,
+    PayloadAction<IFetchPlaylistLevelsFailedPayload>
+  >;
+  [key: string]: CaseReducer<IPlaylistsState, PayloadAction<any>>;
+}
 
 const initialPlaylistsState: IPlaylistsState = {
   playlistsStatus: {},
   playlists: {},
 };
 
-export const playlistsSlice = createSlice({
+export const playlistsSlice: Slice<
+  IPlaylistsState,
+  IPlaylistsReducers,
+  "playlists"
+> = createSlice({
   name: "playlists",
   initialState: initialPlaylistsState,
   reducers: {
@@ -47,21 +78,21 @@ export const playlistsSlice = createSlice({
     },
     fetchPlaylistLevels(
       state,
-      action: PayloadAction<IFetchPlaylistLevelsPayload>,
+      action: PayloadAction<IFetchPlaylistLevelsPayload>
     ) {
       const { playlistID } = action.payload;
       state.playlistsStatus[playlistID]!.status = "fetching";
     },
     fetchPlaylistLevelsSuccess(
       state,
-      action: PayloadAction<IFetchPlaylistLevelsSuccessPayload>,
+      action: PayloadAction<IFetchPlaylistLevelsSuccessPayload>
     ) {
       const { playlistID } = action.payload;
       state.playlistsStatus[playlistID]!.status = "ready";
     },
     fetchPlaylistLevelsFailed(
       state,
-      action: PayloadAction<IFetchPlaylistLevelsFailedPayload>,
+      action: PayloadAction<IFetchPlaylistLevelsFailedPayload>
     ) {
       const { playlistID } = action.payload;
       state.playlistsStatus[playlistID]!.status = "error";

@@ -1,1 +1,1 @@
-(npm run --prefix src/popup storybook)
+pnpm --filter ./src/popup run storybook

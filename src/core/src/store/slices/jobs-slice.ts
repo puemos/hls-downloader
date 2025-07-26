@@ -1,39 +1,69 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+  Slice,
+  CaseReducer,
+} from "@reduxjs/toolkit";
 import { Job, JobStatus } from "../../entities";
 
-export type IJobsState = {
+export interface IJobsState {
   jobs: Record<string, Job | null>;
   jobsStatus: Record<string, JobStatus | null>;
-};
+}
 
-export type IDownloadJobPayload = {
+export interface IDownloadJobPayload {
   jobId: string;
-};
-export type IAddJobPayload = {
+}
+export interface IAddJobPayload {
   job: Job;
-};
-export type IDeleteJobPayload = {
+}
+export interface IDeleteJobPayload {
   jobId: string;
-};
+}
 
-export type IFinishJobDownloadPayload = {
+export interface IFinishJobDownloadPayload {
   jobId: string;
-};
-export type IIncJobDownloadStatusPayload = {
+}
+export interface IIncJobDownloadStatusPayload {
   jobId: string;
-};
-export type ISaveAsJobPayload = {
+}
+export interface ISaveAsJobPayload {
   jobId: string;
-};
-export type ISaveAsJobSuccessPayload = {
+}
+export interface ISaveAsJobSuccessPayload {
   jobId: string;
   link?: string;
-};
+}
+
+interface IJobsReducers {
+  download: CaseReducer<IJobsState, PayloadAction<IDownloadJobPayload>>;
+  clear: CaseReducer<IJobsState, PayloadAction<any>>;
+  add: CaseReducer<IJobsState, PayloadAction<IAddJobPayload>>;
+  cancel: CaseReducer<IJobsState, PayloadAction<IDeleteJobPayload>>;
+  delete: CaseReducer<IJobsState, PayloadAction<IDeleteJobPayload>>;
+  deleteSuccess: CaseReducer<IJobsState, PayloadAction<IDeleteJobPayload>>;
+  finishDownload: CaseReducer<
+    IJobsState,
+    PayloadAction<IFinishJobDownloadPayload>
+  >;
+  incDownloadStatus: CaseReducer<
+    IJobsState,
+    PayloadAction<IIncJobDownloadStatusPayload>
+  >;
+  saveAs: CaseReducer<IJobsState, PayloadAction<ISaveAsJobPayload>>;
+  saveAsSuccess: CaseReducer<
+    IJobsState,
+    PayloadAction<ISaveAsJobSuccessPayload>
+  >;
+  [key: string]: CaseReducer<IJobsState, PayloadAction<any>>;
+}
+
 const initialJobsState: IJobsState = {
   jobsStatus: {},
   jobs: {},
 };
-export const jobsSlice = createSlice({
+
+export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
   name: "jobs",
   initialState: initialJobsState,
   reducers: {
@@ -51,8 +81,8 @@ export const jobsSlice = createSlice({
         status: "downloading",
       };
     },
-    cancel(state, action: PayloadAction<IDeleteJobPayload>) {},
-    delete(state, action: PayloadAction<IDeleteJobPayload>) {},
+    cancel(_state, _action: PayloadAction<IDeleteJobPayload>) {},
+    delete(_state, _action: PayloadAction<IDeleteJobPayload>) {},
     deleteSuccess(state, action: PayloadAction<IDeleteJobPayload>) {
       const { jobId } = action.payload;
       delete state.jobs[jobId];
@@ -67,7 +97,7 @@ export const jobsSlice = createSlice({
     },
     incDownloadStatus(
       state,
-      action: PayloadAction<IIncJobDownloadStatusPayload>,
+      action: PayloadAction<IIncJobDownloadStatusPayload>
     ) {
       const { jobId: jobId } = action.payload;
       const jobStatus = state.jobsStatus[jobId]!;

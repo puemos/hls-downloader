@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@hls-downloader/core": "file:../core",
-    "@hls-downloader/design-system": "file:../design-system",
+    "@hls-downloader/core": "workspace:*",
+    "@hls-downloader/design-system": "workspace:*",
     "lucide-react": "^0.137.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",

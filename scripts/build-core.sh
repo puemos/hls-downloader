@@ -1,2 +1,1 @@
-npm i --prefix src/core -ci
-npm run --prefix src/core build
+pnpm --filter ./src/core run build

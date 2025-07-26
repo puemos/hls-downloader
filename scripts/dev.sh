@@ -1,7 +1,7 @@
 (sh ./scripts/copy-assets.sh) &
-(npm run --prefix src/core dev) &
-(npm run --prefix src/design-system dev) &
-(npm run --prefix src/background dev) &
-(npm run --prefix src/popup dev) &
+(pnpm --filter ./src/core run dev) &
+(pnpm --filter ./src/design-system run dev) &
+(pnpm --filter ./src/background run dev) &
+(pnpm --filter ./src/popup run dev) &
 
 wait
