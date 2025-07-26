@@ -1,5 +1,14 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import { Button, ScrollArea, Separator, cn } from "@hls-downloader/design-system";
+import {
+  Button,
+  ScrollArea,
+  Separator,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@hls-downloader/design-system";
 import React from "react";
 import { Metadata } from "../../components/Metadata";
 
@@ -51,40 +60,40 @@ const PlaylistView = ({
     );
   }
   if (status.status === "ready") {
+    const selectedVideo = videoLevels.find((v) => v.id === selectedVideoId);
+    const selectedAudio = audioLevels.find((a) => a.id === selectedAudioId);
     return (
       <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
         {videoLevels.length > 0 && (
           <div>
             <div className="mb-2 font-semibold">Video</div>
-            {videoLevels.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
-                )}
-              >
-              <div className="flex flex-col w-full gap-1">
-                <div className="flex items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="font-semibold">{item.id}</div>
-                  </div>
+            <Select value={selectedVideoId} onValueChange={onSelectVideo}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a video" />
+              </SelectTrigger>
+              <SelectContent>
+                {videoLevels.map((item) => {
+                  const details = [
+                    item.width && item.height ? `${item.width}×${item.height}` : undefined,
+                    item.bitrate ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps` : undefined,
+                    item.fps ? `${item.fps} fps` : undefined,
+                  ].filter(Boolean).join(" · ");
+                  return (
+                    <SelectItem key={item.id} value={item.id}>
+                      {details ? `${item.id} (${details})` : item.id}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {selectedVideo && (
+              <>
+                <div className="text-xs break-all text-muted-foreground mt-1">
+                  {selectedVideo.uri}
                 </div>
-              </div>
-              <div className="text-xs break-all text-muted-foreground">
-                {item.uri}
-              </div>
-              <Metadata metadata={item} />
-              <div className="flex flex-row-reverse w-full">
-                <Button
-                  onClick={() => onSelectVideo(item.id)}
-                  size="sm"
-                  variant={item.id === selectedVideoId ? "default" : "secondary"}
-                >
-                  {item.id === selectedVideoId ? "Selected" : "Select"}
-                </Button>
-              </div>
-              </div>
-            ))}
+                <Metadata metadata={selectedVideo} />
+              </>
+            )}
           </div>
         )}
         {videoLevels.length > 0 && audioLevels.length > 0 && (
@@ -93,35 +102,31 @@ const PlaylistView = ({
         {audioLevels.length > 0 && (
           <div>
             <div className="mb-2 font-semibold">Audio</div>
-            {audioLevels.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
-                )}
-              >
-              <div className="flex flex-col w-full gap-1">
-                <div className="flex items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="font-semibold">{item.id}</div>
-                  </div>
+            <Select value={selectedAudioId} onValueChange={onSelectAudio}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select an audio" />
+              </SelectTrigger>
+              <SelectContent>
+                {audioLevels.map((item) => {
+                  const details = [
+                    item.bitrate ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps` : undefined,
+                  ].filter(Boolean).join(" · ");
+                  return (
+                    <SelectItem key={item.id} value={item.id}>
+                      {details ? `${item.id} (${details})` : item.id}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {selectedAudio && (
+              <>
+                <div className="text-xs break-all text-muted-foreground mt-1">
+                  {selectedAudio.uri}
                 </div>
-              </div>
-              <div className="text-xs break-all text-muted-foreground">
-                {item.uri}
-              </div>
-              <Metadata metadata={item} />
-              <div className="flex flex-row-reverse w-full">
-                <Button
-                  onClick={() => onSelectAudio(item.id)}
-                  size="sm"
-                  variant={item.id === selectedAudioId ? "default" : "secondary"}
-                >
-                  {item.id === selectedAudioId ? "Selected" : "Select"}
-                </Button>
-              </div>
-              </div>
-            ))}
+                <Metadata metadata={selectedAudio} />
+              </>
+            )}
           </div>
         )}
         <div className="flex flex-row-reverse mt-2">
