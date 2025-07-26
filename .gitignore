@@ -11,6 +11,8 @@
 /dist
 extension.zip
 extension-archive.zip
+extension-chrome.zip
+extension-firefox.xpi
 dist.crx
 dist.pem
 
