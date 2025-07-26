@@ -8,5 +8,6 @@ export * from "./components/ui/slider";
 export * from "./components/ui/badge";
 export * from "./components/ui/progress";
 export * from "./components/ui/switch";
+export * from "./components/ui/select";
 export * from "./hooks/use-localstorage";
 export * from "./lib/utils";
