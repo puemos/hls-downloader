@@ -25,24 +25,32 @@ const JobView = ({
     return null;
   }
 
+  const truncateText = (text: string, maxLength: number = 50) => {
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
+  };
+
   return (
     <div
       className={cn(
-        "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
+        "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm min-w-0 overflow-hidden"
       )}
     >
-      <div className="flex flex-col items-start justify-between w-full mb-1">
-        <div className="flex flex-col w-full">
-          <div className="mr-1 truncate" title={job.filename}>
-            {job.filename}
+      <div className="flex flex-col items-start justify-between w-full mb-1 min-w-0">
+        <div className="flex flex-col w-full min-w-0">
+          <div className="mr-1 min-w-0 max-w-full" title={job.filename}>
+            <span className="block">{truncateText(job.filename)}</span>
           </div>
-          <div className="truncate text-muted-foreground">
-            {new Date(job.createdAt!).toLocaleString()}
+          <div className="text-muted-foreground min-w-0 max-w-full">
+            <span className="block">
+              {truncateText(new Date(job.createdAt!).toLocaleString())}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="w-full mb-1">
+      <div className="w-full mb-1 min-w-0">
         <Metadata
           metadata={{
             type: "stream",
@@ -59,7 +67,7 @@ const JobView = ({
         )}
       </div>
 
-      <div className="flex flex-row-reverse w-full gap-2">
+      <div className="flex flex-row-reverse w-full gap-2 flex-shrink-0">
         {["ready", "done", "saving"].includes(status?.status!) && (
           <Button size="sm" variant="secondary" onClick={saveAsJob}>
             <DownloadIcon className="w-4 h-4 mr-2" /> Save
