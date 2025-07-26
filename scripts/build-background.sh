@@ -1,2 +1,1 @@
-npm i --prefix src/background -ci
-npm run --prefix src/background build
+npm run --workspace src/background build

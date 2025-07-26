@@ -50,9 +50,10 @@ Google just removed the extension from the store due to a claim
 
 1. Clone the repo
 2. Ensure you have Node and npm installed
-3. Run `sh ./scripts/build.sh` and verify it completes without errors
-4. Built files will be at `./dist/`
-5. The zip archive will be in `./extension-archive.zip`
+3. Run `npm install`
+4. Run `sh ./scripts/build.sh` and verify it completes without errors
+5. Built files will be at `./dist/`
+6. The zip archive will be in `./extension-archive.zip`
 
 ### Development
 

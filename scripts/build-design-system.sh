@@ -1,2 +1,1 @@
-npm i --prefix src/design-system -ci
-npm run --prefix src/design-system build
+npm run --workspace src/design-system build
