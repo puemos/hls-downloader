@@ -64,7 +64,18 @@ Google just removed the extension from the store due to a claim
 
 ## Usage
 
-TODO: Write usage instructions
+1. Browse to a page that plays an HLS video and start playback.
+2. Click the **HLS Downloader** icon. Detected playlists will appear in the
+   **Sniffer** tab.
+3. Choose **Select** next to the playlist you want to download.
+4. Pick the desired video and audio streams from the playlist view.
+5. Press **Download**. The extension fetches all segments and automatically
+   merges them into a single MP4 using the bundled `ffmpeg.wasm`.
+6. When processing completes, your browser will prompt you to save the merged
+   file.
+
+`ffmpeg` support is bundled with the extension so no external dependencies are
+required.
 
 ## Contributing
 
