@@ -16,11 +16,12 @@ jobs:
         with:
           node-version: "22"
       - name: Build
-        run: ./scripts/build.sh
+        run: make build
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            extension-archive.zip
+            extension-chrome.zip
+            extension-firefox.xpi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
