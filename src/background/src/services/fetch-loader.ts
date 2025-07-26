@@ -13,7 +13,7 @@ async function fetchWithRetry<Data>(
     try {
       return await fetchFn();
     } catch (e) {
-      if (countdown < 1 && countdown < attempts) {
+      if (countdown > 0) {
         await new Promise((resolve) => setTimeout(resolve, retryTime));
         retryTime *= 1.15;
       }
