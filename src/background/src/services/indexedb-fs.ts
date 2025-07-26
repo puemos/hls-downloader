@@ -20,7 +20,7 @@ interface ChunksDB extends DBSchema {
       data: Uint8Array;
       index: number;
     };
-    key: string;
+    key: number;
     indexes: { index: number };
   };
 }
@@ -80,9 +80,10 @@ export class IndexedDBBucket implements Bucket {
     const db = await openDB<ChunksDB>(this.id, 1, {
       upgrade(db) {
         const store = db.createObjectStore(objectStoreName, {
-          keyPath: "index",
+          keyPath: "id",
+          autoIncrement: true,
         });
-        store.createIndex("index", "index", { unique: true });
+        store.createIndex("index", "index");
       },
     });
 
@@ -119,7 +120,8 @@ export class IndexedDBBucket implements Bucket {
       .transaction(this.objectStoreName)
       .objectStore(this.objectStoreName);
 
-    let cursor = await store.openCursor();
+    const index = store.index("index");
+    let cursor = await index.openCursor();
     let first = true;
     return new ReadableStream(
       {

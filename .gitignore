@@ -13,6 +13,7 @@ extension.zip
 extension-archive.zip
 extension-chrome.zip
 extension-firefox.xpi
+extension-firefox.zip
 dist.crx
 dist.pem
 
