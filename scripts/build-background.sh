@@ -1,1 +1,1 @@
-npm run --workspace src/background build
+pnpm --filter ./src/background run build

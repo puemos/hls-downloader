@@ -1,1 +1,1 @@
-npm run --workspace src/core build
+pnpm --filter ./src/core run build

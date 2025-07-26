@@ -1,7 +1,7 @@
 (sh ./scripts/copy-assets.sh) &
-(npm run --workspace src/core dev) &
-(npm run --workspace src/design-system dev) &
-(npm run --workspace src/background dev) &
-(npm run --workspace src/popup dev) &
+(pnpm --filter ./src/core run dev) &
+(pnpm --filter ./src/design-system run dev) &
+(pnpm --filter ./src/background run dev) &
+(pnpm --filter ./src/popup run dev) &
 
 wait

@@ -1,0 +1,5 @@
+packages:
+  - 'src/background'
+  - 'src/core'
+  - 'src/design-system'
+  - 'src/popup'

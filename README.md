@@ -49,8 +49,8 @@ Google just removed the extension from the store due to a claim
 ## Build
 
 1. Clone the repo
-2. Ensure you have Node and npm installed
-3. Run `npm install`
+2. Ensure you have Node and pnpm installed
+3. Run `pnpm install`
 4. Run `sh ./scripts/build.sh` and verify it completes without errors
 5. Built files will be at `./dist/`
 6. The zip archive will be in `./extension-archive.zip`

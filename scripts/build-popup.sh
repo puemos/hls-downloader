@@ -1,1 +1,1 @@
-npm run --workspace src/popup build
+pnpm --filter ./src/popup run build

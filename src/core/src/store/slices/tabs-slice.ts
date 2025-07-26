@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+  Slice,
+  CaseReducer,
+} from "@reduxjs/toolkit";
 import { Tab } from "../../entities/tab";
 
 export interface ISetTabPayload {
@@ -8,13 +13,19 @@ export interface ISetTabPayload {
 export interface ITabsState {
   current: Tab;
 }
+
+interface ITabsReducers {
+  setTab: CaseReducer<ITabsState, PayloadAction<ISetTabPayload>>;
+  [key: string]: CaseReducer<ITabsState, PayloadAction<any>>;
+}
+
 const initialConfigState: ITabsState = {
   current: {
     id: -1,
   },
 };
 
-export const tabsSlice = createSlice({
+export const tabsSlice: Slice<ITabsState, ITabsReducers, "tabs"> = createSlice({
   name: "tabs",
   initialState: initialConfigState,
   reducers: {

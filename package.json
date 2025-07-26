@@ -1,9 +1,4 @@
 {
   "private": true,
-  "workspaces": [
-    "src/background",
-    "src/core",
-    "src/design-system",
-    "src/popup"
-  ]
+  "packageManager": "pnpm@10.11.0"
 }

@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+  Slice,
+  CaseReducer,
+} from "@reduxjs/toolkit";
 
 export interface ISetConcurrencyPayload {
   concurrency: number;
@@ -16,24 +21,42 @@ export interface IConfigState {
   saveDialog: boolean;
   fetchAttempts: number;
 }
+
+interface IConfigReducers {
+  setConcurrency: CaseReducer<
+    IConfigState,
+    PayloadAction<ISetConcurrencyPayload>
+  >;
+  setSaveDialog: CaseReducer<
+    IConfigState,
+    PayloadAction<ISetSaveDialogPayload>
+  >;
+  setFetchAttempts: CaseReducer<
+    IConfigState,
+    PayloadAction<ISetFetchAttemptsPayload>
+  >;
+  [key: string]: CaseReducer<IConfigState, PayloadAction<any>>;
+}
+
 const initialConfigState: IConfigState = {
   concurrency: 2,
   saveDialog: false,
   fetchAttempts: 100,
 };
 
-export const configSlice = createSlice({
-  name: "config",
-  initialState: initialConfigState,
-  reducers: {
-    setConcurrency(state, action: PayloadAction<ISetConcurrencyPayload>) {
-      state.concurrency = action.payload.concurrency;
+export const configSlice: Slice<IConfigState, IConfigReducers, "config"> =
+  createSlice({
+    name: "config",
+    initialState: initialConfigState,
+    reducers: {
+      setConcurrency(state, action: PayloadAction<ISetConcurrencyPayload>) {
+        state.concurrency = action.payload.concurrency;
+      },
+      setSaveDialog(state, action: PayloadAction<ISetSaveDialogPayload>) {
+        state.saveDialog = action.payload.saveDialog;
+      },
+      setFetchAttempts(state, action: PayloadAction<ISetFetchAttemptsPayload>) {
+        state.fetchAttempts = action.payload.fetchAttempts;
+      },
     },
-    setSaveDialog(state, action: PayloadAction<ISetSaveDialogPayload>) {
-      state.saveDialog = action.payload.saveDialog;
-    },
-    setFetchAttempts(state, action: PayloadAction<ISetFetchAttemptsPayload>) {
-      state.fetchAttempts = action.payload.fetchAttempts;
-    },
-  },
-});
+  });

@@ -1,1 +1,1 @@
-npm run --workspace src/design-system build
+pnpm --filter ./src/design-system run build
