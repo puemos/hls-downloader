@@ -52,6 +52,15 @@ export class InMemoryBucket implements Bucket {
         "copy",
         "-c:a",
         "copy",
+        "-bsf:a",
+        "aac_adtstoasc",
+        "-movflags",
+<<<<<<< ours
+        "+faststart",
+||||||| base
+=======
+        "faststart",
+>>>>>>> theirs
         "file.mp4",
       ]);
       await ffmpeg.deleteFile("video.ts");
@@ -62,8 +71,20 @@ export class InMemoryBucket implements Bucket {
         "video.ts",
         "-c:v",
         "copy",
+<<<<<<< ours
         "-c:a",
         "copy",
+        "-bsf:a",
+        "aac_adtstoasc",
+        "-movflags",
+        "+faststart",
+||||||| base
+        "-c:a",
+        "copy",
+=======
+        "-movflags",
+        "faststart",
+>>>>>>> theirs
         "file.mp4",
       ]);
       await ffmpeg.deleteFile("video.ts");
@@ -71,10 +92,17 @@ export class InMemoryBucket implements Bucket {
       await ffmpeg.exec([
         "-i",
         "audio.ts",
-        "-c:v",
-        "copy",
         "-c:a",
         "copy",
+        "-bsf:a",
+        "aac_adtstoasc",
+        "-movflags",
+<<<<<<< ours
+        "+faststart",
+||||||| base
+=======
+        "faststart",
+>>>>>>> theirs
         "file.mp4",
       ]);
       await ffmpeg.deleteFile("audio.ts");

@@ -213,6 +213,15 @@ export class IndexedDBBucket implements Bucket {
         "copy",
         "-c:a",
         "copy",
+        "-bsf:a",
+        "aac_adtstoasc",
+        "-movflags",
+<<<<<<< ours
+        "+faststart",
+||||||| base
+=======
+        "faststart",
+>>>>>>> theirs
         outputFileName,
       ]);
       try {
@@ -227,8 +236,20 @@ export class IndexedDBBucket implements Bucket {
         "video.ts",
         "-c:v",
         "copy",
+<<<<<<< ours
         "-c:a",
         "copy",
+        "-bsf:a",
+        "aac_adtstoasc",
+        "-movflags",
+        "+faststart",
+||||||| base
+        "-c:a",
+        "copy",
+=======
+        "-movflags",
+        "faststart",
+>>>>>>> theirs
         outputFileName,
       ]);
       try {
@@ -240,10 +261,17 @@ export class IndexedDBBucket implements Bucket {
       await this.ffmpeg.exec([
         "-i",
         "audio.ts",
-        "-c:v",
-        "copy",
         "-c:a",
         "copy",
+        "-bsf:a",
+        "aac_adtstoasc",
+        "-movflags",
+<<<<<<< ours
+        "+faststart",
+||||||| base
+=======
+        "faststart",
+>>>>>>> theirs
         outputFileName,
       ]);
       try {
