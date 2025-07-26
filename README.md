@@ -49,10 +49,26 @@ Google just removed the extension from the store due to a claim
 ## Build
 
 1. Clone the repo
-2. Ensure you have node, npm installed
-3. Run `sh ./scripts/build.sh`
-4. Raw files will be at `./src/extension/dist/`
-5. The zip will be in `./extension-archive.zip`
+2. Ensure you have Node and npm installed
+3. Run `sh ./scripts/build.sh` and verify it completes without errors
+4. Built files will be at `./dist/`
+5. The zip archive will be in `./extension-archive.zip`
+
+### Development
+
+Run `sh ./scripts/dev.sh` to start watchers for all packages while you edit. The
+compiled extension will appear in `dist/` as you work.
+
+## Project Structure
+
+```
+src/
+├── assets          # extension manifest and icons
+├── background      # background scripts
+├── core            # shared logic and Redux store
+├── design-system   # UI component library
+└── popup           # React popup UI
+```
 
 ## Installation
 
@@ -69,6 +85,8 @@ TODO: Write usage instructions
 ## Contributing
 
 [Contributing guideline](./CONTRIBUTING.md)
+
+Additional automation guidelines can be found in [AGENTS.md](./AGENTS.md).
 
 `TL;DR`
 
