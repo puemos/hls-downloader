@@ -15,45 +15,71 @@ export const addDownloadJobEpic: Epic<
 > = (action$, store$, { loader, parser }) =>
   action$.pipe(
     filter(levelsSlice.actions.download.match),
-    map((action) => action.payload.levelID),
-    map((levelID) => store$.value.levels.levels[levelID]),
-    map((level) => level!),
-    mergeMap(
-      (level) =>
-        from(
+    map((action) => action.payload),
+    map(({ levelID, audioLevelID }) => ({
+      videoLevel: store$.value.levels.levels[levelID]!,
+      audioLevel: audioLevelID
+        ? store$.value.levels.levels[audioLevelID]!
+        : undefined,
+    })),
+    mergeMap(({ videoLevel, audioLevel }) =>
+      from(
+        Promise.all([
           getFragmentsDetailsFactory(loader, parser)(
-            level,
-            store$.value.config.fetchAttempts,
+            videoLevel,
+            store$.value.config.fetchAttempts
           ),
-        ),
-      (level, fragments) => ({
-        fragments,
-        level,
-      }),
+          audioLevel
+            ? getFragmentsDetailsFactory(loader, parser)(
+                audioLevel,
+                store$.value.config.fetchAttempts
+              )
+            : Promise.resolve([]),
+        ])
+      ).pipe(
+        map(([videoFragments, audioFragments]) => ({
+          videoLevel,
+          audioLevel,
+          videoFragments,
+          audioFragments,
+        }))
+      )
     ),
-    map(({ level, fragments }) => ({
-      level,
-      fragments,
-      playlist: store$.value.playlists.playlists[level.playlistID]!,
+    map(({ videoLevel, audioLevel, videoFragments, audioFragments }) => ({
+      videoLevel,
+      audioLevel,
+      videoFragments,
+      audioFragments,
+      playlist: store$.value.playlists.playlists[videoLevel.playlistID]!,
     })),
-    map(({ level, fragments, playlist }) => ({
-      level,
-      filename: generateFileName()(playlist, level),
-      fragments,
-    })),
-    mergeMap(({ fragments, level, filename }) =>
+    map(
+      ({
+        videoLevel,
+        audioLevel,
+        videoFragments,
+        audioFragments,
+        playlist,
+      }) => ({
+        level: videoLevel,
+        filename: generateFileName()(playlist, videoLevel),
+        videoFragments,
+        audioFragments,
+      })
+    ),
+    mergeMap(({ videoFragments, audioFragments, level, filename }) =>
       of(
         jobsSlice.actions.add({
           job: {
             id: `${filename}/${new Date().toISOString()}`,
-            fragments: fragments,
-            filename: filename,
+            videoFragments,
+            audioFragments,
+            filename,
             createdAt: Date.now(),
             bitrate: level.bitrate,
             width: level.width,
             height: level.height,
           },
-        }),
-      ),
-    ),
+        })
+      )
+    )
   );

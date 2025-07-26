@@ -1,31 +1,97 @@
 import { Bucket, IFS } from "@hls-downloader/core/lib/services";
 import { downloads } from "webextension-polyfill";
 import filenamify from "filenamify";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile } from "@ffmpeg/util";
 
 const buckets: Record<string, Bucket> = {};
 
 export class InMemoryBucket implements Bucket {
-  private store: Record<string, Blob> = {};
-  constructor(readonly length: number) {}
+  private videoStore: Record<number, Blob> = {};
+  private audioStore: Record<number, Blob> = {};
+  constructor(readonly videoLength: number, readonly audioLength: number) {}
   write(index: number, data: Uint8Array): Promise<void> {
-    this.store[index] = new Blob([new Uint8Array(data)]);
+    if (index < this.videoLength) {
+      this.videoStore[index] = new Blob([new Uint8Array(data)]);
+    } else {
+      this.audioStore[index - this.videoLength] = new Blob([new Uint8Array(data)]);
+    }
     return Promise.resolve();
   }
   async getLink(): Promise<string> {
-    const blob = new Blob(Object.values(this.store), {
-      type: "video/mp2t",
+    const baseURL = "/assets/ffmpeg";
+    const ffmpeg = new FFmpeg();
+    await ffmpeg.load({
+      coreURL: `${baseURL}/ffmpeg-core.js`,
+      wasmURL: `${baseURL}/ffmpeg-core.wasm`,
     });
-    const url = URL.createObjectURL(blob);
 
-    return url;
+    if (this.videoLength > 0) {
+      const videoBlob = new Blob(Object.values(this.videoStore), {
+        type: "video/mp2t",
+      });
+      const vfile = await fetchFile(videoBlob);
+      await ffmpeg.writeFile("video.ts", vfile);
+    }
+
+    if (this.audioLength > 0) {
+      const audioBlob = new Blob(Object.values(this.audioStore), {
+        type: "video/mp2t",
+      });
+      const afile = await fetchFile(audioBlob);
+      await ffmpeg.writeFile("audio.ts", afile);
+    }
+
+    if (this.videoLength > 0 && this.audioLength > 0) {
+      await ffmpeg.exec([
+        "-i",
+        "video.ts",
+        "-i",
+        "audio.ts",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "copy",
+        "file.mp4",
+      ]);
+      await ffmpeg.deleteFile("video.ts");
+      await ffmpeg.deleteFile("audio.ts");
+    } else if (this.videoLength > 0) {
+      await ffmpeg.exec([
+        "-i",
+        "video.ts",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "copy",
+        "file.mp4",
+      ]);
+      await ffmpeg.deleteFile("video.ts");
+    } else {
+      await ffmpeg.exec([
+        "-i",
+        "audio.ts",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "copy",
+        "file.mp4",
+      ]);
+      await ffmpeg.deleteFile("audio.ts");
+    }
+
+    const data = await ffmpeg.readFile("file.mp4");
+    const mp4Blob = new Blob([data], { type: "video/mp4" });
+    return URL.createObjectURL(mp4Blob);
   }
 }
 
 const createBucket: IFS["createBucket"] = function (
   id: string,
-  length: number,
+  videoLength: number,
+  audioLength: number,
 ) {
-  buckets[id] = new InMemoryBucket(length);
+  buckets[id] = new InMemoryBucket(videoLength, audioLength);
   return Promise.resolve();
 };
 

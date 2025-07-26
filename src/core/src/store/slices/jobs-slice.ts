@@ -77,7 +77,7 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
       state.jobs[job.id] = job;
       state.jobsStatus[job.id] = {
         done: 0,
-        total: job.fragments.length,
+        total: job.videoFragments.length + job.audioFragments.length,
         status: "downloading",
       };
     },

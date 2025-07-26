@@ -1,15 +1,31 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import { Button, ScrollArea, cn } from "@hls-downloader/design-system";
+import { Button, ScrollArea, Separator, cn } from "@hls-downloader/design-system";
 import React from "react";
 import { Metadata } from "../../components/Metadata";
 
 interface Props {
   status: PlaylistStatus | null;
-  levels: Level[];
-  onDownloadLevelClick: (levelId: string) => void;
+  videoLevels: Level[];
+  audioLevels: Level[];
+  selectedVideoId?: string;
+  selectedAudioId?: string;
+  onSelectVideo: (id: string) => void;
+  onSelectAudio: (id: string) => void;
+  onDownload: () => void;
+  canDownload: boolean;
 }
 
-const PlaylistView = ({ levels, status, onDownloadLevelClick }: Props) => {
+const PlaylistView = ({
+  status,
+  videoLevels,
+  audioLevels,
+  selectedVideoId,
+  selectedAudioId,
+  onSelectVideo,
+  onSelectAudio,
+  onDownload,
+  canDownload,
+}: Props) => {
   if (!status) {
     return null;
   }
@@ -36,39 +52,83 @@ const PlaylistView = ({ levels, status, onDownloadLevelClick }: Props) => {
   }
   if (status.status === "ready") {
     return (
-      <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full">
-        {levels.map((item) => (
-          <div
-            key={item.id}
-            className={cn(
-              "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
-            )}
-          >
-            <div className="flex flex-col w-full gap-1">
-              <div className="flex items-center">
-                <div className="flex items-center gap-2">
-                  <div className="font-semibold">{item.id}</div>
-                </div>
-                <div className={cn("ml-auto text-xs")}>
-                  {item.type === "audio" ? "Audio" : "Video"}
+      <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
+        {videoLevels.length > 0 && (
+          <div>
+            <div className="mb-2 font-semibold">Video</div>
+            {videoLevels.map((item) => (
+              <div
+                key={item.id}
+                className={cn(
+                  "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
+                )}
+              >
+              <div className="flex flex-col w-full gap-1">
+                <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="font-semibold">{item.id}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="text-xs break-all text-muted-foreground">
-              {item.uri}
-            </div>
-            <Metadata metadata={item} />
-            <div className="flex flex-row-reverse w-full">
-              <Button
-                onClick={() => onDownloadLevelClick(item.id)}
-                size="sm"
-                variant="secondary"
-              >
-                Download
-              </Button>
-            </div>
+              <div className="text-xs break-all text-muted-foreground">
+                {item.uri}
+              </div>
+              <Metadata metadata={item} />
+              <div className="flex flex-row-reverse w-full">
+                <Button
+                  onClick={() => onSelectVideo(item.id)}
+                  size="sm"
+                  variant={item.id === selectedVideoId ? "default" : "secondary"}
+                >
+                  {item.id === selectedVideoId ? "Selected" : "Select"}
+                </Button>
+              </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+        {videoLevels.length > 0 && audioLevels.length > 0 && (
+          <Separator className="my-2" />
+        )}
+        {audioLevels.length > 0 && (
+          <div>
+            <div className="mb-2 font-semibold">Audio</div>
+            {audioLevels.map((item) => (
+              <div
+                key={item.id}
+                className={cn(
+                  "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
+                )}
+              >
+              <div className="flex flex-col w-full gap-1">
+                <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="font-semibold">{item.id}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-xs break-all text-muted-foreground">
+                {item.uri}
+              </div>
+              <Metadata metadata={item} />
+              <div className="flex flex-row-reverse w-full">
+                <Button
+                  onClick={() => onSelectAudio(item.id)}
+                  size="sm"
+                  variant={item.id === selectedAudioId ? "default" : "secondary"}
+                >
+                  {item.id === selectedAudioId ? "Selected" : "Select"}
+                </Button>
+              </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="flex flex-row-reverse mt-2">
+          <Button onClick={onDownload} disabled={!canDownload} size="sm" variant="secondary">
+            Download
+          </Button>
+        </div>
       </ScrollArea>
     );
   }

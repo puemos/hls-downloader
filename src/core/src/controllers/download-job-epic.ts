@@ -20,14 +20,15 @@ export const downloadJobEpic: Epic<
   action$.pipe(
     filter(jobsSlice.actions.add.match),
     map((action) => action.payload.job),
-    mergeMap(({ fragments, id }) =>
-      from(
-        createBucketFactory(fs)(id, fragments.length).then(() => ({
+    mergeMap(({ videoFragments, audioFragments, id }) => {
+      const fragments = videoFragments.concat(audioFragments);
+      return from(
+        createBucketFactory(fs)(id, videoFragments.length, audioFragments.length).then(() => ({
           fragments,
           id,
         })),
-      ),
-    ),
+      );
+    }),
     mergeMap(({ fragments, id }) =>
       from(fragments).pipe(
         mergeMap(

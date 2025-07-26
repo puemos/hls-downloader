@@ -55,7 +55,8 @@ export class IndexedDBBucket implements Bucket {
   ffmpeg: FFmpeg;
 
   constructor(
-    readonly length: number,
+    readonly videoLength: number,
+    readonly audioLength: number,
     readonly id: string,
   ) {}
 
@@ -168,26 +169,68 @@ export class IndexedDBBucket implements Bucket {
     if (!this.db) {
       throw Error();
     }
-    const stream = await this.stream();
-    const response = new Response(stream, {
-      headers: {
-        "Content-Type": "video/mp2t",
-      },
-    });
-    const blob = await response.blob();
-    const file = await fetchFile(blob);
-    await this.ffmpeg.writeFile(`${this.fileName}.ts`, file);
-    await this.ffmpeg.exec([
-      "-i",
-      `${this.fileName}.ts`,
-      "-acodec",
-      "copy",
-      "-vcodec",
-      "copy",
-      `${this.fileName}.mp4`,
-    ]);
-    await this.ffmpeg.deleteFile(`${this.fileName}.ts`);
-    const data = await this.ffmpeg.readFile(`${this.fileName}.mp4`);
+    const videoChunks: Uint8Array[] = [];
+    const audioChunks: Uint8Array[] = [];
+    const store = this.db.transaction(this.objectStoreName).objectStore(this.objectStoreName);
+    let cursor = await store.openCursor();
+    while (cursor) {
+      const chunk: Uint8Array = cursor.value.data;
+      if (cursor.key < this.videoLength) {
+        videoChunks.push(chunk);
+      } else {
+        audioChunks.push(chunk);
+      }
+      cursor = await cursor.continue();
+    }
+    if (this.videoLength > 0) {
+      const videoBlob = new Blob(videoChunks, { type: "video/mp2t" });
+      const videoFile = await fetchFile(videoBlob);
+      await this.ffmpeg.writeFile("video.ts", videoFile);
+    }
+    if (this.audioLength > 0) {
+      const audioBlob = new Blob(audioChunks, { type: "video/mp2t" });
+      const audioFile = await fetchFile(audioBlob);
+      await this.ffmpeg.writeFile("audio.ts", audioFile);
+    }
+
+    if (this.videoLength > 0 && this.audioLength > 0) {
+      await this.ffmpeg.exec([
+        "-i",
+        "video.ts",
+        "-i",
+        "audio.ts",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "copy",
+        "file.mp4",
+      ]);
+      await this.ffmpeg.deleteFile("video.ts");
+      await this.ffmpeg.deleteFile("audio.ts");
+    } else if (this.videoLength > 0) {
+      await this.ffmpeg.exec([
+        "-i",
+        "video.ts",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "copy",
+        "file.mp4",
+      ]);
+      await this.ffmpeg.deleteFile("video.ts");
+    } else {
+      await this.ffmpeg.exec([
+        "-i",
+        "audio.ts",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "copy",
+        "file.mp4",
+      ]);
+      await this.ffmpeg.deleteFile("audio.ts");
+    }
+    const data = await this.ffmpeg.readFile("file.mp4");
     return new Blob([data], { type: "video/mp4" });
   }
 }
@@ -208,9 +251,10 @@ const cleanup: IFS["cleanup"] = async function () {
 
 const createBucket: IFS["createBucket"] = async function (
   id: string,
-  length: number,
+  videoLength: number,
+  audioLength: number,
 ) {
-  buckets[id] = new IndexedDBBucket(length, id);
+  buckets[id] = new IndexedDBBucket(videoLength, audioLength, id);
 
   storageManager.setItem("dbs", JSON.stringify(Object.keys(buckets)));
   return Promise.resolve();
