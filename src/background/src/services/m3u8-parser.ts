@@ -10,19 +10,38 @@ export const M3u8Parser: IParser = {
   parseLevelPlaylist(string: string, baseurl: string): Fragment[] {
     const parser = new Parser();
     parser.push(string);
-    return parser.manifest.segments.map((segment, index) => ({
-      index,
-      key: segment.key
-        ? {
-            iv: segment.key.iv,
-            uri: buildAbsoluteURL(baseurl, segment.key.uri),
-          }
-        : {
-            iv: null,
-            uri: null,
-          },
-      uri: buildAbsoluteURL(baseurl, segment.uri),
-    }));
+
+    const segments = parser.manifest.segments;
+    const fragments: Fragment[] = [];
+
+    let startIndex = 0;
+    const first = segments[0];
+    if (first && first.map && first.map.uri) {
+      fragments.push({
+        index: 0,
+        key: { iv: null, uri: null },
+        uri: buildAbsoluteURL(baseurl, first.map.uri),
+      });
+      startIndex = 1;
+    }
+
+    segments.forEach((segment, i) => {
+      fragments.push({
+        index: i + startIndex,
+        key: segment.key
+          ? {
+              iv: segment.key.iv,
+              uri: buildAbsoluteURL(baseurl, segment.key.uri),
+            }
+          : {
+              iv: null,
+              uri: null,
+            },
+        uri: buildAbsoluteURL(baseurl, segment.uri),
+      });
+    });
+
+    return fragments;
   },
   parseMasterPlaylist(string: string, baseurl: string): Level[] {
     const parser = new Parser();

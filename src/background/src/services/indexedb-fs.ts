@@ -57,12 +57,16 @@ export class IndexedDBBucket implements Bucket {
   constructor(
     readonly videoLength: number,
     readonly audioLength: number,
-    readonly id: string,
+    readonly id: string
   ) {}
 
   async cleanup() {
     await this.deleteDB();
-    this.ffmpeg.deleteFile(`${this.fileName}.mp4`);
+    try {
+      await this.ffmpeg.deleteFile(`${this.fileName}.mp4`);
+    } catch (error) {
+      // File may not exist, ignore error
+    }
     return;
   }
 
@@ -132,7 +136,7 @@ export class IndexedDBBucket implements Bucket {
               ["chunks"],
               "chunks",
               unknown
-            > | null,
+            > | null
           ) {
             if (!currentCursor) {
               controller.close();
@@ -148,7 +152,7 @@ export class IndexedDBBucket implements Bucket {
           }
         },
       },
-      {},
+      {}
     );
   }
 
@@ -173,7 +177,9 @@ export class IndexedDBBucket implements Bucket {
     }
     const videoChunks: Uint8Array[] = [];
     const audioChunks: Uint8Array[] = [];
-    const store = this.db.transaction(this.objectStoreName).objectStore(this.objectStoreName);
+    const store = this.db
+      .transaction(this.objectStoreName)
+      .objectStore(this.objectStoreName);
     let cursor = await store.openCursor();
     while (cursor) {
       const chunk: Uint8Array = cursor.value.data;
@@ -195,6 +201,8 @@ export class IndexedDBBucket implements Bucket {
       await this.ffmpeg.writeFile("audio.ts", audioFile);
     }
 
+    const outputFileName = `${this.fileName}.mp4`;
+
     if (this.videoLength > 0 && this.audioLength > 0) {
       await this.ffmpeg.exec([
         "-i",
@@ -205,10 +213,14 @@ export class IndexedDBBucket implements Bucket {
         "copy",
         "-c:a",
         "copy",
-        "file.mp4",
+        outputFileName,
       ]);
-      await this.ffmpeg.deleteFile("video.ts");
-      await this.ffmpeg.deleteFile("audio.ts");
+      try {
+        await this.ffmpeg.deleteFile("video.ts");
+        await this.ffmpeg.deleteFile("audio.ts");
+      } catch (error) {
+        // Files may not exist, ignore error
+      }
     } else if (this.videoLength > 0) {
       await this.ffmpeg.exec([
         "-i",
@@ -217,9 +229,13 @@ export class IndexedDBBucket implements Bucket {
         "copy",
         "-c:a",
         "copy",
-        "file.mp4",
+        outputFileName,
       ]);
-      await this.ffmpeg.deleteFile("video.ts");
+      try {
+        await this.ffmpeg.deleteFile("video.ts");
+      } catch (error) {
+        // File may not exist, ignore error
+      }
     } else {
       await this.ffmpeg.exec([
         "-i",
@@ -228,12 +244,25 @@ export class IndexedDBBucket implements Bucket {
         "copy",
         "-c:a",
         "copy",
-        "file.mp4",
+        outputFileName,
       ]);
-      await this.ffmpeg.deleteFile("audio.ts");
+      try {
+        await this.ffmpeg.deleteFile("audio.ts");
+      } catch (error) {
+        // File may not exist, ignore error
+      }
     }
-    const data = await this.ffmpeg.readFile("file.mp4");
-    return new Blob([data], { type: "video/mp4" });
+
+    // Check if the output file exists before trying to read it
+    try {
+      const data = await this.ffmpeg.readFile(outputFileName);
+      return new Blob([data], { type: "video/mp4" });
+    } catch (error) {
+      console.error(`Failed to read output file ${outputFileName}:`, error);
+      throw new Error(
+        `Output file ${outputFileName} was not created by FFmpeg`
+      );
+    }
   }
 }
 
@@ -254,7 +283,7 @@ const cleanup: IFS["cleanup"] = async function () {
 const createBucket: IFS["createBucket"] = async function (
   id: string,
   videoLength: number,
-  audioLength: number,
+  audioLength: number
 ) {
   buckets[id] = new IndexedDBBucket(videoLength, audioLength, id);
 
@@ -276,7 +305,7 @@ const getBucket: IFS["getBucket"] = function (id: string) {
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
-  { dialog },
+  { dialog }
 ) {
   if (link === "") {
     return Promise.resolve();
