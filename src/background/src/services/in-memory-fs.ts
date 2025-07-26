@@ -14,7 +14,9 @@ export class InMemoryBucket implements Bucket {
     if (index < this.videoLength) {
       this.videoStore[index] = new Blob([new Uint8Array(data)]);
     } else {
-      this.audioStore[index - this.videoLength] = new Blob([new Uint8Array(data)]);
+      this.audioStore[index - this.videoLength] = new Blob([
+        new Uint8Array(data),
+      ]);
     }
     return Promise.resolve();
   }
@@ -55,12 +57,7 @@ export class InMemoryBucket implements Bucket {
         "-bsf:a",
         "aac_adtstoasc",
         "-movflags",
-<<<<<<< ours
-        "+faststart",
-||||||| base
-=======
         "faststart",
->>>>>>> theirs
         "file.mp4",
       ]);
       await ffmpeg.deleteFile("video.ts");
@@ -71,20 +68,10 @@ export class InMemoryBucket implements Bucket {
         "video.ts",
         "-c:v",
         "copy",
-<<<<<<< ours
         "-c:a",
         "copy",
-        "-bsf:a",
-        "aac_adtstoasc",
-        "-movflags",
-        "+faststart",
-||||||| base
-        "-c:a",
-        "copy",
-=======
         "-movflags",
         "faststart",
->>>>>>> theirs
         "file.mp4",
       ]);
       await ffmpeg.deleteFile("video.ts");
@@ -97,12 +84,7 @@ export class InMemoryBucket implements Bucket {
         "-bsf:a",
         "aac_adtstoasc",
         "-movflags",
-<<<<<<< ours
-        "+faststart",
-||||||| base
-=======
         "faststart",
->>>>>>> theirs
         "file.mp4",
       ]);
       await ffmpeg.deleteFile("audio.ts");
@@ -117,7 +99,7 @@ export class InMemoryBucket implements Bucket {
 const createBucket: IFS["createBucket"] = function (
   id: string,
   videoLength: number,
-  audioLength: number,
+  audioLength: number
 ) {
   buckets[id] = new InMemoryBucket(videoLength, audioLength);
   return Promise.resolve();
@@ -135,7 +117,7 @@ const getBucket: IFS["getBucket"] = function (id: string) {
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
-  { dialog },
+  { dialog }
 ) {
   window.URL = window.URL || window.webkitURL;
   const filename = filenamify(path ?? "steam.mp4");

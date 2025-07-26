@@ -216,12 +216,7 @@ export class IndexedDBBucket implements Bucket {
         "-bsf:a",
         "aac_adtstoasc",
         "-movflags",
-<<<<<<< ours
-        "+faststart",
-||||||| base
-=======
         "faststart",
->>>>>>> theirs
         outputFileName,
       ]);
       try {
@@ -236,20 +231,8 @@ export class IndexedDBBucket implements Bucket {
         "video.ts",
         "-c:v",
         "copy",
-<<<<<<< ours
-        "-c:a",
-        "copy",
-        "-bsf:a",
-        "aac_adtstoasc",
-        "-movflags",
-        "+faststart",
-||||||| base
-        "-c:a",
-        "copy",
-=======
         "-movflags",
         "faststart",
->>>>>>> theirs
         outputFileName,
       ]);
       try {
@@ -266,12 +249,7 @@ export class IndexedDBBucket implements Bucket {
         "-bsf:a",
         "aac_adtstoasc",
         "-movflags",
-<<<<<<< ours
-        "+faststart",
-||||||| base
-=======
         "faststart",
->>>>>>> theirs
         outputFileName,
       ]);
       try {
