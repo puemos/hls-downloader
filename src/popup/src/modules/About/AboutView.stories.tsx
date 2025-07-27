@@ -12,5 +12,11 @@ export default meta;
 type Story = StoryObj<typeof AboutView>;
 
 export const Primary: Story = {
-  render: () => <AboutView version="1.0.0" />,
+  render: () => (
+    <AboutView
+      version="1.0.0"
+      name="HLS Downloader"
+      description="HTTP Live Stream downloader"
+    />
+  ),
 };

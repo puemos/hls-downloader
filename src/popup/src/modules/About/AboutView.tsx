@@ -3,39 +3,104 @@ import React from "react";
 
 interface Props {
   version: string;
+  name: string;
+  description: string;
 }
 
-const AboutView = ({ version }: Props) => {
+const AboutView = ({ version, name, description }: Props) => {
+  const open = (url: string) => {
+    window.open(url, "_blank");
+  };
   return (
-    <div className="flex flex-col p-1 mt-4 space-y-3">
-      <div className="flex items-center justify-between h-16 p-3 border rounded-sm shrink-0">
-        <div>
-          <p className="text-sm font-semibold">
-            <span aria-label="plant" role="img" className="mr-2">
-              🌱
-            </span>
-            Version
-          </p>
-        </div>
+    <div className="flex flex-col p-1 mt-4 space-y-2">
+      <div className="flex flex-col items-center justify-center space-y-1">
+        <img src="assets/icons/128.png" alt={name} className="w-16 h-16" />
+        <p className="text-lg font-semibold">{name}</p>
+        <p className="text-sm text-muted-foreground text-center">
+          {description}
+        </p>
+      </div>
+      <div className="flex items-center justify-between p-2 border rounded-sm">
+        <p className="text-sm font-semibold flex items-center">
+          <span aria-label="plant" role="img" className="mr-2">
+            🌱
+          </span>
+          Version
+        </p>
         <div className="text-sm font-semibold">{version}</div>
       </div>
-      <div className="flex items-center justify-between h-16 p-3 border rounded-sm shrink-0">
-        <div>
-          <p className="text-sm font-semibold">
-            <span aria-label="plant" role="img" className="mr-2">
-              🐞
-            </span>
-            Report a bug
-          </p>
-        </div>
-        <Button size="sm" variant="secondary">
+      <div className="flex items-center justify-between p-2 border rounded-sm">
+        <p className="text-sm font-semibold flex items-center">
+          <span aria-label="bug" role="img" className="mr-2">
+            🐞
+          </span>
+          Report a bug
+        </p>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() =>
+            open("https://github.com/puemos/hls-downloader/issues")
+          }
+        >
           Report
         </Button>
       </div>
+      <div className="flex items-center justify-between p-2 border rounded-sm">
+        <p className="text-sm font-semibold flex items-center">
+          <span aria-label="code" role="img" className="mr-2">
+            💻
+          </span>
+          Source code
+        </p>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => open("https://github.com/puemos/hls-downloader")}
+        >
+          GitHub
+        </Button>
+      </div>
+      <div className="flex items-center justify-between p-2 border rounded-sm">
+        <p className="text-sm font-semibold flex items-center">
+          <span aria-label="lock" role="img" className="mr-2">
+            🔒
+          </span>
+          Privacy Policy
+        </p>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() =>
+            open(
+              "https://github.com/puemos/hls-downloader/blob/main/PRIVACY.md"
+            )
+          }
+        >
+          View
+        </Button>
+      </div>
+      <div className="flex items-center justify-between p-2 border rounded-sm">
+        <p className="text-sm font-semibold flex items-center">
+          <span aria-label="scroll" role="img" className="mr-2">
+            📜
+          </span>
+          License
+        </p>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() =>
+            open("https://github.com/puemos/hls-downloader/blob/main/LICENSE")
+          }
+        >
+          MIT
+        </Button>
+      </div>
 
-      <p className="mt-10 text-sm">
-        This browser extension template was made with love by Shy Alter. Please
-        support the project at{" "}
+      <p className="mt-6 text-sm text-center">
+        This browser extension was made with love by Shy Alter. Please support
+        the project at{" "}
         <a
           href="https://github.com/puemos/hls-downloader"
           target="_blank"
