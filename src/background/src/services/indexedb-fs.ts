@@ -203,11 +203,6 @@ export class IndexedDBBucket implements Bucket {
 
     const ffmpeg = await FFmpegSingleton.getInstance();
 
-    let currentMessage = "Processing...";
-    const progressHandler = ({ progress }: { progress: number }) => {
-      onProgress?.(progress, currentMessage);
-    };
-    ffmpeg.on("progress", progressHandler);
     ffmpeg.on("log", ({ message }) => console.log(message));
 
     // write somewhere predictable
@@ -226,11 +221,9 @@ export class IndexedDBBucket implements Bucket {
     try {
       const data = await ffmpeg.readFile(outputFileName);
       onProgress?.(1, "Done");
-      ffmpeg.off("progress", progressHandler);
       return new Blob([data], { type: "video/mp4" });
     } catch (error) {
       console.error(`Failed to read output file ${outputFileName}:`, error);
-      ffmpeg.off("progress", progressHandler);
       throw new Error(
         `Output file ${outputFileName} was not created by FFmpeg`
       );
@@ -276,27 +269,22 @@ export class IndexedDBBucket implements Bucket {
     outputFileName: string,
     onProgress?: (progress: number, message: string) => void
   ) {
-    onProgress?.(0.1, "Concatenating video chunks...");
-    // Concatenate video chunks using streams
+    onProgress?.(0.1, "Concatenating video chunks");
     const videoBlob = await this.concatenateChunks(0, this.videoLength);
 
-    onProgress?.(0.3, "Concatenating audio chunks...");
-    // Concatenate audio chunks using streams
+    onProgress?.(0.3, "Concatenating audio chunks");
     const audioBlob = await this.concatenateChunks(
       this.videoLength,
       this.audioLength
     );
 
-    onProgress?.(0.5, "Writing video stream to FFmpeg...");
-    // Write concatenated video to FFmpeg using fetchFile
+    onProgress?.(0.5, "Writing video stream");
     await ffmpeg.writeFile("video.ts", await fetchFile(videoBlob));
 
-    onProgress?.(0.6, "Writing audio stream to FFmpeg...");
-    // Write concatenated audio to FFmpeg using fetchFile
+    onProgress?.(0.6, "Writing audio stream");
     await ffmpeg.writeFile("audio.ts", await fetchFile(audioBlob));
 
-    onProgress?.(0.7, "Transcoding and transmuxing...");
-    // Transcode and transmux
+    onProgress?.(0.7, "Merging video and audio");
     await ffmpeg.exec([
       "-y",
       "-i",
@@ -329,16 +317,13 @@ export class IndexedDBBucket implements Bucket {
     outputFileName: string,
     onProgress?: (progress: number, message: string) => void
   ) {
-    onProgress?.(0.2, "Concatenating video chunks...");
-    // Concatenate video chunks using streams
+    onProgress?.(0.2, "Concatenating video chunks");
     const videoBlob = await this.concatenateChunks(0, this.videoLength);
 
-    onProgress?.(0.5, "Writing video stream to FFmpeg...");
-    // Write concatenated video to FFmpeg using fetchFile
+    onProgress?.(0.5, "Writing video stream");
     await ffmpeg.writeFile("video.ts", await fetchFile(videoBlob));
 
-    onProgress?.(0.7, "Transcoding and transmuxing...");
-    // Transcode and transmux
+    onProgress?.(0.7, "Transcoding video");
     await ffmpeg.exec([
       "-y",
       "-i",
@@ -363,19 +348,16 @@ export class IndexedDBBucket implements Bucket {
     outputFileName: string,
     onProgress?: (progress: number, message: string) => void
   ) {
-    onProgress?.(0.2, "Concatenating audio chunks...");
-    // Concatenate audio chunks using streams
+    onProgress?.(0.2, "Concatenating audio chunks");
     const audioBlob = await this.concatenateChunks(
       this.videoLength,
       this.audioLength
     );
 
-    onProgress?.(0.5, "Writing audio stream to FFmpeg...");
-    // Write concatenated audio to FFmpeg using fetchFile
+    onProgress?.(0.5, "Writing audio stream");
     await ffmpeg.writeFile("audio.ts", await fetchFile(audioBlob));
 
-    onProgress?.(0.7, "Transcoding and transmuxing...");
-    // Transcode and transmux
+    onProgress?.(0.7, "Transcoding audio");
     await ffmpeg.exec([
       "-y",
       "-i",

@@ -72,7 +72,12 @@ const JobView = ({
 
       <div className="flex flex-row-reverse w-full gap-2 flex-shrink-0">
         {["ready", "done", "saving"].includes(status?.status!) && (
-          <Button size="sm" variant="secondary" onClick={saveAsJob}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={saveAsJob}
+            disabled={status?.status === "saving"}
+          >
             <DownloadIcon className="w-4 h-4 mr-2" /> Save
           </Button>
         )}
@@ -135,7 +140,6 @@ const JobSavingView = ({ status }: { status: JobStatus }) => {
         </svg>
         {status.saveMessage || "Processing..."}
       </div>
-      <Progress value={per} className="h-2 rounded-full bg-muted" />
     </div>
   );
 };
