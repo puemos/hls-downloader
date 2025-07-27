@@ -3,9 +3,15 @@ import AboutView from "./AboutView";
 import useAboutController from "./AboutController";
 
 const AboutModule = () => {
-  const { version } = useAboutController();
+  const { version, name, description } = useAboutController();
 
-  return <AboutView version={version}></AboutView>;
+  return (
+    <AboutView
+      version={version}
+      name={name}
+      description={description}
+    ></AboutView>
+  );
 };
 
 export default AboutModule;
