@@ -1,7 +1,9 @@
 import React from "react";
 import RouterModule from "./modules/Navbar/RouterModule";
+import { useTheme } from "@hls-downloader/design-system";
 
 function App() {
+  useTheme();
   return (
     <div
       id="hls-downloader-ext"

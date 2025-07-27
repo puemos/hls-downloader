@@ -10,4 +10,5 @@ export * from "./components/ui/progress";
 export * from "./components/ui/switch";
 export * from "./components/ui/select";
 export * from "./hooks/use-localstorage";
+export * from "./hooks/use-theme";
 export * from "./lib/utils";
