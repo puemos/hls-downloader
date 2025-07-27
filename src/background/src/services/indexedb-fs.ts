@@ -172,13 +172,15 @@ export class IndexedDBBucket implements Bucket {
     );
   }
 
-  async getLink(): Promise<string> {
+  async getLink(
+    onProgress?: (progress: number, message: string) => void,
+  ): Promise<string> {
     if (!this.db) {
       throw Error();
     }
 
     try {
-      const mp4Blob = await this.streamToMp4Blob();
+      const mp4Blob = await this.streamToMp4Blob(onProgress);
       const url = URL.createObjectURL(mp4Blob);
       return url;
     } catch (error) {
@@ -187,12 +189,24 @@ export class IndexedDBBucket implements Bucket {
     }
   }
 
-  private async streamToMp4Blob() {
+  private async streamToMp4Blob(
+    onProgress?: (progress: number, message: string) => void,
+  ) {
     if (!this.db) {
       throw Error();
     }
 
     const ffmpeg = await FFmpegSingleton.getInstance();
+
+    let currentMessage = "Processing...";
+    const progressHandler = ({ progress }: { progress: number }) => {
+      onProgress?.(progress, currentMessage);
+    };
+    ffmpeg.on("progress", progressHandler);
+    const run = async (args: string[], message: string) => {
+      currentMessage = message;
+      await ffmpeg.exec(args);
+    };
 
     // Helper function to read chunks by index to avoid transaction timeout
     const readChunkByIndex = async (
@@ -253,7 +267,8 @@ export class IndexedDBBucket implements Bucket {
       await ffmpeg.writeFile("audio_list.txt", audioList);
 
       // Concatenate chunks first, then combine
-      await ffmpeg.exec([
+      await run(
+        [
         "-y",
         "-f",
         "concat",
@@ -264,9 +279,12 @@ export class IndexedDBBucket implements Bucket {
         "-c",
         "copy",
         "video.ts",
-      ]);
+      ],
+        "Processing...",
+      );
 
-      await ffmpeg.exec([
+      await run(
+        [
         "-y",
         "-f",
         "concat",
@@ -277,10 +295,13 @@ export class IndexedDBBucket implements Bucket {
         "-c",
         "copy",
         "audio.ts",
-      ]);
+      ],
+        "Processing...",
+      );
 
       // Now combine video and audio
-      await ffmpeg.exec([
+      await run(
+        [
         "-y",
         "-fflags",
         "+genpts",
@@ -309,7 +330,9 @@ export class IndexedDBBucket implements Bucket {
         "-movflags",
         "+faststart",
         outputFileName,
-      ]);
+      ],
+        "Merging video + audio...",
+      );
 
       // Cleanup intermediate files
       try {
@@ -334,7 +357,8 @@ export class IndexedDBBucket implements Bucket {
       }
       await ffmpeg.writeFile("video_list.txt", videoList);
 
-      await ffmpeg.exec([
+      await run(
+        [
         "-y",
         "-f",
         "concat",
@@ -347,7 +371,9 @@ export class IndexedDBBucket implements Bucket {
         "-movflags",
         "+faststart",
         outputFileName,
-      ]);
+      ],
+        "Transcoding...",
+      );
 
       // Cleanup
       try {
@@ -366,7 +392,8 @@ export class IndexedDBBucket implements Bucket {
       }
       await ffmpeg.writeFile("audio_list.txt", audioList);
 
-      await ffmpeg.exec([
+      await run(
+        [
         "-y",
         "-f",
         "concat",
@@ -383,7 +410,9 @@ export class IndexedDBBucket implements Bucket {
         "-movflags",
         "+faststart",
         outputFileName,
-      ]);
+      ],
+        "Transcoding...",
+      );
 
       // Cleanup
       try {
@@ -399,9 +428,12 @@ export class IndexedDBBucket implements Bucket {
     // Check if the output file exists before trying to read it
     try {
       const data = await ffmpeg.readFile(outputFileName);
+      onProgress?.(1, "Done");
+      ffmpeg.off("progress", progressHandler);
       return new Blob([data], { type: "video/mp4" });
     } catch (error) {
       console.error(`Failed to read output file ${outputFileName}:`, error);
+      ffmpeg.off("progress", progressHandler);
       throw new Error(
         `Output file ${outputFileName} was not created by FFmpeg`
       );

@@ -65,6 +65,9 @@ const JobView = ({
         {["downloading"].includes(status?.status!) && (
           <JobProgressView status={status!} />
         )}
+        {["saving"].includes(status?.status!) && (
+          <JobSavingView status={status!} />
+        )}
       </div>
 
       <div className="flex flex-row-reverse w-full gap-2 flex-shrink-0">
@@ -105,6 +108,32 @@ const JobProgressView = ({ status }: { status: LevelStatus }) => {
       <div className="flex justify-between mb-1">
         <span className="text-muted-foreground">{`${per.toFixed(0)}%`}</span>
         <span className="text-muted-foreground">{`${done} / ${total}`}</span>
+      </div>
+      <Progress value={per} className="h-2 rounded-full bg-muted" />
+    </div>
+  );
+};
+
+const JobSavingView = ({ status }: { status: JobStatus }) => {
+  const per = Number(((status.saveProgress ?? 0) * 100).toFixed(0));
+  return (
+    <div className="w-full">
+      <div className="flex items-center mb-1 text-sm text-muted-foreground">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-4 h-4 mr-2 animate-spin"
+        >
+          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+        </svg>
+        {status.saveMessage || "Processing..."}
       </div>
       <Progress value={per} className="h-2 rounded-full bg-muted" />
     </div>

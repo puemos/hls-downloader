@@ -16,7 +16,18 @@ export const saveAsJobEpic: Epic<
     filter(jobsSlice.actions.saveAs.match),
     map((action) => action.payload.jobId),
     mergeMap(
-      (jobId) => from(getLinkBucketFactory(fs)(jobId)),
+      (jobId) =>
+        from(
+          getLinkBucketFactory(fs)(jobId, (progress, message) =>
+            store$.dispatch(
+              jobsSlice.actions.setSaveProgress({
+                jobId,
+                progress,
+                message,
+              }),
+            ),
+          ),
+        ),
       (jobId, link) => ({ jobId, link }),
     ),
     map(({ jobId, link }) => ({
