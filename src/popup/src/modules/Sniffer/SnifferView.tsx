@@ -38,10 +38,10 @@ const SnifferView = ({
         </>
       )}
       {!currentPlaylistId && playlists.length === 0 && (
-        <div className="flex flex-col items-center justify-center mt-32">
+        <div className="flex flex-col items-center justify-center py-20">
           <Banana></Banana>
 
-          <h3 className="mt-4 text-lg font-semibold">No video were found</h3>
+          <h3 className="mt-4 text-lg font-semibold">No videos found</h3>
           <p className="mt-2 mb-4 text-sm text-muted-foreground">
             Try visiting a website with video and try again.
           </p>
@@ -51,12 +51,11 @@ const SnifferView = ({
         <div className="flex flex-row items-center justify-between gap-2">
           <Input
             type="text"
-            className="p-2 border rounded-md"
             placeholder="Filter playlists..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
-          <Button size={"default"} variant="secondary" onClick={clearPlaylists}>
+          <Button size="sm" variant="secondary" onClick={clearPlaylists}>
             Clear all
           </Button>
         </div>
@@ -67,7 +66,7 @@ const SnifferView = ({
             <div
               key={item.id}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm"
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm hover:bg-muted"
               )}
             >
               <div className="flex flex-col w-full gap-1">
@@ -79,16 +78,12 @@ const SnifferView = ({
                     {new Date(item.createdAt!).toLocaleString()}
                   </div>
                 </div>
-                <div className="text-xs font-medium">
-                  {item.initiator && item.initiator.length > 70
-                    ? item.initiator.substring(0, 70) + "..."
-                    : item.initiator}
+                <div className="text-xs font-medium truncate" title={item.initiator}>
+                  {item.initiator}
                 </div>
               </div>
-              <div className="text-xs break-all text-muted-foreground">
-                {item.uri && item.uri.length > 70
-                  ? item.uri.substring(0, 70) + "..."
-                  : item.uri}
+              <div className="text-xs text-muted-foreground truncate" title={item.uri}>
+                {item.uri}
               </div>
               <div className="flex flex-row-reverse w-full">
                 <Button
