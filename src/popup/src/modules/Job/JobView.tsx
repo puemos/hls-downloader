@@ -34,7 +34,7 @@ const JobView = ({
   return (
     <div
       className={cn(
-        "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm min-w-0 overflow-hidden"
+        "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm min-w-0 overflow-hidden hover:bg-muted bg-card"
       )}
     >
       <div className="flex flex-col items-start justify-between w-full mb-1 min-w-0">

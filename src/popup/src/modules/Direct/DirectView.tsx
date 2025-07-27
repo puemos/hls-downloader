@@ -30,7 +30,7 @@ const DirectView = ({
   const showFilterInput = playlists.length !== 0;
 
   return (
-    <div className="flex flex-col p-1 mt-4 space-y-3">
+    <div className="flex flex-col p-2 mt-4 space-y-4">
       {currentPlaylistId && (
         <>
           <Button
@@ -44,16 +44,16 @@ const DirectView = ({
         </>
       )}
       {!currentPlaylistId && (
-        <div className="flex flex-row items-center justify-between gap-2">
+        <div className="flex flex-row items-center gap-2">
           <Input
             type="text"
-            className="p-2 border rounded-md"
+            className="flex-grow"
             placeholder="https://.../playlist.m3u8"
             value={directURI}
             onChange={(e) => setDirectURI(e.target.value)}
           />
           <Button
-            size={"default"}
+            size="sm"
             variant="secondary"
             onClick={addDirectPlaylist}
           >
@@ -62,7 +62,7 @@ const DirectView = ({
         </div>
       )}
       {!currentPlaylistId && playlists.length === 0 && (
-        <div className="flex flex-col items-center justify-center pt-36">
+        <div className="flex flex-col items-center justify-center py-20">
           <Banana></Banana>
 
           <h3 className="mt-4 text-lg font-semibold">No videos</h3>
@@ -77,7 +77,7 @@ const DirectView = ({
             <div
               key={item.id}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm hover:bg-muted bg-card",
               )}
             >
               <div className="flex flex-col w-full gap-1">
@@ -89,9 +89,11 @@ const DirectView = ({
                     {new Date(item.createdAt!).toLocaleString()}
                   </div>
                 </div>
-                <div className="text-xs font-medium">{item.initiator}</div>
+                <div className="text-xs font-medium truncate" title={item.initiator}>
+                  {item.initiator}
+                </div>
               </div>
-              <div className="text-xs break-all text-muted-foreground">
+              <div className="text-xs text-muted-foreground truncate" title={item.uri}>
                 {item.uri}
               </div>
               <div className="flex flex-row-reverse w-full">

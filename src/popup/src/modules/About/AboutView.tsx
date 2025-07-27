@@ -7,8 +7,8 @@ interface Props {
 
 const AboutView = ({ version }: Props) => {
   return (
-    <div className="flex flex-col p-1 mt-4 space-y-3">
-      <div className="flex items-center justify-between h-16 p-3 border rounded-sm shrink-0">
+    <div className="flex flex-col p-2 mt-4 space-y-4">
+      <div className="flex items-center justify-between h-16 p-3 border rounded-md shrink-0">
         <div>
           <p className="text-sm font-semibold">
             <span aria-label="plant" role="img" className="mr-2">
@@ -19,7 +19,7 @@ const AboutView = ({ version }: Props) => {
         </div>
         <div className="text-sm font-semibold">{version}</div>
       </div>
-      <div className="flex items-center justify-between h-16 p-3 border rounded-sm shrink-0">
+      <div className="flex items-center justify-between h-16 p-3 border rounded-md shrink-0">
         <div>
           <p className="text-sm font-semibold">
             <span aria-label="plant" role="img" className="mr-2">

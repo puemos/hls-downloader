@@ -23,7 +23,7 @@ const DownloadsView = ({
   const showFilterInput = jobs.length !== 0;
 
   return (
-    <div className="flex flex-col p-1 mt-4 space-y-3">
+    <div className="flex flex-col p-2 mt-4 space-y-4">
       {currentJobId && (
         <>
           <Button
@@ -37,7 +37,7 @@ const DownloadsView = ({
         </>
       )}
       {!currentJobId && jobs.length === 0 && (
-        <div className="flex flex-col items-center justify-center mt-32">
+        <div className="flex flex-col items-center justify-center py-20">
           <TreePine></TreePine>
 
           <h3 className="mt-4 text-lg font-semibold">
@@ -49,10 +49,10 @@ const DownloadsView = ({
         </div>
       )}
       {!currentJobId && jobs.length > 0 && showFilterInput && (
-        <div className="flex flex-row items-center justify-between gap-2">
+        <div className="flex flex-row items-center gap-2">
           <Input
             type="text"
-            className="p-2 border rounded-md"
+            className="flex-grow"
             placeholder="Filter downloads..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}

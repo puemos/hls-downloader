@@ -19,7 +19,7 @@ const RouterView = () => {
   return (
     <Tabs value={tab} defaultValue={tab} onValueChange={setTab}>
       <div className="flex justify-center">
-        <TabsList>
+        <TabsList className="mb-4 gap-1">
           <TabsTrigger value={TabOptions.SNIFTER}>Sniffer</TabsTrigger>
           <TabsTrigger value={TabOptions.DIRECT}>Direct</TabsTrigger>
           <TabsTrigger value={TabOptions.DOWNLOADS}>Downloads</TabsTrigger>
