@@ -17,6 +17,7 @@ export interface IAddLevelsPayload {
 }
 export interface IDownloadLevelPayload {
   levelID: string;
+  audioLevelID?: string;
 }
 
 interface ILevelsReducers {

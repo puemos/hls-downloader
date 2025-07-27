@@ -9,7 +9,7 @@ import { TabOptions } from "../Navbar/types";
 interface ReturnType {
   status: PlaylistStatus | null;
   levels: Level[];
-  downloadLevel: (levelId: string) => void;
+  downloadLevel: (videoId: string, audioLevelID?: string) => void;
 }
 
 const usePlaylistController = ({ id }: { id: string }): ReturnType => {
@@ -30,8 +30,8 @@ const usePlaylistController = ({ id }: { id: string }): ReturnType => {
     return list;
   });
 
-  function downloadLevel(levelId: string) {
-    dispatch(levelsSlice.actions.download({ levelID: levelId }));
+  function downloadLevel(levelId: string, audioLevelID?: string) {
+    dispatch(levelsSlice.actions.download({ levelID: levelId, audioLevelID }));
     setTab(TabOptions.DOWNLOADS);
   }
   return {

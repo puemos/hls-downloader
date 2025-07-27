@@ -1,7 +1,7 @@
 export interface IFS {
   cleanup(): Promise<void>;
   getBucket(id: string): Promise<Bucket>;
-  createBucket(id: string, length: number): Promise<void>;
+  createBucket(id: string, videoLength: number, audioLength: number): Promise<void>;
   deleteBucket(id: string): Promise<void>;
   saveAs(
     path: string,
@@ -14,5 +14,7 @@ export interface IFS {
 
 export interface Bucket {
   write(index: number, data: ArrayBuffer): Promise<void>;
-  getLink(): Promise<string>;
+  getLink(
+    onProgress?: (progress: number, message: string) => void,
+  ): Promise<string>;
 }

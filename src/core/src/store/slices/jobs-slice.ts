@@ -34,6 +34,11 @@ export interface ISaveAsJobSuccessPayload {
   jobId: string;
   link?: string;
 }
+export interface ISetSaveProgressPayload {
+  jobId: string;
+  progress: number;
+  message: string;
+}
 
 interface IJobsReducers {
   download: CaseReducer<IJobsState, PayloadAction<IDownloadJobPayload>>;
@@ -54,6 +59,10 @@ interface IJobsReducers {
   saveAsSuccess: CaseReducer<
     IJobsState,
     PayloadAction<ISaveAsJobSuccessPayload>
+  >;
+  setSaveProgress: CaseReducer<
+    IJobsState,
+    PayloadAction<ISetSaveProgressPayload>
   >;
   [key: string]: CaseReducer<IJobsState, PayloadAction<any>>;
 }
@@ -77,8 +86,9 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
       state.jobs[job.id] = job;
       state.jobsStatus[job.id] = {
         done: 0,
-        total: job.fragments.length,
+        total: job.videoFragments.length + job.audioFragments.length,
         status: "downloading",
+        saveProgress: 0,
       };
     },
     cancel(_state, _action: PayloadAction<IDeleteJobPayload>) {},
@@ -116,6 +126,14 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
       const jobStatus = state.jobsStatus[jobId]!;
       job.link = action.payload.link;
       jobStatus.status = "done";
+    },
+    setSaveProgress(state, action: PayloadAction<ISetSaveProgressPayload>) {
+      const { jobId, progress, message } = action.payload;
+      const jobStatus = state.jobsStatus[jobId]!;
+      if (jobStatus) {
+        jobStatus.saveProgress = progress;
+        jobStatus.saveMessage = message;
+      }
     },
   },
 });

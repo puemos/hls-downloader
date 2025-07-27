@@ -20,7 +20,7 @@ interface ChunksDB extends DBSchema {
       data: Uint8Array;
       index: number;
     };
-    key: string;
+    key: number;
     indexes: { index: number };
   };
 }
@@ -48,20 +48,54 @@ const storageManager = (function () {
   };
 })();
 
+// Singleton FFmpeg instance
+class FFmpegSingleton {
+  private static instance: FFmpeg | null = null;
+  private static isLoaded = false;
+
+  static async getInstance(): Promise<FFmpeg> {
+    if (!FFmpegSingleton.instance) {
+      FFmpegSingleton.instance = new FFmpeg();
+
+      const baseURL = "/assets/ffmpeg";
+      await FFmpegSingleton.instance.load({
+        coreURL: `${baseURL}/ffmpeg-core.js`,
+        wasmURL: `${baseURL}/ffmpeg-core.wasm`,
+      });
+
+      FFmpegSingleton.isLoaded = true;
+    }
+
+    return FFmpegSingleton.instance;
+  }
+
+  static isFFmpegLoaded(): boolean {
+    return FFmpegSingleton.isLoaded;
+  }
+}
+
 export class IndexedDBBucket implements Bucket {
-  readonly fileName = "file";
+  // make output name unique per bucket
+  readonly fileName: string;
   readonly objectStoreName = "chunks";
   private db?: IDBPDatabase<ChunksDB>;
-  ffmpeg: FFmpeg;
 
   constructor(
-    readonly length: number,
-    readonly id: string,
-  ) {}
+    readonly videoLength: number,
+    readonly audioLength: number,
+    readonly id: string
+  ) {
+    this.fileName = filenamify(id) ?? "file";
+  }
 
   async cleanup() {
     await this.deleteDB();
-    this.ffmpeg.deleteFile(`${this.fileName}.mp4`);
+    try {
+      const ffmpeg = await FFmpegSingleton.getInstance();
+      await ffmpeg.deleteFile(`${this.fileName}.mp4`);
+    } catch (error) {
+      // File may not exist, ignore error
+    }
     return;
   }
 
@@ -79,19 +113,11 @@ export class IndexedDBBucket implements Bucket {
     const db = await openDB<ChunksDB>(this.id, 1, {
       upgrade(db) {
         const store = db.createObjectStore(objectStoreName, {
-          keyPath: "index",
+          keyPath: "id",
+          autoIncrement: true,
         });
         store.createIndex("index", "index", { unique: true });
       },
-    });
-
-    const baseURL = "/assets/ffmpeg";
-
-    this.ffmpeg = new FFmpeg();
-
-    await this.ffmpeg.load({
-      coreURL: `${baseURL}/ffmpeg-core.js`,
-      wasmURL: `${baseURL}/ffmpeg-core.wasm`,
     });
 
     this.db = db;
@@ -118,7 +144,8 @@ export class IndexedDBBucket implements Bucket {
       .transaction(this.objectStoreName)
       .objectStore(this.objectStoreName);
 
-    let cursor = await store.openCursor();
+    const index = store.index("index");
+    let cursor = await index.openCursor();
     let first = true;
     return new ReadableStream(
       {
@@ -129,7 +156,7 @@ export class IndexedDBBucket implements Bucket {
               ["chunks"],
               "chunks",
               unknown
-            > | null,
+            > | null
           ) {
             if (!currentCursor) {
               controller.close();
@@ -145,50 +172,231 @@ export class IndexedDBBucket implements Bucket {
           }
         },
       },
-      {},
+      {}
     );
   }
 
-  async getLink(): Promise<string> {
+  async getLink(
+    onProgress?: (progress: number, message: string) => void
+  ): Promise<string> {
     if (!this.db) {
       throw Error();
     }
 
     try {
-      const mp4Blob = await this.streamToMp4Blob();
+      const mp4Blob = await this.streamToMp4Blob(onProgress);
       const url = URL.createObjectURL(mp4Blob);
       return url;
     } catch (error) {
-      console.error(error);
-      return "";
+      console.error("getLink failed:", error);
+      // Bubble up so caller can react
+      throw error;
     }
   }
 
-  private async streamToMp4Blob() {
+  private async streamToMp4Blob(
+    onProgress?: (progress: number, message: string) => void
+  ) {
     if (!this.db) {
       throw Error();
     }
-    const stream = await this.stream();
-    const response = new Response(stream, {
-      headers: {
-        "Content-Type": "video/mp2t",
-      },
-    });
-    const blob = await response.blob();
-    const file = await fetchFile(blob);
-    await this.ffmpeg.writeFile(`${this.fileName}.ts`, file);
-    await this.ffmpeg.exec([
+
+    const ffmpeg = await FFmpegSingleton.getInstance();
+
+    let currentMessage = "Processing...";
+    const progressHandler = ({ progress }: { progress: number }) => {
+      onProgress?.(progress, currentMessage);
+    };
+    ffmpeg.on("progress", progressHandler);
+    ffmpeg.on("log", ({ message }) => console.log(message));
+
+    // write somewhere predictable
+    const outputFileName = `/tmp/${this.fileName}.mp4`;
+
+    // Process based on available streams
+    if (this.videoLength > 0 && this.audioLength > 0) {
+      await this.processVideoAndAudio(ffmpeg, outputFileName, onProgress);
+    } else if (this.videoLength > 0) {
+      await this.processVideoOnly(ffmpeg, outputFileName, onProgress);
+    } else {
+      await this.processAudioOnly(ffmpeg, outputFileName, onProgress);
+    }
+
+    // Check if the output file exists before trying to read it
+    try {
+      const data = await ffmpeg.readFile(outputFileName);
+      onProgress?.(1, "Done");
+      ffmpeg.off("progress", progressHandler);
+      return new Blob([data], { type: "video/mp4" });
+    } catch (error) {
+      console.error(`Failed to read output file ${outputFileName}:`, error);
+      ffmpeg.off("progress", progressHandler);
+      throw new Error(
+        `Output file ${outputFileName} was not created by FFmpeg`
+      );
+    }
+  }
+
+  // Helper function to read chunks by index to avoid transaction timeout
+  private async readChunkByIndex(
+    chunkIndex: number
+  ): Promise<Uint8Array | null> {
+    const transaction = this.db!.transaction(this.objectStoreName, "readonly");
+    const store = transaction.objectStore(this.objectStoreName);
+    const index = store.index("index");
+
+    try {
+      const result = await index.get(chunkIndex);
+      return result ? result.data : null;
+    } catch (error) {
+      console.error(`Error reading chunk ${chunkIndex}:`, error);
+      return null;
+    }
+  }
+
+  // Helper function to concatenate chunks using streams
+  private async concatenateChunks(
+    startIndex: number,
+    length: number
+  ): Promise<Blob> {
+    const chunks: Uint8Array[] = [];
+
+    for (let i = 0; i < length; i++) {
+      const chunk = await this.readChunkByIndex(startIndex + i);
+      if (chunk) {
+        chunks.push(chunk);
+      }
+    }
+
+    return new Blob(chunks);
+  }
+
+  private async processVideoAndAudio(
+    ffmpeg: FFmpeg,
+    outputFileName: string,
+    onProgress?: (progress: number, message: string) => void
+  ) {
+    onProgress?.(0.1, "Concatenating video chunks...");
+    // Concatenate video chunks using streams
+    const videoBlob = await this.concatenateChunks(0, this.videoLength);
+
+    onProgress?.(0.3, "Concatenating audio chunks...");
+    // Concatenate audio chunks using streams
+    const audioBlob = await this.concatenateChunks(
+      this.videoLength,
+      this.audioLength
+    );
+
+    onProgress?.(0.5, "Writing video stream to FFmpeg...");
+    // Write concatenated video to FFmpeg using fetchFile
+    await ffmpeg.writeFile("video.ts", await fetchFile(videoBlob));
+
+    onProgress?.(0.6, "Writing audio stream to FFmpeg...");
+    // Write concatenated audio to FFmpeg using fetchFile
+    await ffmpeg.writeFile("audio.ts", await fetchFile(audioBlob));
+
+    onProgress?.(0.7, "Transcoding and transmuxing...");
+    // Transcode and transmux
+    await ffmpeg.exec([
+      "-y",
       "-i",
-      `${this.fileName}.ts`,
-      "-acodec",
+      "video.ts",
+      "-i",
+      "audio.ts",
+      "-c:v",
       "copy",
-      "-vcodec",
+      "-c:a",
       "copy",
-      `${this.fileName}.mp4`,
+      "-bsf:a",
+      "aac_adtstoasc",
+      "-shortest",
+      "-movflags",
+      "+faststart",
+      outputFileName,
     ]);
-    await this.ffmpeg.deleteFile(`${this.fileName}.ts`);
-    const data = await this.ffmpeg.readFile(`${this.fileName}.mp4`);
-    return new Blob([data], { type: "video/mp4" });
+
+    // Cleanup intermediate files
+    try {
+      await ffmpeg.deleteFile("video.ts");
+      await ffmpeg.deleteFile("audio.ts");
+    } catch (error) {
+      // Files may not exist, ignore error
+    }
+  }
+
+  private async processVideoOnly(
+    ffmpeg: FFmpeg,
+    outputFileName: string,
+    onProgress?: (progress: number, message: string) => void
+  ) {
+    onProgress?.(0.2, "Concatenating video chunks...");
+    // Concatenate video chunks using streams
+    const videoBlob = await this.concatenateChunks(0, this.videoLength);
+
+    onProgress?.(0.5, "Writing video stream to FFmpeg...");
+    // Write concatenated video to FFmpeg using fetchFile
+    await ffmpeg.writeFile("video.ts", await fetchFile(videoBlob));
+
+    onProgress?.(0.7, "Transcoding and transmuxing...");
+    // Transcode and transmux
+    await ffmpeg.exec([
+      "-y",
+      "-i",
+      "video.ts",
+      "-c:v",
+      "copy",
+      "-movflags",
+      "+faststart",
+      outputFileName,
+    ]);
+
+    // Cleanup intermediate files
+    try {
+      await ffmpeg.deleteFile("video.ts");
+    } catch (error) {
+      // Files may not exist, ignore error
+    }
+  }
+
+  private async processAudioOnly(
+    ffmpeg: FFmpeg,
+    outputFileName: string,
+    onProgress?: (progress: number, message: string) => void
+  ) {
+    onProgress?.(0.2, "Concatenating audio chunks...");
+    // Concatenate audio chunks using streams
+    const audioBlob = await this.concatenateChunks(
+      this.videoLength,
+      this.audioLength
+    );
+
+    onProgress?.(0.5, "Writing audio stream to FFmpeg...");
+    // Write concatenated audio to FFmpeg using fetchFile
+    await ffmpeg.writeFile("audio.ts", await fetchFile(audioBlob));
+
+    onProgress?.(0.7, "Transcoding and transmuxing...");
+    // Transcode and transmux
+    await ffmpeg.exec([
+      "-y",
+      "-i",
+      "audio.ts",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "192k",
+      "-af",
+      "aresample=async=1:first_pts=0",
+      "-movflags",
+      "+faststart",
+      outputFileName,
+    ]);
+
+    // Cleanup intermediate files
+    try {
+      await ffmpeg.deleteFile("audio.ts");
+    } catch (error) {
+      // Files may not exist, ignore error
+    }
   }
 }
 
@@ -208,9 +416,10 @@ const cleanup: IFS["cleanup"] = async function () {
 
 const createBucket: IFS["createBucket"] = async function (
   id: string,
-  length: number,
+  videoLength: number,
+  audioLength: number
 ) {
-  buckets[id] = new IndexedDBBucket(length, id);
+  buckets[id] = new IndexedDBBucket(videoLength, audioLength, id);
 
   storageManager.setItem("dbs", JSON.stringify(Object.keys(buckets)));
   return Promise.resolve();
@@ -230,7 +439,7 @@ const getBucket: IFS["getBucket"] = function (id: string) {
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
-  { dialog },
+  { dialog }
 ) {
   if (link === "") {
     return Promise.resolve();

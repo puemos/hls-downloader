@@ -67,7 +67,7 @@ const SnifferView = ({
             <div
               key={item.id}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm"
               )}
             >
               <div className="flex flex-col w-full gap-1">
@@ -79,10 +79,16 @@ const SnifferView = ({
                     {new Date(item.createdAt!).toLocaleString()}
                   </div>
                 </div>
-                <div className="text-xs font-medium">{item.initiator}</div>
+                <div className="text-xs font-medium">
+                  {item.initiator && item.initiator.length > 70
+                    ? item.initiator.substring(0, 70) + "..."
+                    : item.initiator}
+                </div>
               </div>
               <div className="text-xs break-all text-muted-foreground">
-                {item.uri}
+                {item.uri && item.uri.length > 70
+                  ? item.uri.substring(0, 70) + "..."
+                  : item.uri}
               </div>
               <div className="flex flex-row-reverse w-full">
                 <Button

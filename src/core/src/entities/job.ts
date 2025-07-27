@@ -3,7 +3,8 @@ import { Fragment } from "./fragment";
 export class Job {
   constructor(
     readonly id: string,
-    readonly fragments: Fragment[],
+    readonly videoFragments: Fragment[],
+    readonly audioFragments: Fragment[],
     readonly filename: string,
     readonly createdAt: number,
     readonly width?: number,
