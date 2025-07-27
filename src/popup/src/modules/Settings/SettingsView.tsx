@@ -90,8 +90,9 @@ const SettingsView = ({
           ></Switch>
         </div>
       </div>
-    </div>
-  );
+
+  </div>
+);
 };
 
 export default SettingsView;

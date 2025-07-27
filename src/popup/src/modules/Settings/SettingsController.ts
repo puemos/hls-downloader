@@ -60,7 +60,6 @@ const useSettingsController = (): ReturnType => {
       }),
     );
   }
-
   return {
     concurrency,
     onConcurrencyIncrease,
