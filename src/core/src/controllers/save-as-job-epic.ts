@@ -15,36 +15,30 @@ export const saveAsJobEpic: Epic<
   action$.pipe(
     filter(jobsSlice.actions.saveAs.match),
     map((action) => action.payload.jobId),
-    mergeMap(
-      (jobId) =>
-        from(
-          getLinkBucketFactory(fs)(jobId, (progress, message) =>
-            store$.dispatch(
-              jobsSlice.actions.setSaveProgress({
-                jobId,
-                progress,
-                message,
-              }),
-            ),
-          ),
-        ),
-      (jobId, link) => ({ jobId, link }),
+    mergeMap((jobId) =>
+      from(
+        getLinkBucketFactory(fs)(jobId, (progress, message) =>
+          jobsSlice.actions.setSaveProgress({
+            jobId,
+            progress,
+            message,
+          })
+        )
+      ).pipe(map((link) => ({ jobId, link })))
     ),
     map(({ jobId, link }) => ({
       job: store$.value.jobs.jobs[jobId]!,
       dialog: store$.value.config.saveDialog,
       link,
     })),
-    mergeMap(
-      ({ dialog, link, job }) =>
-        from(
-          saveAsFactory(fs)(job.filename, link, {
-            dialog,
-          }),
-        ),
-      ({ job, link }) => ({ job, link }),
+    mergeMap(({ dialog, link, job }) =>
+      from(
+        saveAsFactory(fs)(job.filename, link, {
+          dialog,
+        })
+      ).pipe(map(() => ({ job, link })))
     ),
     mergeMap(({ job, link }) =>
-      of(jobsSlice.actions.saveAsSuccess({ jobId: job.id, link })),
-    ),
+      of(jobsSlice.actions.saveAsSuccess({ jobId: job.id, link }))
+    )
   );
