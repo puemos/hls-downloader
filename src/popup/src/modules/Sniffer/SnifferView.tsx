@@ -73,8 +73,9 @@ const SnifferView = ({
           {playlists.map((item) => (
             <div
               key={item.id}
+              onClick={() => setCurrentPlaylistId(item.id)}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm bg-muted"
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted"
               )}
             >
               <div className="flex flex-col w-full gap-1">
@@ -96,15 +97,6 @@ const SnifferView = ({
                 {item.uri && item.uri.length > 70
                   ? item.uri.substring(0, 70) + "..."
                   : item.uri}
-              </div>
-              <div className="flex flex-row-reverse w-full">
-                <Button
-                  onClick={() => setCurrentPlaylistId(item.id)}
-                  size="sm"
-                  variant="secondary"
-                >
-                  Select
-                </Button>
               </div>
             </div>
           ))}

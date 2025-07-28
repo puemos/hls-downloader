@@ -1,5 +1,6 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
 import { Button, ScrollArea, Separator } from "@hls-downloader/design-system";
+import { ChevronRight } from "lucide-react";
 import React, { useState } from "react";
 import { Metadata } from "../../components/Metadata";
 
@@ -109,7 +110,7 @@ const PlaylistView = ({
     return (
       <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
         {videoLevels.length > 0 && (
-          <div className="border rounded-md p-3 bg-muted">
+          <div className="border rounded-md p-3 hover:bg-muted">
             <div
               className="mb-2 font-semibold cursor-pointer flex items-center justify-between"
               onClick={() => setVideoOpen((o) => !o)}
@@ -133,21 +134,11 @@ const PlaylistView = ({
                     )}
                   </span>
                 )}
-                <svg
+                <ChevronRight
                   className={`w-4 h-4 transition-transform flex-shrink-0 ${
                     videoOpen ? "rotate-90" : ""
                   }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                />
               </div>
             </div>
             {videoOpen && (
@@ -188,7 +179,7 @@ const PlaylistView = ({
           <Separator className="my-2" />
         )}
         {audioLevels.length > 0 && (
-          <div className="border rounded-md p-3 bg-muted">
+          <div className="border rounded-md p-3 hover:bg-muted">
             <div
               className="mb-2 font-semibold cursor-pointer flex items-center justify-between"
               onClick={() => setAudioOpen((o) => !o)}
@@ -212,21 +203,11 @@ const PlaylistView = ({
                     )}
                   </span>
                 )}
-                <svg
+                <ChevronRight
                   className={`w-4 h-4 transition-transform flex-shrink-0 ${
                     audioOpen ? "rotate-90" : ""
                   }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                />
               </div>
             </div>
             {audioOpen && (
