@@ -1,14 +1,5 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import {
-  Button,
-  ScrollArea,
-  Separator,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@hls-downloader/design-system";
+import { Button, ScrollArea, Separator } from "@hls-downloader/design-system";
 import React from "react";
 import { Metadata } from "../../components/Metadata";
 
@@ -103,21 +94,23 @@ const PlaylistView = ({
         {videoLevels.length > 0 && (
           <div className="border rounded-md p-3 space-y-2">
             <h3 className="text-sm font-semibold">Video</h3>
-            <Select value={selectedVideoId} onValueChange={handleSelectVideo}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select video quality" />
-              </SelectTrigger>
-              <SelectContent>
-                {videoLevels.map((item) => {
-                  const details = getVideoDetails(item);
-                  return (
-                    <SelectItem key={item.id} value={item.id}>
-                      {getDisplayText(item.id, details)}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+            <select
+              value={selectedVideoId}
+              onChange={(e) => handleSelectVideo(e.target.value)}
+              className="w-full rounded-md border p-2 text-sm bg-transparent"
+            >
+              <option value="" disabled>
+                Select video quality
+              </option>
+              {videoLevels.map((item) => {
+                const details = getVideoDetails(item);
+                return (
+                  <option key={item.id} value={item.id}>
+                    {getDisplayText(item.id, details)}
+                  </option>
+                );
+              })}
+            </select>
             {selectedVideo && (
               <>
                 {selectedVideo.uri && (
@@ -136,21 +129,23 @@ const PlaylistView = ({
         {audioLevels.length > 0 && (
           <div className="border rounded-md p-3 space-y-2">
             <h3 className="text-sm font-semibold">Audio</h3>
-            <Select value={selectedAudioId} onValueChange={handleSelectAudio}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select audio quality" />
-              </SelectTrigger>
-              <SelectContent>
-                {audioLevels.map((item) => {
-                  const details = getAudioDetails(item);
-                  return (
-                    <SelectItem key={item.id} value={item.id}>
-                      {getDisplayText(item.id, details)}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+            <select
+              value={selectedAudioId}
+              onChange={(e) => handleSelectAudio(e.target.value)}
+              className="w-full rounded-md border p-2 text-sm bg-transparent"
+            >
+              <option value="" disabled>
+                Select audio quality
+              </option>
+              {audioLevels.map((item) => {
+                const details = getAudioDetails(item);
+                return (
+                  <option key={item.id} value={item.id}>
+                    {getDisplayText(item.id, details)}
+                  </option>
+                );
+              })}
+            </select>
             {selectedAudio && (
               <>
                 {selectedAudio.uri && (

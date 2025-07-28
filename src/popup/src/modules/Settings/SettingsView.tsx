@@ -23,72 +23,56 @@ const SettingsView = ({
   onSaveDialogToggle,
 }: Props) => {
   return (
-    <div className="flex flex-col p-4 space-y-4">
-      <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
-        <div>
-          <p className="text-sm font-semibold">Concurrency</p>
-        </div>
-        <div className="">
-          <div className="flex flex-row items-center justify-center gap-2">
-            <Button
-              variant={"ghost"}
-              aria-label="decrease fetch attempts"
-              onClick={onConcurrencyDecrease}
-            >
-              -
-            </Button>
-            <Input className="w-16 text-center" value={concurrency} disabled />
-            <Button
-              variant={"ghost"}
-              aria-label="increase fetch attempts"
-              onClick={onConcurrencyIncrease}
-            >
-              +
-            </Button>
-          </div>
+    <div className="flex flex-col p-4 space-y-6">
+      <div className="space-y-1">
+        <p className="text-sm font-medium">Concurrency</p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            aria-label="decrease concurrency"
+            onClick={onConcurrencyDecrease}
+          >
+            -
+          </Button>
+          <Input className="w-16 text-center" value={concurrency} disabled />
+          <Button
+            variant="ghost"
+            aria-label="increase concurrency"
+            onClick={onConcurrencyIncrease}
+          >
+            +
+          </Button>
         </div>
       </div>
 
-      <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
-        <div>
-          <p className="text-sm font-semibold">Fetch Attempts</p>
-        </div>
-        <div className="">
-          <div className="flex flex-row items-center justify-center gap-2">
-            <Button
-              variant={"ghost"}
-              aria-label="decrease fetch attempts"
-              onClick={onFetchAttemptsDecrease}
-            >
-              -
-            </Button>
-            <Input
-              className="w-16 text-center"
-              value={fetchAttempts}
-              disabled
-            />
-            <Button
-              variant={"ghost"}
-              aria-label="increase fetch attempts"
-              onClick={onFetchAttemptsIncrease}
-            >
-              +
-            </Button>
-          </div>
+      <div className="space-y-1">
+        <p className="text-sm font-medium">Fetch Attempts</p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            aria-label="decrease fetch attempts"
+            onClick={onFetchAttemptsDecrease}
+          >
+            -
+          </Button>
+          <Input className="w-16 text-center" value={fetchAttempts} disabled />
+          <Button
+            variant="ghost"
+            aria-label="increase fetch attempts"
+            onClick={onFetchAttemptsIncrease}
+          >
+            +
+          </Button>
         </div>
       </div>
 
-      <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
-        <div>
-          <p className="text-sm font-semibold">Save Dialog</p>
-        </div>
-        <div className="">
-          <Switch
-            aria-label="toggle save dialog"
-            onClick={onSaveDialogToggle}
-            checked={saveDialog}
-          ></Switch>
-        </div>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium">Save Dialog</p>
+        <Switch
+          aria-label="toggle save dialog"
+          onClick={onSaveDialogToggle}
+          checked={saveDialog}
+        ></Switch>
       </div>
 
   </div>
