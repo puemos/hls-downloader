@@ -1,7 +1,15 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import { Button, ScrollArea, Separator } from "@hls-downloader/design-system";
-import { ChevronRight } from "lucide-react";
-import React, { useState } from "react";
+import {
+  Button,
+  ScrollArea,
+  Separator,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@hls-downloader/design-system";
+import React from "react";
 import { Metadata } from "../../components/Metadata";
 
 interface Props {
@@ -27,9 +35,6 @@ const PlaylistView = ({
   onDownload,
   canDownload,
 }: Props) => {
-  const [videoOpen, setVideoOpen] = useState(true);
-  const [audioOpen, setAudioOpen] = useState(false);
-
   if (!status) {
     return null;
   }
@@ -62,23 +67,16 @@ const PlaylistView = ({
 
     function handleSelectVideo(id: string) {
       onSelectVideo(id);
-      setVideoOpen(false);
-      if (audioLevels.length > 0) {
-        setAudioOpen(true);
-      }
     }
 
     function handleSelectAudio(id: string) {
       onSelectAudio(id);
-      setAudioOpen(false);
     }
 
     function getVideoDetails(item: Level) {
       return [
         item.width && item.height ? `${item.width}×${item.height}` : undefined,
-        item.bitrate
-          ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps`
-          : undefined,
+        item.bitrate ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps` : undefined,
         item.fps ? `${item.fps} fps` : undefined,
       ]
         .filter(Boolean)
@@ -87,17 +85,10 @@ const PlaylistView = ({
 
     function getAudioDetails(item: Level) {
       return [
-        item.bitrate
-          ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps`
-          : undefined,
+        item.bitrate ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps` : undefined,
       ]
         .filter(Boolean)
         .join(" · ");
-    }
-
-    function truncateText(text: string, maxLength: number) {
-      if (text.length <= maxLength) return text;
-      return text.substring(0, maxLength) + "...";
     }
 
     function getDisplayText(id: string, details: string) {
@@ -110,68 +101,32 @@ const PlaylistView = ({
     return (
       <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
         {videoLevels.length > 0 && (
-          <div className="border rounded-md p-3 hover:bg-muted">
-            <div
-              className="mb-2 font-semibold cursor-pointer flex items-center justify-between"
-              onClick={() => setVideoOpen((o) => !o)}
-            >
-              <span>Video</span>
-              <div className="flex items-center gap-2 min-w-0 flex-1 justify-end">
-                {selectedVideo && !videoOpen && (
-                  <span
-                    className="text-sm text-muted-foreground font-normal truncate max-w-xs"
-                    title={getDisplayText(
-                      selectedVideo.id,
-                      getVideoDetails(selectedVideo)
-                    )}
-                  >
-                    {truncateText(
-                      getDisplayText(
-                        selectedVideo.id,
-                        getVideoDetails(selectedVideo)
-                      ),
-                      40
-                    )}
-                  </span>
-                )}
-                <ChevronRight
-                  className={`w-4 h-4 transition-transform flex-shrink-0 ${
-                    videoOpen ? "rotate-90" : ""
-                  }`}
-                />
-              </div>
-            </div>
-            {videoOpen && (
-              <div className="space-y-2">
+          <div className="border rounded-md p-3 space-y-2">
+            <h3 className="text-sm font-semibold">Video</h3>
+            <Select value={selectedVideoId} onValueChange={handleSelectVideo}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select video quality" />
+              </SelectTrigger>
+              <SelectContent>
                 {videoLevels.map((item) => {
                   const details = getVideoDetails(item);
                   return (
-                    <Button
-                      key={item.id}
-                      variant={
-                        item.id === selectedVideoId ? "secondary" : "outline"
-                      }
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() => handleSelectVideo(item.id)}
-                    >
-                      <span className="truncate">
-                        {getDisplayText(item.id, details)}
-                      </span>
-                    </Button>
+                    <SelectItem key={item.id} value={item.id}>
+                      {getDisplayText(item.id, details)}
+                    </SelectItem>
                   );
                 })}
-                {selectedVideo && (
-                  <>
-                    {selectedVideo.uri && (
-                      <div className="text-xs break-all text-muted-foreground mt-1">
-                        {selectedVideo.uri}
-                      </div>
-                    )}
-                    <Metadata metadata={selectedVideo} />
-                  </>
+              </SelectContent>
+            </Select>
+            {selectedVideo && (
+              <>
+                {selectedVideo.uri && (
+                  <div className="text-xs break-all text-muted-foreground">
+                    {selectedVideo.uri}
+                  </div>
                 )}
-              </div>
+                <Metadata metadata={selectedVideo} />
+              </>
             )}
           </div>
         )}
@@ -179,78 +134,37 @@ const PlaylistView = ({
           <Separator className="my-2" />
         )}
         {audioLevels.length > 0 && (
-          <div className="border rounded-md p-3 hover:bg-muted">
-            <div
-              className="mb-2 font-semibold cursor-pointer flex items-center justify-between"
-              onClick={() => setAudioOpen((o) => !o)}
-            >
-              <span>Audio</span>
-              <div className="flex items-center gap-2 min-w-0 flex-1 justify-end">
-                {selectedAudio && !audioOpen && (
-                  <span
-                    className="text-sm text-muted-foreground font-normal truncate max-w-xs"
-                    title={getDisplayText(
-                      selectedAudio.id,
-                      getAudioDetails(selectedAudio)
-                    )}
-                  >
-                    {truncateText(
-                      getDisplayText(
-                        selectedAudio.id,
-                        getAudioDetails(selectedAudio)
-                      ),
-                      40
-                    )}
-                  </span>
-                )}
-                <ChevronRight
-                  className={`w-4 h-4 transition-transform flex-shrink-0 ${
-                    audioOpen ? "rotate-90" : ""
-                  }`}
-                />
-              </div>
-            </div>
-            {audioOpen && (
-              <div className="space-y-2">
+          <div className="border rounded-md p-3 space-y-2">
+            <h3 className="text-sm font-semibold">Audio</h3>
+            <Select value={selectedAudioId} onValueChange={handleSelectAudio}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select audio quality" />
+              </SelectTrigger>
+              <SelectContent>
                 {audioLevels.map((item) => {
                   const details = getAudioDetails(item);
                   return (
-                    <Button
-                      key={item.id}
-                      variant={
-                        item.id === selectedAudioId ? "secondary" : "outline"
-                      }
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() => handleSelectAudio(item.id)}
-                    >
-                      <span className="truncate">
-                        {getDisplayText(item.id, details)}
-                      </span>
-                    </Button>
+                    <SelectItem key={item.id} value={item.id}>
+                      {getDisplayText(item.id, details)}
+                    </SelectItem>
                   );
                 })}
-                {selectedAudio && (
-                  <>
-                    {selectedAudio.uri && (
-                      <div className="text-xs break-all text-muted-foreground mt-1">
-                        {selectedAudio.uri}
-                      </div>
-                    )}
-                    <Metadata metadata={selectedAudio} />
-                  </>
+              </SelectContent>
+            </Select>
+            {selectedAudio && (
+              <>
+                {selectedAudio.uri && (
+                  <div className="text-xs break-all text-muted-foreground">
+                    {selectedAudio.uri}
+                  </div>
                 )}
-              </div>
+                <Metadata metadata={selectedAudio} />
+              </>
             )}
           </div>
         )}
         <div className="flex flex-row-reverse mt-2">
-          <Button
-            onClick={onDownload}
-            disabled={!canDownload}
-            size="sm"
-            variant="secondary"
-          >
+          <Button onClick={onDownload} disabled={!canDownload} size="sm" variant="secondary">
             Download
           </Button>
         </div>

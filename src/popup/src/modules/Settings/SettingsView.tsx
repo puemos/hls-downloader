@@ -23,8 +23,8 @@ const SettingsView = ({
   onSaveDialogToggle,
 }: Props) => {
   return (
-    <div className="flex flex-col p-1 mt-4 space-y-3">
-      <div className="flex items-center justify-between h-16 p-3 border rounded-sm shrink-0">
+    <div className="flex flex-col p-4 space-y-4">
+      <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
         <div>
           <p className="text-sm font-semibold">Concurrency</p>
         </div>
@@ -49,7 +49,7 @@ const SettingsView = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-between h-16 p-3 border rounded-sm shrink-0">
+      <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
         <div>
           <p className="text-sm font-semibold">Fetch Attempts</p>
         </div>
@@ -78,7 +78,7 @@ const SettingsView = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-between h-16 p-3 border rounded-sm shrink-0">
+      <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
         <div>
           <p className="text-sm font-semibold">Save Dialog</p>
         </div>
