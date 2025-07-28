@@ -76,8 +76,9 @@ const DirectView = ({
           {playlists.map((item) => (
             <div
               key={item.id}
+              onClick={() => setCurrentPlaylistId(item.id)}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm",
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted",
               )}
             >
               <div className="flex flex-col w-full gap-1">
@@ -93,15 +94,6 @@ const DirectView = ({
               </div>
               <div className="text-xs break-all text-muted-foreground">
                 {item.uri}
-              </div>
-              <div className="flex flex-row-reverse w-full">
-                <Button
-                  onClick={() => setCurrentPlaylistId(item.id)}
-                  size="sm"
-                  variant="secondary"
-                >
-                  Select
-                </Button>
               </div>
             </div>
           ))}
