@@ -60,6 +60,8 @@ Google just removed the extension from the store due to a claim
 Run `make dev` to start watchers for all packages while you edit. The
 compiled extension will appear in `dist/` as you work.
 
+Run `make storybook` to launch Storybook for previewing popup and design-system components.
+
 ## Project Structure
 
 ```
