@@ -24,7 +24,7 @@ const SnifferView = ({
   const showFilterInput = playlists.length !== 0;
 
   return (
-    <div className="flex flex-col p-1 mt-4 space-y-3">
+    <div className="flex flex-col p-4 space-y-4">
       {currentPlaylistId && (
         <>
           <Button
@@ -48,17 +48,24 @@ const SnifferView = ({
         </div>
       )}
       {!currentPlaylistId && playlists.length > 0 && showFilterInput && (
-        <div className="flex flex-row items-center justify-between gap-2">
-          <Input
-            type="text"
-            className="p-2 border rounded-md"
-            placeholder="Filter playlists..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          />
-          <Button size={"default"} variant="secondary" onClick={clearPlaylists}>
-            Clear all
-          </Button>
+        <div className="flex flex-col space-y-2">
+          <h3 className="text-base font-semibold">Detected playlists</h3>
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              className="p-2 border rounded-md flex-1"
+              placeholder="Filter playlists..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={clearPlaylists}
+            >
+              Clear all
+            </Button>
+          </div>
         </div>
       )}
       {!currentPlaylistId && playlists.length > 0 && (
@@ -67,7 +74,7 @@ const SnifferView = ({
             <div
               key={item.id}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm"
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm bg-muted"
               )}
             >
               <div className="flex flex-col w-full gap-1">

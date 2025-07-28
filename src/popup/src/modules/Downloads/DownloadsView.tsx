@@ -23,7 +23,7 @@ const DownloadsView = ({
   const showFilterInput = jobs.length !== 0;
 
   return (
-    <div className="flex flex-col p-1 mt-4 space-y-3">
+    <div className="flex flex-col p-4 space-y-4">
       {currentJobId && (
         <>
           <Button
@@ -49,7 +49,8 @@ const DownloadsView = ({
         </div>
       )}
       {!currentJobId && jobs.length > 0 && showFilterInput && (
-        <div className="flex flex-row items-center justify-between gap-2">
+        <div className="flex flex-col space-y-2">
+          <h3 className="text-base font-semibold">Downloads</h3>
           <Input
             type="text"
             className="p-2 border rounded-md"

@@ -109,7 +109,7 @@ const PlaylistView = ({
     return (
       <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
         {videoLevels.length > 0 && (
-          <div>
+          <div className="border rounded-md p-3 bg-muted">
             <div
               className="mb-2 font-semibold cursor-pointer flex items-center justify-between"
               onClick={() => setVideoOpen((o) => !o)}
@@ -188,7 +188,7 @@ const PlaylistView = ({
           <Separator className="my-2" />
         )}
         {audioLevels.length > 0 && (
-          <div>
+          <div className="border rounded-md p-3 bg-muted">
             <div
               className="mb-2 font-semibold cursor-pointer flex items-center justify-between"
               onClick={() => setAudioOpen((o) => !o)}
