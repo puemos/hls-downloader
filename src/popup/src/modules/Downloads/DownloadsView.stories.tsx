@@ -1,10 +1,38 @@
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
 import { Job } from "@hls-downloader/core/lib/entities";
 import DownloadsView from "./DownloadsView";
+
+// Create a mock store for Storybook using configureStore
+const mockStore = configureStore({
+  reducer: {
+    downloads: (state = { playlistsStatus: {}, jobsStatus: {} }) => state,
+    jobs: (state = { jobs: {}, jobsStatus: {} }) => state,
+  },
+  preloadedState: {
+    downloads: {
+      playlistsStatus: {},
+      jobsStatus: {},
+    },
+    jobs: {
+      jobs: {},
+      jobsStatus: {},
+    },
+  },
+});
 
 const meta: Meta<typeof DownloadsView> = {
   title: "popup/views/DownloadsView",
   component: DownloadsView,
+  decorators: [
+    (Story) => (
+      <Provider store={mockStore}>
+        <Story />
+      </Provider>
+    ),
+  ],
 };
 
 export default meta;

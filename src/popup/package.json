@@ -32,6 +32,7 @@
     "@storybook/addon-essentials": "^7.6.20",
     "@storybook/react": "^7.6.20",
     "@storybook/react-vite": "^7.6.20",
+    "@reduxjs/toolkit": "^1.9.5",
     "storybook": "^7.6.20"
   },
   "scripts": {
