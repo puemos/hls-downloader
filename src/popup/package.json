@@ -30,6 +30,7 @@
     "tailwindcss-animate": "^1.0.5",
     "vite": "5.2.10",
     "@storybook/addon-essentials": "^7.6.20",
+    "@storybook/react": "^7.6.20",
     "@storybook/react-vite": "^7.6.20",
     "storybook": "^7.6.20"
   },
