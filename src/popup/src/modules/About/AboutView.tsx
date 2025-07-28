@@ -73,7 +73,7 @@ const AboutView = ({ version, name, description }: Props) => {
           variant="secondary"
           onClick={() =>
             open(
-              "https://github.com/puemos/hls-downloader/blob/main/PRIVACY.md"
+              "https://github.com/puemos/hls-downloader/blob/master/PRIVACY.md"
             )
           }
         >
@@ -91,7 +91,7 @@ const AboutView = ({ version, name, description }: Props) => {
           size="sm"
           variant="secondary"
           onClick={() =>
-            open("https://github.com/puemos/hls-downloader/blob/main/LICENSE")
+            open("https://github.com/puemos/hls-downloader/blob/master/LICENSE")
           }
         >
           MIT
