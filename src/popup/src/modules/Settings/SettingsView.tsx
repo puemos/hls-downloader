@@ -23,11 +23,14 @@ const SettingsView = ({
   onSaveDialogToggle,
 }: Props) => {
   return (
-    <div className="flex flex-col p-4 space-y-6">
-      <div className="space-y-1">
-        <p className="text-sm font-medium">Concurrency</p>
-        <div className="flex items-center gap-2">
+    <div className="flex flex-col p-4 space-y-4">
+      <h2 className="text-lg font-semibold">Settings</h2>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <p className="text-sm font-medium">Concurrency</p>
+          <div className="flex items-center gap-2">
           <Button
+            size="sm"
             variant="ghost"
             aria-label="decrease concurrency"
             onClick={onConcurrencyDecrease}
@@ -36,6 +39,7 @@ const SettingsView = ({
           </Button>
           <Input className="w-16 text-center" value={concurrency} disabled />
           <Button
+            size="sm"
             variant="ghost"
             aria-label="increase concurrency"
             onClick={onConcurrencyIncrease}
@@ -45,10 +49,11 @@ const SettingsView = ({
         </div>
       </div>
 
-      <div className="space-y-1">
+      <div className="flex items-center justify-between rounded-lg border p-3">
         <p className="text-sm font-medium">Fetch Attempts</p>
         <div className="flex items-center gap-2">
           <Button
+            size="sm"
             variant="ghost"
             aria-label="decrease fetch attempts"
             onClick={onFetchAttemptsDecrease}
@@ -57,6 +62,7 @@ const SettingsView = ({
           </Button>
           <Input className="w-16 text-center" value={fetchAttempts} disabled />
           <Button
+            size="sm"
             variant="ghost"
             aria-label="increase fetch attempts"
             onClick={onFetchAttemptsIncrease}
@@ -66,13 +72,15 @@ const SettingsView = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between rounded-lg border p-3">
         <p className="text-sm font-medium">Save Dialog</p>
         <Switch
           aria-label="toggle save dialog"
           onClick={onSaveDialogToggle}
           checked={saveDialog}
         ></Switch>
+      </div>
+
       </div>
 
   </div>
