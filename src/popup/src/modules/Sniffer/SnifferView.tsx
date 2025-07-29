@@ -41,9 +41,9 @@ const SnifferView = ({
         <div className="flex flex-col items-center justify-center mt-32">
           <Banana></Banana>
 
-          <h3 className="mt-4 text-lg font-semibold">No video were found</h3>
+          <h3 className="mt-4 text-lg font-semibold">No videos found</h3>
           <p className="mt-2 mb-4 text-sm text-muted-foreground">
-            Try visiting a website with video and try again.
+            Visit a page with a video and try again.
           </p>
         </div>
       )}
