@@ -1,6 +1,6 @@
 ### Before you fork...
 
-If you are looking for a template, check out this repo: https://github.com/puemos/browser-extension-template
+If you're looking for a template project, check out this repo: https://github.com/puemos/browser-extension-template
 
 ---
 
@@ -42,7 +42,7 @@ If you are looking for a template, check out this repo: https://github.com/puemo
 
 ### Google
 
-Google just removed the extension from the store due to a claim
+Google removed the extension from the Chrome Web Store following a claim:
 
 > Globo Comunicação e Participações SA informs that the denounced extension is practicing and/or supporting the practice of illegal activities related to Globo's Copyright Law. This extension allows full and high resolution downloads of Globo content from the Globoplay streaming platform. The disclosure and sale of clandestine services puts the safety of consumers at risk and contributes to organized crime.
 
@@ -79,7 +79,7 @@ src/
 2. Open `chrome://extensions/`
 3. Enable `Developer mode`
 4. Drop the `hls-downloader.crx` file into the page
-5. Enjoy :)
+5. Enjoy!
 
 ## Usage
 

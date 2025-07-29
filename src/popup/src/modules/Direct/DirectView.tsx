@@ -67,7 +67,7 @@ const DirectView = ({
 
           <h3 className="mt-4 text-lg font-semibold">No videos</h3>
           <p className="mt-2 mb-4 text-sm text-muted-foreground">
-            Enter an URI and hit the Add button
+            Enter a URI and click Add
           </p>
         </div>
       )}

@@ -41,7 +41,7 @@ const DownloadsView = ({
           <TreePine></TreePine>
 
           <h3 className="mt-4 text-lg font-semibold">
-            No downloads were found
+            No downloads yet
           </h3>
           <p className="mt-2 mb-4 text-sm text-muted-foreground">
             As soon as you start a download, it will appear here.
