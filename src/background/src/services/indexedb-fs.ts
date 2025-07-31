@@ -151,10 +151,11 @@ export class IndexedDBBucket implements Bucket {
     }
 
     const tsBlob = await this.streamToTsBlob();
+    const buffer = await tsBlob.arrayBuffer();
     await ensureOffscreen();
     const { url } = await runtime.sendMessage({
       type: "ts-to-object-url",
-      blob: tsBlob,
+      buffer,
     });
     return url as string;
   }

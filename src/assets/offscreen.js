@@ -1,8 +1,8 @@
 let ffmpeg;
 async function ensureFFmpeg() {
   if (ffmpeg) return;
-  const { FFmpeg } = await import(chrome.runtime.getURL('assets/ffmpeg/ffmpeg.js'));
-  ffmpeg = new FFmpeg();
+  await import(chrome.runtime.getURL('assets/ffmpeg/ffmpeg.js'));
+  ffmpeg = new FFmpegWASM.FFmpeg();
   await ffmpeg.load({
     coreURL: chrome.runtime.getURL('assets/ffmpeg/ffmpeg-core.js'),
     wasmURL: chrome.runtime.getURL('assets/ffmpeg/ffmpeg-core.wasm'),
@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   } else if (msg && msg.type === 'ts-to-object-url') {
     (async () => {
       await ensureFFmpeg();
-      const data = new Uint8Array(await msg.blob.arrayBuffer());
+      const data = new Uint8Array(msg.buffer);
       await ffmpeg.writeFile('input.ts', data);
       await ffmpeg.exec(['-i', 'input.ts', '-acodec', 'copy', '-vcodec', 'copy', 'output.mp4']);
       await ffmpeg.deleteFile('input.ts');
