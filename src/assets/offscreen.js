@@ -19,7 +19,18 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   } else if (msg && msg.type === 'ts-to-object-url') {
     (async () => {
       await ensureFFmpeg();
-      const data = new Uint8Array(msg.buffer);
+      let buffer;
+      if (msg.tsUrl) {
+        const resp = await fetch(msg.tsUrl);
+        buffer = await resp.arrayBuffer();
+      } else if (msg.buffer) {
+        buffer = msg.buffer;
+      } else if (msg.blob) {
+        buffer = await msg.blob.arrayBuffer();
+      } else {
+        buffer = new ArrayBuffer(0);
+      }
+      const data = new Uint8Array(buffer);
       await ffmpeg.writeFile('input.ts', data);
       await ffmpeg.exec(['-i', 'input.ts', '-acodec', 'copy', '-vcodec', 'copy', 'output.mp4']);
       await ffmpeg.deleteFile('input.ts');
