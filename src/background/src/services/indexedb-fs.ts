@@ -150,21 +150,16 @@ export class IndexedDBBucket implements Bucket {
       throw Error();
     }
 
-    const tsBlob = await this.streamToTsBlob();
+    const data = await this.streamToTsArray();
     await ensureOffscreen();
-    const { url: tsUrl } = await runtime.sendMessage({
-      type: "create-object-url",
-      blob: tsBlob,
-    });
     const { url } = await runtime.sendMessage({
       type: "ts-to-object-url",
-      tsUrl,
+      data,
     });
-    await runtime.sendMessage({ type: "revoke-object-url", url: tsUrl });
     return url as string;
   }
 
-  private async streamToTsBlob() {
+  private async streamToTsArray(): Promise<number[]> {
     if (!this.db) {
       throw Error();
     }
@@ -176,7 +171,14 @@ export class IndexedDBBucket implements Bucket {
         chunks.push(chunk);
       }
     }
-    return new Blob(chunks, { type: "video/mp2t" });
+    const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
+    const buffer = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      buffer.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return Array.from(buffer);
   }
 
   // Helper function to read chunks by index to avoid transaction timeout
@@ -196,22 +198,6 @@ export class IndexedDBBucket implements Bucket {
     }
   }
 
-  // Helper function to concatenate chunks using streams
-  private async concatenateChunks(
-    startIndex: number,
-    length: number
-  ): Promise<Blob> {
-    const chunks: Uint8Array[] = [];
-
-    for (let i = 0; i < length; i++) {
-      const chunk = await this.readChunkByIndex(startIndex + i);
-      if (chunk) {
-        chunks.push(chunk);
-      }
-    }
-
-    return new Blob(chunks);
-  }
 }
 
 const cleanup: IFS["cleanup"] = async function () {

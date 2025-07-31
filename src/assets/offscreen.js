@@ -20,17 +20,19 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     (async () => {
       await ensureFFmpeg();
       let buffer;
-      if (msg.tsUrl) {
+      if (Array.isArray(msg.data)) {
+        buffer = new Uint8Array(msg.data);
+      } else if (msg.tsUrl) {
         const resp = await fetch(msg.tsUrl);
-        buffer = await resp.arrayBuffer();
+        buffer = new Uint8Array(await resp.arrayBuffer());
       } else if (msg.buffer) {
-        buffer = msg.buffer;
+        buffer = new Uint8Array(msg.buffer);
       } else if (msg.blob) {
-        buffer = await msg.blob.arrayBuffer();
+        buffer = new Uint8Array(await msg.blob.arrayBuffer());
       } else {
-        buffer = new ArrayBuffer(0);
+        buffer = new Uint8Array();
       }
-      const data = new Uint8Array(buffer);
+      const data = buffer;
       await ffmpeg.writeFile('input.ts', data);
       await ffmpeg.exec(['-i', 'input.ts', '-acodec', 'copy', '-vcodec', 'copy', 'output.mp4']);
       await ffmpeg.deleteFile('input.ts');
