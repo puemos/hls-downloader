@@ -7,10 +7,11 @@ import {
 } from "idb";
 
 import { Bucket, IFS } from "@hls-downloader/core/lib/services";
-import { downloads } from "webextension-polyfill";
+import { downloads, runtime } from "webextension-polyfill";
 import filenamify from "filenamify";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
+import { ensureOffscreen } from "../offscreen";
 
 const buckets: Record<string, IndexedDBBucket> = {};
 
@@ -184,9 +185,13 @@ export class IndexedDBBucket implements Bucket {
     }
 
     try {
-      const mp4Blob = await this.streamToMp4Blob(onProgress);
-      const url = URL.createObjectURL(mp4Blob);
-      return url;
+      const mp4Blob = await this.streamToMp4Blob();
+      await ensureOffscreen();
+      const { url } = await runtime.sendMessage({
+        type: "create-object-url",
+        blob: mp4Blob,
+      });
+      return url as string;
     } catch (error) {
       console.error("getLink failed:", error);
       // Bubble up so caller can react
@@ -426,16 +431,34 @@ const saveAs: IFS["saveAs"] = async function (
   if (link === "") {
     return Promise.resolve();
   }
-  window.URL = window.URL || window.webkitURL;
   const filename = filenamify(path ?? "stream.mp4");
 
-  await downloads.download({
+  const downloadId = await downloads.download({
     url: link,
     saveAs: dialog,
     conflictAction: "uniquify",
     filename,
   });
-  // URL.revokeObjectURL(link);
+
+  await new Promise<void>((resolve) => {
+    const listener = (delta: downloads.DownloadDelta) => {
+      if (
+        delta.id === downloadId &&
+        delta.state &&
+        (delta.state.current === "complete" ||
+          delta.state.current === "interrupted")
+      ) {
+        downloads.onChanged.removeListener(listener);
+        resolve();
+      }
+    };
+    downloads.onChanged.addListener(listener);
+  });
+
+  await runtime.sendMessage({
+    type: "revoke-object-url",
+    url: link,
+  });
   return Promise.resolve();
 };
 
