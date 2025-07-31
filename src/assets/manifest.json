@@ -25,6 +25,13 @@
   "background": {
     "service_worker": "background.js"
   },
-  "web_accessible_resources": ["assets/**/*"],
-  "content_security_policy": "script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'; object-src 'self'"
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/**/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
 }
