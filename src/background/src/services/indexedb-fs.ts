@@ -9,8 +9,8 @@ import {
 import { Bucket, IFS } from "@hls-downloader/core/lib/services";
 import { downloads } from "webextension-polyfill";
 import filenamify from "filenamify";
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile } from "@ffmpeg/util";
+import { runtime } from "webextension-polyfill";
+import { ensureOffscreen } from "../helpers/offscreen";
 
 const buckets: Record<string, IndexedDBBucket> = {};
 
@@ -48,31 +48,6 @@ const storageManager = (function () {
   };
 })();
 
-// Singleton FFmpeg instance
-class FFmpegSingleton {
-  private static instance: FFmpeg | null = null;
-  private static isLoaded = false;
-
-  static async getInstance(): Promise<FFmpeg> {
-    if (!FFmpegSingleton.instance) {
-      FFmpegSingleton.instance = new FFmpeg();
-
-      const baseURL = "/assets/ffmpeg";
-      await FFmpegSingleton.instance.load({
-        coreURL: `${baseURL}/ffmpeg-core.js`,
-        wasmURL: `${baseURL}/ffmpeg-core.wasm`,
-      });
-
-      FFmpegSingleton.isLoaded = true;
-    }
-
-    return FFmpegSingleton.instance;
-  }
-
-  static isFFmpegLoaded(): boolean {
-    return FFmpegSingleton.isLoaded;
-  }
-}
 
 export class IndexedDBBucket implements Bucket {
   // make output name unique per bucket
@@ -90,12 +65,6 @@ export class IndexedDBBucket implements Bucket {
 
   async cleanup() {
     await this.deleteDB();
-    try {
-      const ffmpeg = await FFmpegSingleton.getInstance();
-      await ffmpeg.deleteFile(`${this.fileName}.mp4`);
-    } catch (error) {
-      // File may not exist, ignore error
-    }
     return;
   }
 
@@ -176,58 +145,33 @@ export class IndexedDBBucket implements Bucket {
     );
   }
 
-  async getLink(
-    onProgress?: (progress: number, message: string) => void
-  ): Promise<string> {
+  async getLink(): Promise<string> {
     if (!this.db) {
       throw Error();
     }
 
-    try {
-      const mp4Blob = await this.streamToMp4Blob(onProgress);
-      const url = URL.createObjectURL(mp4Blob);
-      return url;
-    } catch (error) {
-      console.error("getLink failed:", error);
-      // Bubble up so caller can react
-      throw error;
-    }
+    const tsBlob = await this.streamToTsBlob();
+    await ensureOffscreen();
+    const { url } = await runtime.sendMessage({
+      type: "ts-to-object-url",
+      blob: tsBlob,
+    });
+    return url as string;
   }
 
-  private async streamToMp4Blob(
-    onProgress?: (progress: number, message: string) => void
-  ) {
+  private async streamToTsBlob() {
     if (!this.db) {
       throw Error();
     }
-
-    const ffmpeg = await FFmpegSingleton.getInstance();
-
-    ffmpeg.on("log", ({ message }) => console.log(message));
-
-    // write somewhere predictable
-    const outputFileName = `/tmp/${this.fileName}.mp4`;
-
-    // Process based on available streams
-    if (this.videoLength > 0 && this.audioLength > 0) {
-      await this.processVideoAndAudio(ffmpeg, outputFileName, onProgress);
-    } else if (this.videoLength > 0) {
-      await this.processVideoOnly(ffmpeg, outputFileName, onProgress);
-    } else {
-      await this.processAudioOnly(ffmpeg, outputFileName, onProgress);
+    const chunks: Uint8Array[] = [];
+    const total = this.videoLength + this.audioLength;
+    for (let i = 0; i < total; i++) {
+      const chunk = await this.readChunkByIndex(i);
+      if (chunk) {
+        chunks.push(chunk);
+      }
     }
-
-    // Check if the output file exists before trying to read it
-    try {
-      const data = await ffmpeg.readFile(outputFileName);
-      onProgress?.(1, "Done");
-      return new Blob([data], { type: "video/mp4" });
-    } catch (error) {
-      console.error(`Failed to read output file ${outputFileName}:`, error);
-      throw new Error(
-        `Output file ${outputFileName} was not created by FFmpeg`
-      );
-    }
+    return new Blob(chunks, { type: "video/mp2t" });
   }
 
   // Helper function to read chunks by index to avoid transaction timeout
@@ -262,123 +206,6 @@ export class IndexedDBBucket implements Bucket {
     }
 
     return new Blob(chunks);
-  }
-
-  private async processVideoAndAudio(
-    ffmpeg: FFmpeg,
-    outputFileName: string,
-    onProgress?: (progress: number, message: string) => void
-  ) {
-    onProgress?.(0.1, "Concatenating video chunks");
-    const videoBlob = await this.concatenateChunks(0, this.videoLength);
-
-    onProgress?.(0.3, "Concatenating audio chunks");
-    const audioBlob = await this.concatenateChunks(
-      this.videoLength,
-      this.audioLength
-    );
-
-    onProgress?.(0.5, "Writing video stream");
-    await ffmpeg.writeFile("video.ts", await fetchFile(videoBlob));
-
-    onProgress?.(0.6, "Writing audio stream");
-    await ffmpeg.writeFile("audio.ts", await fetchFile(audioBlob));
-
-    onProgress?.(0.7, "Merging video and audio");
-    await ffmpeg.exec([
-      "-y",
-      "-i",
-      "video.ts",
-      "-i",
-      "audio.ts",
-      "-c:v",
-      "copy",
-      "-c:a",
-      "copy",
-      "-bsf:a",
-      "aac_adtstoasc",
-      "-shortest",
-      "-movflags",
-      "+faststart",
-      outputFileName,
-    ]);
-
-    // Cleanup intermediate files
-    try {
-      await ffmpeg.deleteFile("video.ts");
-      await ffmpeg.deleteFile("audio.ts");
-    } catch (error) {
-      // Files may not exist, ignore error
-    }
-  }
-
-  private async processVideoOnly(
-    ffmpeg: FFmpeg,
-    outputFileName: string,
-    onProgress?: (progress: number, message: string) => void
-  ) {
-    onProgress?.(0.2, "Concatenating video chunks");
-    const videoBlob = await this.concatenateChunks(0, this.videoLength);
-
-    onProgress?.(0.5, "Writing video stream");
-    await ffmpeg.writeFile("video.ts", await fetchFile(videoBlob));
-
-    onProgress?.(0.7, "Transcoding video");
-    await ffmpeg.exec([
-      "-y",
-      "-i",
-      "video.ts",
-      "-c:v",
-      "copy",
-      "-movflags",
-      "+faststart",
-      outputFileName,
-    ]);
-
-    // Cleanup intermediate files
-    try {
-      await ffmpeg.deleteFile("video.ts");
-    } catch (error) {
-      // Files may not exist, ignore error
-    }
-  }
-
-  private async processAudioOnly(
-    ffmpeg: FFmpeg,
-    outputFileName: string,
-    onProgress?: (progress: number, message: string) => void
-  ) {
-    onProgress?.(0.2, "Concatenating audio chunks");
-    const audioBlob = await this.concatenateChunks(
-      this.videoLength,
-      this.audioLength
-    );
-
-    onProgress?.(0.5, "Writing audio stream");
-    await ffmpeg.writeFile("audio.ts", await fetchFile(audioBlob));
-
-    onProgress?.(0.7, "Transcoding audio");
-    await ffmpeg.exec([
-      "-y",
-      "-i",
-      "audio.ts",
-      "-c:a",
-      "aac",
-      "-b:a",
-      "192k",
-      "-af",
-      "aresample=async=1:first_pts=0",
-      "-movflags",
-      "+faststart",
-      outputFileName,
-    ]);
-
-    // Cleanup intermediate files
-    try {
-      await ffmpeg.deleteFile("audio.ts");
-    } catch (error) {
-      // Files may not exist, ignore error
-    }
   }
 }
 
@@ -435,7 +262,7 @@ const saveAs: IFS["saveAs"] = async function (
     conflictAction: "uniquify",
     filename,
   });
-  // URL.revokeObjectURL(link);
+  await runtime.sendMessage({ type: "revoke-object-url", url: link });
   return Promise.resolve();
 };
 
