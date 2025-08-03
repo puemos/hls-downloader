@@ -8,7 +8,7 @@ import {
 } from "webextension-polyfill";
 
 export function addPlaylistListener(store: ReturnType<typeof createStore>) {
-  webRequest.onResponseStarted.addListener(
+  webRequest.onCompleted.addListener(
     async (details) => {
       if (details.tabId < 0) {
         return;
