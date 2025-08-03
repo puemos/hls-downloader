@@ -1,5 +1,6 @@
 import { Button } from "@hls-downloader/design-system";
 import React from "react";
+import { tabs } from "webextension-polyfill";
 
 interface Props {
   version: string;
@@ -9,7 +10,7 @@ interface Props {
 
 const AboutView = ({ version, name, description }: Props) => {
   const open = (url: string) => {
-    window.open(url, "_blank");
+    tabs.create({ url });
   };
   return (
     <div className="flex flex-col p-1 mt-4 space-y-2">
