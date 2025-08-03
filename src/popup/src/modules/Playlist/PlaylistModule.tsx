@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PlaylistView from "./PlaylistView";
 import usePlaylistController from "./PlaylistController";
 
@@ -18,6 +18,26 @@ const PlaylistModule = ({ id }: { id: string }) => {
     () => levels.filter((l) => l.type === "audio"),
     [levels],
   );
+
+  useEffect(() => {
+    if (videoLevels.length > 0) {
+      if (!videoId || !videoLevels.some((v) => v.id === videoId)) {
+        setVideoId(videoLevels[0].id);
+      }
+    } else if (videoId) {
+      setVideoId(undefined);
+    }
+  }, [videoLevels, videoId]);
+
+  useEffect(() => {
+    if (audioLevels.length > 0) {
+      if (!audioId || !audioLevels.some((a) => a.id === audioId)) {
+        setAudioId(audioLevels[0].id);
+      }
+    } else if (audioId) {
+      setAudioId(undefined);
+    }
+  }, [audioLevels, audioId]);
 
   const requiresVideo = videoLevels.length > 0;
   const requiresAudio = audioLevels.length > 0;
