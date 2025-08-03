@@ -11,14 +11,16 @@
   ],
   "scripts": {
     "dev": "tsc -w",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest"
   },
   "devDependencies": {
-    "@types/node": "18.15.11",
+    "@types/node": "20.19.0",
     "@types/redux-logger": "3.0.9",
-    "prettier": "2.8.7",
     "path": "0.12.7",
-    "typescript": "5.0.4"
+    "prettier": "2.8.7",
+    "typescript": "5.0.4",
+    "vitest": "3.2.4"
   },
   "dependencies": {
     "@reduxjs/toolkit": "1.9.3",
