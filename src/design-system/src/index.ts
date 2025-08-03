@@ -5,6 +5,7 @@ export * from "./components/ui/aspect-ratio";
 export * from "./components/ui/separator";
 export * from "./components/ui/input";
 export * from "./components/ui/slider";
+export * from "./components/ui/hover-card";
 export * from "./components/ui/badge";
 export * from "./components/ui/progress";
 export * from "./components/ui/switch";

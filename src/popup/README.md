@@ -1,5 +1,9 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Usage
+
+Job filenames and playlist entries are truncated in the popup. Hover over them to view the full text, which can be scrolled when very long.
+
 ## Available Scripts
 
 In the project directory, you can run:

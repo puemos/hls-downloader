@@ -1,5 +1,13 @@
 import { Playlist } from "@hls-downloader/core/lib/entities";
-import { Button, Input, ScrollArea, cn } from "@hls-downloader/design-system";
+import {
+  Button,
+  Input,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  ScrollArea,
+  cn,
+} from "@hls-downloader/design-system";
 import { Banana } from "lucide-react";
 import React from "react";
 import PlaylistModule from "../Playlist/PlaylistModule";
@@ -84,11 +92,11 @@ const SnifferView = ({
               key={item.id}
               onClick={() => setCurrentPlaylistId(item.id)}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted"
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted w-full overflow-hidden"
               )}
             >
-              <div className="flex flex-col w-full gap-1">
-                <div className="flex items-center">
+              <div className="flex flex-col w-full gap-1 min-w-0">
+                <div className="flex items-center w-full min-w-0">
                   <div className="flex items-center gap-2">
                     <div className="font-semibold">{item.pageTitle}</div>
                   </div>
@@ -96,17 +104,31 @@ const SnifferView = ({
                     {new Date(item.createdAt!).toLocaleString()}
                   </div>
                 </div>
-                <div className="text-xs font-medium">
-                  {item.initiator && item.initiator.length > 70
-                    ? item.initiator.substring(0, 70) + "..."
-                    : item.initiator}
-                </div>
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <div className="block text-xs font-medium truncate w-full min-w-0">
+                      {item.initiator}
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent>
+                    <ScrollArea className="break-all max-h-60 text-xs font-medium">
+                      {item.initiator}
+                    </ScrollArea>
+                  </HoverCardContent>
+                </HoverCard>
               </div>
-              <div className="text-xs break-all text-muted-foreground">
-                {item.uri && item.uri.length > 70
-                  ? item.uri.substring(0, 70) + "..."
-                  : item.uri}
-              </div>
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <div className="block text-xs text-muted-foreground truncate w-full min-w-0">
+                    {item.uri}
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  <ScrollArea className="break-all max-h-60 text-xs text-muted-foreground">
+                    {item.uri}
+                  </ScrollArea>
+                </HoverCardContent>
+              </HoverCard>
             </div>
           ))}
         </ScrollArea>
