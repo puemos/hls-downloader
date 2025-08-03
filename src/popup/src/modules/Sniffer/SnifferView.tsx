@@ -97,9 +97,9 @@ const SnifferView = ({
                 </div>
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <ScrollArea className="text-xs font-medium break-all max-h-24">
+                    <div className="text-xs font-medium truncate">
                       {item.initiator}
-                    </ScrollArea>
+                    </div>
                   </HoverCardTrigger>
                   <HoverCardContent>
                     <ScrollArea className="break-all max-h-60 text-xs font-medium">
@@ -110,9 +110,9 @@ const SnifferView = ({
               </div>
               <HoverCard>
                 <HoverCardTrigger asChild>
-                  <ScrollArea className="text-xs break-all text-muted-foreground max-h-24">
+                  <div className="text-xs text-muted-foreground truncate">
                     {item.uri}
-                  </ScrollArea>
+                  </div>
                 </HoverCardTrigger>
                 <HoverCardContent>
                   <ScrollArea className="break-all max-h-60 text-xs text-muted-foreground">

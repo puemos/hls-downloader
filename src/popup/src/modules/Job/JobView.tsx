@@ -43,9 +43,9 @@ const JobView = ({
         <div className="flex flex-col w-full min-w-0">
           <HoverCard>
             <HoverCardTrigger asChild>
-              <ScrollArea className="mr-1 min-w-0 max-w-full max-h-24 break-all">
+              <div className="mr-1 min-w-0 max-w-full truncate">
                 {job.filename}
-              </ScrollArea>
+              </div>
             </HoverCardTrigger>
             <HoverCardContent>
               <ScrollArea className="break-all max-h-60">
