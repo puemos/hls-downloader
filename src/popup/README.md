@@ -2,7 +2,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Usage
 
-Hover over a job filename to view the full name. Long names wrap or can be scrolled without truncation.
+Hover over job filenames or playlist entries to view the full text. Long names wrap or can be scrolled without truncation.
 
 ## Available Scripts
 
