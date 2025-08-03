@@ -20,7 +20,7 @@
     "path": "0.12.7",
     "prettier": "2.8.7",
     "typescript": "5.0.4",
-    "vitest": "0.34.6"
+    "vitest": "3.2.4"
   },
   "dependencies": {
     "@reduxjs/toolkit": "1.9.3",

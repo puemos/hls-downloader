@@ -1,7 +1,7 @@
 import { of, firstValueFrom } from 'rxjs';
 import { describe, it, expect, vi } from 'vitest';
-import { fsCleanupOnInitEpic } from '../lib/controllers/on-init.js';
-import type { IFS } from '../lib/services';
+import { fsCleanupOnInitEpic } from '../src/controllers/on-init.ts';
+import type { IFS } from '../src/services';
 
 describe('fsCleanupOnInitEpic', () => {
   it('cleans fs on init and emits done action', async () => {

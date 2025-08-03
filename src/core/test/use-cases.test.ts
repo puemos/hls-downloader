@@ -8,9 +8,9 @@ import {
   getLinkBucketFactory,
   generateFileName,
   decryptSingleFragmentFactory,
-} from '../lib/use-cases/index.js';
-import { Playlist, Level, Key } from '../lib/entities/index.js';
-import type { IFS, Bucket, ILoader, IDecryptor } from '../lib/services/index.js';
+} from '../src/use-cases/index.ts';
+import { Playlist, Level, Key } from '../src/entities/index.ts';
+import type { IFS, Bucket, ILoader, IDecryptor } from '../src/services/index.ts';
 
 const createFsMock = () => {
   const bucket: Bucket = {
