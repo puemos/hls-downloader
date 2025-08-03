@@ -10,12 +10,14 @@ const SnifferModule = () => {
     setCurrentPlaylistId,
     playlists,
     currentPlaylistId,
+    copyPlaylistsToClipboard,
   } = useSnifferController();
 
   return (
     <SnifferView
       filter={filter}
       clearPlaylists={clearPlaylists}
+      copyPlaylistsToClipboard={copyPlaylistsToClipboard}
       setFilter={setFilter}
       setCurrentPlaylistId={setCurrentPlaylistId}
       playlists={playlists}
