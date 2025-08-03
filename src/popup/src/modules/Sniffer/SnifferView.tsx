@@ -9,12 +9,14 @@ interface Props {
   currentPlaylistId: string | undefined;
   filter: string;
   clearPlaylists: () => void;
+  copyPlaylistsToClipboard: () => void;
   setFilter: (filter: string) => void;
   setCurrentPlaylistId: (playlistId?: string) => void;
 }
 
 const SnifferView = ({
   clearPlaylists,
+  copyPlaylistsToClipboard,
   setFilter,
   filter,
   playlists,
@@ -58,6 +60,13 @@ const SnifferView = ({
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             />
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={copyPlaylistsToClipboard}
+            >
+              Copy URLs
+            </Button>
             <Button
               size="sm"
               variant="secondary"

@@ -14,6 +14,7 @@ interface ReturnType {
   clearPlaylists: () => void;
   setFilter: (filter: string) => void;
   setCurrentPlaylistId: (playlistId?: string) => void;
+  copyPlaylistsToClipboard: () => void;
 }
 
 const playlistFilter =
@@ -68,6 +69,11 @@ const useSnifferController = (): ReturnType => {
 
   playlists.sort((a, b) => b.createdAt - a.createdAt);
 
+  function copyPlaylistsToClipboard() {
+    const playlistUris = playlists.map((p) => p.uri).join("\n");
+    navigator.clipboard.writeText(playlistUris);
+  }
+
   return {
     filter,
     clearPlaylists,
@@ -75,6 +81,7 @@ const useSnifferController = (): ReturnType => {
     setCurrentPlaylistId,
     playlists,
     currentPlaylistId,
+    copyPlaylistsToClipboard,
   };
 };
 
