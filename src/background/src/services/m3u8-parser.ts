@@ -14,31 +14,45 @@ export const M3u8Parser: IParser = {
     const segments = parser.manifest.segments;
     const fragments: Fragment[] = [];
 
-    let startIndex = 0;
-    const first = segments[0];
-    if (first && first.map && first.map.uri) {
-      fragments.push({
-        index: 0,
-        key: { iv: null, uri: null },
-        uri: buildAbsoluteURL(baseurl, first.map.uri),
-      });
-      startIndex = 1;
-    }
+    let index = 0;
+    let currentMapUri: string | null = null;
+    let currentMapByteRange: string | null = null;
 
-    segments.forEach((segment, i) => {
+    segments.forEach((segment) => {
+      if (segment.map && segment.map.uri) {
+        const mapUri = buildAbsoluteURL(baseurl, segment.map.uri);
+        const mapByteRange = segment.map.byterange
+          ? `${segment.map.byterange.offset}:${segment.map.byterange.length}`
+          : null;
+
+        if (mapUri !== currentMapUri || mapByteRange !== currentMapByteRange) {
+          fragments.push({
+            index,
+            key: segment.key && segment.key.uri
+              ? {
+                  iv: segment.key.iv ?? null,
+                  uri: buildAbsoluteURL(baseurl, segment.key.uri),
+                }
+              : { iv: null, uri: null },
+            uri: mapUri,
+          });
+          index++;
+          currentMapUri = mapUri;
+          currentMapByteRange = mapByteRange;
+        }
+      }
+
       fragments.push({
-        index: i + startIndex,
-        key: segment.key
+        index,
+        key: segment.key && segment.key.uri
           ? {
-              iv: segment.key.iv,
+              iv: segment.key.iv ?? null,
               uri: buildAbsoluteURL(baseurl, segment.key.uri),
             }
-          : {
-              iv: null,
-              uri: null,
-            },
+          : { iv: null, uri: null },
         uri: buildAbsoluteURL(baseurl, segment.uri),
       });
+      index++;
     });
 
     return fragments;
