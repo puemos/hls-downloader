@@ -5,6 +5,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
+  ScrollArea,
   cn,
 } from "@hls-downloader/design-system";
 import { Trash2Icon, DownloadIcon } from "lucide-react";
@@ -42,12 +43,14 @@ const JobView = ({
         <div className="flex flex-col w-full min-w-0">
           <HoverCard>
             <HoverCardTrigger asChild>
-              <div className="mr-1 min-w-0 max-w-full overflow-auto break-all">
+              <ScrollArea className="mr-1 min-w-0 max-w-full max-h-24 break-all">
                 {job.filename}
-              </div>
+              </ScrollArea>
             </HoverCardTrigger>
-            <HoverCardContent className="break-all">
-              {job.filename}
+            <HoverCardContent>
+              <ScrollArea className="break-all max-h-60">
+                {job.filename}
+              </ScrollArea>
             </HoverCardContent>
           </HoverCard>
           <div className="text-muted-foreground min-w-0 max-w-full break-all">
