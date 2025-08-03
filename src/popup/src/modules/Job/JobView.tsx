@@ -1,5 +1,12 @@
 import { Job, JobStatus, LevelStatus } from "@hls-downloader/core/lib/entities";
-import { Button, Progress, cn } from "@hls-downloader/design-system";
+import {
+  Button,
+  Progress,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  cn,
+} from "@hls-downloader/design-system";
 import { Trash2Icon, DownloadIcon } from "lucide-react";
 import React from "react";
 import { Metadata } from "../../components/Metadata";
@@ -25,12 +32,6 @@ const JobView = ({
     return null;
   }
 
-  const truncateText = (text: string, maxLength: number = 50) => {
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + "..."
-      : text;
-  };
-
   return (
     <div
       className={cn(
@@ -39,12 +40,19 @@ const JobView = ({
     >
       <div className="flex flex-col items-start justify-between w-full mb-1 min-w-0">
         <div className="flex flex-col w-full min-w-0">
-          <div className="mr-1 min-w-0 max-w-full" title={job.filename}>
-            <span className="block">{truncateText(job.filename)}</span>
-          </div>
-          <div className="text-muted-foreground min-w-0 max-w-full">
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <div className="mr-1 min-w-0 max-w-full overflow-auto break-all">
+                {job.filename}
+              </div>
+            </HoverCardTrigger>
+            <HoverCardContent className="break-all">
+              {job.filename}
+            </HoverCardContent>
+          </HoverCard>
+          <div className="text-muted-foreground min-w-0 max-w-full break-all">
             <span className="block">
-              {truncateText(new Date(job.createdAt!).toLocaleString())}
+              {new Date(job.createdAt!).toLocaleString()}
             </span>
           </div>
         </div>

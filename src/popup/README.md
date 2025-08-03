@@ -1,5 +1,9 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Usage
+
+Hover over a job filename to view the full name. Long names wrap or can be scrolled without truncation.
+
 ## Available Scripts
 
 In the project directory, you can run:
