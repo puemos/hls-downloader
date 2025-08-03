@@ -83,11 +83,11 @@ const SnifferView = ({
               key={item.id}
               onClick={() => setCurrentPlaylistId(item.id)}
               className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted"
+                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted w-full overflow-hidden"
               )}
             >
-              <div className="flex flex-col w-full gap-1">
-                <div className="flex items-center">
+              <div className="flex flex-col w-full gap-1 min-w-0">
+                <div className="flex items-center w-full min-w-0">
                   <div className="flex items-center gap-2">
                     <div className="font-semibold">{item.pageTitle}</div>
                   </div>
@@ -97,7 +97,7 @@ const SnifferView = ({
                 </div>
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <div className="text-xs font-medium truncate">
+                    <div className="text-xs font-medium truncate w-full min-w-0">
                       {item.initiator}
                     </div>
                   </HoverCardTrigger>
@@ -110,7 +110,7 @@ const SnifferView = ({
               </div>
               <HoverCard>
                 <HoverCardTrigger asChild>
-                  <div className="text-xs text-muted-foreground truncate">
+                  <div className="text-xs text-muted-foreground truncate w-full min-w-0">
                     {item.uri}
                   </div>
                 </HoverCardTrigger>
