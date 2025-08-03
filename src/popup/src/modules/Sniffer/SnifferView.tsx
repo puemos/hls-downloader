@@ -97,7 +97,7 @@ const SnifferView = ({
                 </div>
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <div className="text-xs font-medium truncate w-full min-w-0">
+                    <div className="block text-xs font-medium truncate w-full min-w-0">
                       {item.initiator}
                     </div>
                   </HoverCardTrigger>
@@ -110,7 +110,7 @@ const SnifferView = ({
               </div>
               <HoverCard>
                 <HoverCardTrigger asChild>
-                  <div className="text-xs text-muted-foreground truncate w-full min-w-0">
+                  <div className="block text-xs text-muted-foreground truncate w-full min-w-0">
                     {item.uri}
                   </div>
                 </HoverCardTrigger>

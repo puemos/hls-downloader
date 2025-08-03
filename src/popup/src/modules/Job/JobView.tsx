@@ -43,7 +43,7 @@ const JobView = ({
         <div className="flex flex-col w-full min-w-0">
           <HoverCard>
             <HoverCardTrigger asChild>
-              <div className="mr-1 min-w-0 max-w-full truncate">
+              <div className="block mr-1 min-w-0 max-w-full truncate">
                 {job.filename}
               </div>
             </HoverCardTrigger>
