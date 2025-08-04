@@ -13,7 +13,7 @@
     "dev": "tsc -w",
     "build": "tsc",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage --coverage.reporter=json-summary"
   },
   "devDependencies": {
     "@types/node": "20.19.0",

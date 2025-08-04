@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "vite build -w",
     "build": "vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage --coverage.reporter=json-summary"
   },
   "devDependencies": {
     "@types/webextension-polyfill": "0.10.0",

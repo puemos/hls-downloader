@@ -5,6 +5,7 @@
 
 # testing
 /coverage
+/badges
 
 # production
 /build
