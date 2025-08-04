@@ -60,7 +60,7 @@ Google removed the extension from the Chrome Web Store following a claim:
 
 Run `pnpm test` to execute unit tests across all packages.
 
-Run `pnpm test:coverage` to generate a combined coverage report and badge.
+Run `pnpm test:coverage` to generate a combined coverage report and badge locally. The badge is updated automatically on pushes to `master` and release tags.
 
 ### Development
 
