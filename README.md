@@ -55,6 +55,10 @@ Google removed the extension from the Chrome Web Store following a claim:
 5. Built files will be at `./dist/`
 6. The zip archive will be in `./extension-archive.zip`
 
+### Tests
+
+Run `sh ./scripts/test.sh` to execute unit tests across all packages.
+
 ### Development
 
 Run `make dev` to start watchers for all packages while you edit. The
