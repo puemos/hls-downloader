@@ -53,4 +53,3 @@ describe("useRouterController", () => {
     expect(controller.tab).toBe(TabOptions.DOWNLOADS);
   });
 });
-

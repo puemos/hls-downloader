@@ -29,10 +29,7 @@ describe("useLocalStorage", () => {
   });
 
   it("retrieves existing value and parses JSON", () => {
-    window.localStorage.setItem(
-      "settings",
-      JSON.stringify({ theme: "dark" })
-    );
+    window.localStorage.setItem("settings", JSON.stringify({ theme: "dark" }));
 
     const { result } = renderHook(() =>
       useLocalStorage("settings", { theme: "light" })
@@ -62,4 +59,3 @@ describe("useLocalStorage", () => {
     );
   });
 });
-
