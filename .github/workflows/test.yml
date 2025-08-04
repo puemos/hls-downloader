@@ -1,12 +1,13 @@
-name: "Release"
+name: Tests
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,15 +20,7 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: pnpm install
-      - name: Test
-        run: pnpm test
       - name: Build
         run: pnpm build
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            extension-chrome.zip
-            extension-firefox.xpi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test
+        run: pnpm test
