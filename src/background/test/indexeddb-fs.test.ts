@@ -170,6 +170,17 @@ describe("IndexedDBFS", () => {
         })
       );
     });
+
+    it("normalizes unicode filenames", async () => {
+      const path = "Cafe\u0301.mp4";
+      const link = "blob:test-link";
+
+      await IndexedDBFS.saveAs(path, link, { dialog: false });
+
+      expect(mockDownload).toHaveBeenCalledWith(
+        expect.objectContaining({ filename: "Caf\u00E9.mp4" })
+      );
+    });
   });
 
   describe("cleanup functionality", () => {

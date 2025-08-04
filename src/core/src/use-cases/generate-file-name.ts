@@ -7,10 +7,11 @@ export const generateFileName = () => {
     const playlistFilename = chunks[chunks.length - 1];
     const playlistFilenameWithoutExt = playlistFilename.split(".m3u8")[0];
 
-    if (playlist.pageTitle) {
-      return `${playlist.pageTitle}-${playlistFilenameWithoutExt}.mp4`;
-    }
-    return `${playlistFilenameWithoutExt}.mp4`;
+    const filename = playlist.pageTitle
+      ? `${playlist.pageTitle}-${playlistFilenameWithoutExt}.mp4`
+      : `${playlistFilenameWithoutExt}.mp4`;
+
+    return filename.normalize("NFC");
   };
   return run;
 };

@@ -85,7 +85,7 @@ export class IndexedDBBucket implements Bucket {
     readonly audioLength: number,
     readonly id: string
   ) {
-    this.fileName = filenamify(id) ?? "file";
+    this.fileName = (filenamify(id) ?? "file").normalize("NFC");
   }
 
   async cleanup() {
@@ -428,7 +428,7 @@ const saveAs: IFS["saveAs"] = async function (
     return Promise.resolve();
   }
   window.URL = window.URL || window.webkitURL;
-  const filename = filenamify(path ?? "stream.mp4");
+  const filename = filenamify(path ?? "stream.mp4").normalize("NFC");
 
   await downloads.download({
     url: link,

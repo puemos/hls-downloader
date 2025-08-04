@@ -89,6 +89,18 @@ describe("use-cases", () => {
     expect(run(playlist, level)).toBe("page-c.mp4");
   });
 
+  it("normalizes non-ASCII page title", () => {
+    const playlist = new Playlist(
+      "1",
+      "https://a/b/c.m3u8",
+      Date.now(),
+      "Cafe\u0301"
+    );
+    const level = new Level("stream", "l", "1", "uri");
+    const run = generateFileName();
+    expect(run(playlist, level)).toBe("Caf\u00E9-c.mp4");
+  });
+
   it("decrypts fragment when key available", async () => {
     const loader: ILoader = {
       fetchText: vi.fn(),
