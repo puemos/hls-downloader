@@ -1,4 +1,4 @@
-name: tests
+name: Tests
 
 on:
   push:
@@ -20,5 +20,7 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: pnpm install
+      - name: Build
+        run: pnpm build
       - name: Test
         run: pnpm test
