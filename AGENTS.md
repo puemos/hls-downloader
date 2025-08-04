@@ -21,31 +21,37 @@ Follow these rules when automating changes or submitting pull requests.
 - UI components should come from `src/design-system/src` to keep styling
   consistent across the extension.
 
-## Build Verification
+## Build and Test
 
-- Run `sh ./scripts/build.sh` from the project root. This installs
-  dependencies, builds each package and produces the bundled extension in
-  `dist/` as well as `extension-chrome.zip` and `extension-firefox.xpi`.
-- There is no test suite; a successful build is required before opening a PR.
+- Install dependencies with `pnpm install` when necessary.
+- Run `pnpm test` from the project root to execute package test suites.
+- Run `pnpm run build` to build all packages and produce `dist/`,
+  `extension-chrome.zip` and `extension-firefox.xpi`.
+- Remove `dist/` and generated archives after verifying the build to keep the
+  working tree clean.
 
 ## Development
 
-- Use `sh ./scripts/dev.sh` for watch mode. It runs the background, popup, core
-  and design-system builds in parallel while copying assets to `dist/`.
+- Use `pnpm run dev` for watch mode. It runs the background, popup, core and
+  design-system builds in parallel while copying assets to `dist/`.
 
 ## Artifact Handling
 
 - Do **not** commit `dist/`, `extension-chrome.zip`, `extension-firefox.xpi` or
   `extension-archive.zip`; they are temporary build outputs listed in
   `.gitignore`.
-- Remove generated artifacts after verifying a build to keep the working tree
-  clean.
 
 ## Coding Style
 
 - Use two spaces for indentation in all `.ts`, `.tsx`, `.js` and `.json` files.
 - Do not edit `src/core/lib` directly – it is generated from the TypeScript
   sources in `src/core/src`.
+
+## Commit Guidelines
+
+- Follow `<type>: <summary>` format for commit messages, e.g.
+  `feat: add download button`.
+- Common types include `feat`, `fix`, `chore`, `test`, and `docs`.
 
 ## Documentation
 

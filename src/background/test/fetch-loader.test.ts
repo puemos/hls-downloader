@@ -62,8 +62,10 @@ describe("FetchLoader", () => {
       ]);
 
       expect(error.status).toBe("fulfilled");
-      expect(error.value).toBeInstanceOf(Error);
-      expect(error.value.message).toBe("Fetch error");
+      if (error.status === "fulfilled") {
+        expect(error.value).toBeInstanceOf(Error);
+        expect(error.value.message).toBe("Fetch error");
+      }
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
 
