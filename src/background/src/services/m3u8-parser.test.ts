@@ -28,6 +28,16 @@ seg0.ts
 seg1.ts
 `;
 
+const masterPlaylist = `#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="eng",DEFAULT=YES,AUTOSELECT=YES,URI="eng.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="spa",DEFAULT=NO,AUTOSELECT=YES,URI="spa.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=640x360,FRAME-RATE=30,AUDIO="audio"
+low.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=1400000,RESOLUTION=1280x720,FRAME-RATE=60,AUDIO="audio"
+high.m3u8
+`;
+
 describe("M3u8Parser", () => {
   it("inserts init fragments when EXT-X-MAP changes", () => {
     const fragments = M3u8Parser.parseLevelPlaylist(playlist, base);
@@ -51,5 +61,56 @@ describe("M3u8Parser", () => {
       `${base}seg1.ts`,
     ]);
     expect(fragments.map((f) => f.index)).toEqual([0, 1, 2, 3]);
+  });
+
+  it("parses master playlist with stream and audio variants", () => {
+    const masterBase = `${base}master.m3u8`;
+    const levels = M3u8Parser.parseMasterPlaylist(masterPlaylist, masterBase);
+    expect(levels).toHaveLength(4);
+    const [stream0, stream1, audioEng, audioSpa] = levels;
+
+    expect(stream0).toMatchObject({
+      type: "stream",
+      playlistID: masterBase,
+      uri: `${base}low.m3u8`,
+      bitrate: 800000,
+      fps: 30,
+      width: 640,
+      height: 360,
+    });
+    expect(typeof stream0.id).toBe("string");
+
+    expect(stream1).toMatchObject({
+      type: "stream",
+      playlistID: masterBase,
+      uri: `${base}high.m3u8`,
+      bitrate: 1400000,
+      fps: 60,
+      width: 1280,
+      height: 720,
+    });
+    expect(typeof stream1.id).toBe("string");
+
+    expect(audioEng).toEqual({
+      type: "audio",
+      id: "eng-audio",
+      playlistID: masterBase,
+      uri: `${base}eng.m3u8`,
+      bitrate: undefined,
+      fps: undefined,
+      width: undefined,
+      height: undefined,
+    });
+
+    expect(audioSpa).toEqual({
+      type: "audio",
+      id: "spa-audio",
+      playlistID: masterBase,
+      uri: `${base}spa.m3u8`,
+      bitrate: undefined,
+      fps: undefined,
+      width: undefined,
+      height: undefined,
+    });
   });
 });
