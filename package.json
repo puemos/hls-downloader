@@ -20,6 +20,7 @@
     "dev": "run-p dev:*",
     "test:core": "pnpm --filter ./src/core run test",
     "test:background": "pnpm --filter ./src/background run test",
+    "test:popup": "pnpm --filter ./src/popup run test",
     "test": "run-p test:*",
     "storybook": "pnpm --filter ./src/design-system run storybook",
     "install-deps": "pnpm install"
