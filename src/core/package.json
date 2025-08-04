@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "tsc -w",
     "build": "tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@types/node": "20.19.0",
