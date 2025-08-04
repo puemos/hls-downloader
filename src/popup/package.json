@@ -40,7 +40,7 @@
     "dev": "vite build -w",
     "build": "vite build",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage --coverage.reporter=json-summary",
     "storybook": "storybook dev -p 6006"
   },
   "eslintConfig": {

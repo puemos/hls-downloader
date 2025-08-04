@@ -3,6 +3,7 @@
 If you're looking for a template project, check out this repo: https://github.com/puemos/browser-extension-template
 
 ---
+![Test Coverage](./coverage-badge.svg)
 
 <img height="150px" src="./store-assets/png/Small-Promo-Tile.png?raw=true">
 <img height="350px" src="store-assets/jpg/sceenshot-1.jpg?raw=true">
@@ -57,7 +58,9 @@ Google removed the extension from the Chrome Web Store following a claim:
 
 ### Tests
 
-Run `sh ./scripts/test.sh` to execute unit tests across all packages.
+Run `pnpm test` to execute unit tests across all packages.
+
+Run `pnpm test:coverage` to generate a combined coverage report and badge.
 
 ### Development
 

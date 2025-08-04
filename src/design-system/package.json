@@ -13,7 +13,8 @@
   "scripts": {
     "dev": "vite build -w",
     "build": "vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage --coverage.reporter=json-summary"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.0",
