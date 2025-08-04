@@ -53,14 +53,13 @@ Google removed the extension from the Chrome Web Store following a claim:
 3. Run `pnpm install`
 4. Run `make build` (or `sh ./scripts/build.sh`) and verify it completes without errors
 5. Built files will be at `./dist/`
-6. The zip archive will be in `./extension-archive.zip`
+6. Packaged extensions will be created as `extension-chrome.zip` and `extension-firefox.xpi`
 
 ### Development
 
 Run `make dev` to start watchers for all packages while you edit. The
-compiled extension will appear in `dist/` as you work.
-
-Run `make storybook` to launch Storybook for previewing popup and design-system components.
+command ensures the Chrome `.zip` and Firefox `.xpi` archives are up to date
+before launching watch mode.
 
 ## Project Structure
 
