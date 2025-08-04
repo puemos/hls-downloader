@@ -40,9 +40,7 @@ const DownloadsView = ({
         <div className="flex flex-col items-center justify-center mt-32">
           <TreePine></TreePine>
 
-          <h3 className="mt-4 text-lg font-semibold">
-            No downloads yet
-          </h3>
+          <h3 className="mt-4 text-lg font-semibold">No downloads yet</h3>
           <p className="mt-2 mb-4 text-sm text-muted-foreground">
             As soon as you start a download, it will appear here.
           </p>

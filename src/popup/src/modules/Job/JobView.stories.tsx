@@ -42,7 +42,13 @@ export const Saving: Story = {
   render: () => (
     <JobView
       job={sampleJob}
-      status={{ status: "saving", total: 10, done: 10, saveProgress: 0.5, saveMessage: "Processing" }}
+      status={{
+        status: "saving",
+        total: 10,
+        done: 10,
+        saveProgress: 0.5,
+        saveMessage: "Processing",
+      }}
       downloadJob={() => {}}
       deleteJob={() => {}}
       cancelJob={() => {}}

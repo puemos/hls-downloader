@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { M3u8Parser } from './m3u8-parser';
+import { describe, it, expect } from "vitest";
+import { M3u8Parser } from "./m3u8-parser";
 
-const base = 'http://example.com/';
+const base = "http://example.com/";
 
 const playlist = `#EXTM3U
 #EXT-X-VERSION:7
@@ -28,8 +28,8 @@ seg0.ts
 seg1.ts
 `;
 
-describe('M3u8Parser', () => {
-  it('inserts init fragments when EXT-X-MAP changes', () => {
+describe("M3u8Parser", () => {
+  it("inserts init fragments when EXT-X-MAP changes", () => {
     const fragments = M3u8Parser.parseLevelPlaylist(playlist, base);
     expect(fragments.map((f) => f.uri)).toEqual([
       `${base}init0.mp4`,
@@ -42,7 +42,7 @@ describe('M3u8Parser', () => {
     expect(fragments[0].key.uri).toBe(`${base}key.key`);
   });
 
-  it('re-inserts init fragment when BYTERANGE changes', () => {
+  it("re-inserts init fragment when BYTERANGE changes", () => {
     const fragments = M3u8Parser.parseLevelPlaylist(byterangePlaylist, base);
     expect(fragments.map((f) => f.uri)).toEqual([
       `${base}init.mp4`,

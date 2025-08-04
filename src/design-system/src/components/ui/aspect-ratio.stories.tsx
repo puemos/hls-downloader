@@ -10,7 +10,5 @@ export default meta;
 type Story = StoryObj<typeof AspectRatio>;
 
 export const Default: Story = {
-  render: () => (
-    <AspectRatio ratio={16 / 9} className="bg-muted" />
-  ),
+  render: () => <AspectRatio ratio={16 / 9} className="bg-muted" />,
 };

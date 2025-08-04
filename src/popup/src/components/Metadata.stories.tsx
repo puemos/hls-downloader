@@ -11,6 +11,14 @@ type Story = StoryObj<typeof Metadata>;
 
 export const Default: Story = {
   render: () => (
-    <Metadata metadata={{ type: "stream", width: 1920, height: 1080, bitrate: 4000000, fps: 30 }} />
+    <Metadata
+      metadata={{
+        type: "stream",
+        width: 1920,
+        height: 1080,
+        bitrate: 4000000,
+        fps: 30,
+      }}
+    />
   ),
 };

@@ -12,11 +12,11 @@ const PlaylistModule = ({ id }: { id: string }) => {
 
   const videoLevels = useMemo(
     () => levels.filter((l) => l.type !== "audio"),
-    [levels],
+    [levels]
   );
   const audioLevels = useMemo(
     () => levels.filter((l) => l.type === "audio"),
-    [levels],
+    [levels]
   );
 
   useEffect(() => {

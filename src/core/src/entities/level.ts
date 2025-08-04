@@ -9,6 +9,6 @@ export class Level {
     readonly width?: number,
     readonly height?: number,
     readonly bitrate?: number,
-    readonly fps?: number,
+    readonly fps?: number
   ) {}
 }

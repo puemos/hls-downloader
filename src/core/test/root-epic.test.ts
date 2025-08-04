@@ -119,8 +119,8 @@ describe("root epic", () => {
           new Observable((observer) => {
             source.subscribe({
               next: (action) => {
-                if (action.type === "custom/action") {
-                  observer.next({ type: "custom/result" });
+                if ((action as any).type === "custom/action") {
+                  observer.next({ type: "custom/result" } as any);
                 }
               },
               error: (err) => observer.error(err),

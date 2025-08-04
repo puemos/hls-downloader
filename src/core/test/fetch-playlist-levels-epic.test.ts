@@ -30,7 +30,7 @@ describe("fetchPlaylistLevelsEpic", () => {
     parser = { parseMasterPlaylist: vi.fn().mockReturnValue([level]) };
     action$ = of(
       playlistsSlice.actions.fetchPlaylistLevels({ playlistID: "1" })
-    );
+    ) as any;
     state = createMockState({
       playlists: { "1": playlist },
       fetchAttempts: 1,

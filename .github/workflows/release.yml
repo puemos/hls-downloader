@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: "22"
       - name: Build
-        run: make build
+        run: pnpm build
       - name: Release
         uses: softprops/action-gh-release@v2
         with:

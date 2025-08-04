@@ -75,11 +75,7 @@ const SnifferView = ({
             >
               Copy URLs
             </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={clearPlaylists}
-            >
+            <Button size="sm" variant="secondary" onClick={clearPlaylists}>
               Clear all
             </Button>
           </div>

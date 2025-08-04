@@ -13,7 +13,6 @@ const useRouterController = (): ReturnType => {
   const [tab, setTab] = useLocalStorage("view", DEFAULT_TAB);
 
   function safeSetTab(tab: string) {
-
     if (
       [
         TabOptions.ABOUT,

@@ -28,12 +28,13 @@ export const M3u8Parser: IParser = {
         if (mapUri !== currentMapUri || mapByteRange !== currentMapByteRange) {
           fragments.push({
             index,
-            key: segment.key && segment.key.uri
-              ? {
-                  iv: segment.key.iv ?? null,
-                  uri: buildAbsoluteURL(baseurl, segment.key.uri),
-                }
-              : { iv: null, uri: null },
+            key:
+              segment.key && segment.key.uri
+                ? {
+                    iv: segment.key.iv ?? null,
+                    uri: buildAbsoluteURL(baseurl, segment.key.uri),
+                  }
+                : { iv: null, uri: null },
             uri: mapUri,
           });
           index++;
@@ -44,12 +45,13 @@ export const M3u8Parser: IParser = {
 
       fragments.push({
         index,
-        key: segment.key && segment.key.uri
-          ? {
-              iv: segment.key.iv ?? null,
-              uri: buildAbsoluteURL(baseurl, segment.key.uri),
-            }
-          : { iv: null, uri: null },
+        key:
+          segment.key && segment.key.uri
+            ? {
+                iv: segment.key.iv ?? null,
+                uri: buildAbsoluteURL(baseurl, segment.key.uri),
+              }
+            : { iv: null, uri: null },
         uri: buildAbsoluteURL(baseurl, segment.uri),
       });
       index++;
@@ -87,7 +89,7 @@ export const M3u8Parser: IParser = {
             height: undefined,
           };
         });
-      },
+      }
     );
 
     return results.concat(audioResults);

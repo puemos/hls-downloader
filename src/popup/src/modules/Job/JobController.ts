@@ -15,10 +15,10 @@ interface ReturnType {
 const useJobController = ({ id }: { id: string }): ReturnType => {
   const dispatch = useDispatch();
   const status = useSelector<RootState, JobStatus | null>(
-    (state) => state.jobs.jobsStatus[id],
+    (state) => state.jobs.jobsStatus[id]
   );
   const job = useSelector<RootState, Job | null>(
-    (state) => state.jobs.jobs[id],
+    (state) => state.jobs.jobs[id]
   );
 
   function downloadJob() {

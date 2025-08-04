@@ -1,6 +1,15 @@
-(sh ./scripts/clean.sh)
-(sh ./scripts/build-core.sh)
-(sh ./scripts/build-design-system.sh)
-(sh ./scripts/build-extension.sh)
-(zip -r extension-chrome.zip ./dist/.)
-(cd ./dist && zip -r ../extension-firefox.xpi *)
+#!/bin/bash
+
+# HLS Downloader Build Script
+# Simple wrapper around pnpm scripts
+
+set -e
+
+echo "🚀 Building HLS Downloader Extension..."
+
+pnpm run build
+
+echo "✅ Build complete!"
+echo "📦 Chrome: extension-chrome.zip"
+echo "📦 Firefox: extension-firefox.xpi"
+echo "📁 Development: dist/"

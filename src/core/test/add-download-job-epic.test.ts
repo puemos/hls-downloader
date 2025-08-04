@@ -84,9 +84,10 @@ describe("addDownloadJobEpic", () => {
 
     // Verify
     expect(result.type).toBe(jobsSlice.actions.add.type);
-    expect(result.payload).toBeDefined();
+    expect(result).toHaveProperty("payload");
+    expect((result as any).payload).toBeDefined();
 
-    const { job } = result.payload;
+    const { job } = (result as any).payload;
     expect(job).toMatchObject({
       filename: "page-master.mp4",
       videoFragments: [videoFragment],
@@ -119,9 +120,9 @@ describe("addDownloadJobEpic", () => {
 
     // Verify
     expect(result.type).toBe(jobsSlice.actions.add.type);
-    expect(result.payload).toBeDefined();
+    expect(result).toHaveProperty("payload");
 
-    const { job } = result.payload;
+    const { job } = (result as any).payload;
     expect(job.videoFragments).toEqual([videoFragment]);
     expect(job.audioFragments).toEqual([]);
 
@@ -138,12 +139,10 @@ describe("addDownloadJobEpic", () => {
       levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
-
     // Execute
     await firstValueFrom(
       addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
-
     // Verify that loader uses the configured fetch attempts
     expect(mockLoader.fetchText).toHaveBeenCalledWith("video", 3);
     expect(mockLoader.fetchText).toHaveBeenCalledWith("audio", 3);
@@ -156,14 +155,16 @@ describe("addDownloadJobEpic", () => {
       levelsSlice.actions.download({ levelID: "v" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
-
     // Execute
     const result = await firstValueFrom(
       addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
 
     // Verify filename contains the custom title
-    expect(result.payload.job.filename).toBe("My Custom Title-master.mp4");
+    expect(result.type).toBe(jobsSlice.actions.add.type);
+    expect((result as any).payload.job.filename).toBe(
+      "My Custom Title-master.mp4"
+    );
   });
 
   it("handles errors when fetching fragments", async () => {
@@ -176,12 +177,10 @@ describe("addDownloadJobEpic", () => {
       levelsSlice.actions.download({ levelID: "v" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
-
     // Verify that the epic completes without throwing
     const promise = firstValueFrom(
       addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
-
     // The epic should complete with an empty result or an error action
     await expect(promise).rejects.toThrow();
   });

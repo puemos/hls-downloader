@@ -44,6 +44,7 @@ Coverage reports are generated in the `coverage/` directory and include HTML, JS
 The `test-utils.ts` file provides a set of utility functions to make testing easier:
 
 - **Mock Factories**:
+
   - `createMockLoader()`: Creates a mock loader for network operations
   - `createMockParser()`: Creates a mock parser for HLS manifest parsing
   - `createMockFS()`: Creates a mock filesystem
@@ -51,6 +52,7 @@ The `test-utils.ts` file provides a set of utility functions to make testing eas
   - `createMockDependencies()`: Creates all dependencies with mocks
 
 - **Test Data Factories**:
+
   - `createTestFragment()`: Creates a test Fragment instance
   - `createTestLevel()`: Creates a test Level instance
   - `createTestPlaylist()`: Creates a test Playlist instance
@@ -64,11 +66,13 @@ The `test-utils.ts` file provides a set of utility functions to make testing eas
 ## Testing Redux Slices
 
 Redux slices are tested by verifying:
+
 1. Initial state is correctly set
 2. Each reducer properly handles its actions
 3. Edge cases and error scenarios
 
 Example:
+
 ```typescript
 it("should add a job to the state", () => {
   const job = createTestJob({ id: "job1" });
@@ -87,12 +91,14 @@ it("should add a job to the state", () => {
 ## Testing Epics
 
 Redux-Observable epics are tested by:
+
 1. Creating a mock action stream
 2. Providing mock dependencies and state
 3. Observing the output action stream
 4. Verifying the correct actions are emitted
 
 Example:
+
 ```typescript
 it("creates a download job for video and audio levels", async () => {
   // Setup
@@ -118,6 +124,7 @@ it("creates a download job for video and audio levels", async () => {
 ## Testing Use Cases
 
 Use cases are tested by:
+
 1. Creating mock implementations of dependencies
 2. Running the use case with test inputs
 3. Verifying the output matches expectations
@@ -126,6 +133,7 @@ Use cases are tested by:
 ## Coverage Goals
 
 The project aims for the following code coverage targets:
+
 - Statements: 80%
 - Branches: 70%
 - Functions: 80%

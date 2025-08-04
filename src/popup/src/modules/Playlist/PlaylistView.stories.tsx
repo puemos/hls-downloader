@@ -10,7 +10,16 @@ const meta: Meta<typeof PlaylistView> = {
 export default meta;
 type Story = StoryObj<typeof PlaylistView>;
 
-const videoLevel = new Level("stream", "v1", "p1", "video.m3u8", 1280, 720, 3000000, 30);
+const videoLevel = new Level(
+  "stream",
+  "v1",
+  "p1",
+  "video.m3u8",
+  1280,
+  720,
+  3000000,
+  30
+);
 const audioLevel = new Level("audio", "a1", "p1", "audio.m3u8");
 
 export const Ready: Story = {

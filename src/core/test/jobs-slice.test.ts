@@ -3,7 +3,7 @@ import { jobsSlice } from "../src/store/slices/jobs-slice";
 import {
   createTestJob,
   createTestFragment,
-  createTestJobStatus
+  createTestJobStatus,
 } from "./test-utils";
 import { Job, Fragment, Key } from "../src/entities";
 
@@ -40,18 +40,18 @@ describe("jobs slice", () => {
     it("should set correct total when job has both video and audio fragments", () => {
       const videoFragments = [
         createTestFragment({ index: 0 }),
-        createTestFragment({ index: 1 })
+        createTestFragment({ index: 1 }),
       ];
       const audioFragments = [
         createTestFragment({ index: 0 }),
         createTestFragment({ index: 1 }),
-        createTestFragment({ index: 2 })
+        createTestFragment({ index: 2 }),
       ];
 
       const job = createTestJob({
         id: "job1",
         videoFragments,
-        audioFragments
+        audioFragments,
       });
 
       const initialState = { jobs: {}, jobsStatus: {} };
@@ -70,14 +70,14 @@ describe("jobs slice", () => {
     it("should increment the done count for a job", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
-        jobs: { "job1": job },
+        jobs: { job1: job },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "downloading" as const,
             total: 5,
-            done: 2
-          }
-        }
+            done: 2,
+          },
+        },
       };
 
       state = jobsSlice.reducer(
@@ -94,14 +94,14 @@ describe("jobs slice", () => {
     it("should mark the job as ready", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
-        jobs: { "job1": job },
+        jobs: { job1: job },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "downloading" as const,
             total: 5,
-            done: 5
-          }
-        }
+            done: 5,
+          },
+        },
       };
 
       state = jobsSlice.reducer(
@@ -119,14 +119,14 @@ describe("jobs slice", () => {
     it("should mark the job as saving", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
-        jobs: { "job1": job },
+        jobs: { job1: job },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "ready" as const,
             total: 5,
-            done: 5
-          }
-        }
+            done: 5,
+          },
+        },
       };
 
       state = jobsSlice.reducer(
@@ -143,19 +143,22 @@ describe("jobs slice", () => {
     it("should update the job link and mark as done", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
-        jobs: { "job1": job },
+        jobs: { job1: job },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "saving" as const,
             total: 5,
-            done: 5
-          }
-        }
+            done: 5,
+          },
+        },
       };
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.saveAsSuccess({ jobId: "job1", link: "file://test.mp4" })
+        jobsSlice.actions.saveAsSuccess({
+          jobId: "job1",
+          link: "file://test.mp4",
+        })
       );
 
       expect(state.jobs["job1"]?.link).toBe("file://test.mp4");
@@ -165,14 +168,14 @@ describe("jobs slice", () => {
     it("should work when link is undefined", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
-        jobs: { "job1": job },
+        jobs: { job1: job },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "saving" as const,
             total: 5,
-            done: 5
-          }
-        }
+            done: 5,
+          },
+        },
       };
 
       state = jobsSlice.reducer(
@@ -190,14 +193,14 @@ describe("jobs slice", () => {
     it("should update the save progress and message", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
-        jobs: { "job1": job },
+        jobs: { job1: job },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "saving" as const,
             total: 5,
-            done: 5
-          }
-        }
+            done: 5,
+          },
+        },
       };
 
       state = jobsSlice.reducer(
@@ -205,7 +208,7 @@ describe("jobs slice", () => {
         jobsSlice.actions.setSaveProgress({
           jobId: "job1",
           progress: 75,
-          message: "Preparing file"
+          message: "Preparing file",
         })
       );
 
@@ -216,8 +219,8 @@ describe("jobs slice", () => {
     it("should handle missing jobStatus", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
-        jobs: { "job1": job },
-        jobsStatus: {}
+        jobs: { job1: job },
+        jobsStatus: {},
       };
 
       // This shouldn't throw
@@ -226,7 +229,7 @@ describe("jobs slice", () => {
         jobsSlice.actions.setSaveProgress({
           jobId: "job1",
           progress: 75,
-          message: "Preparing file"
+          message: "Preparing file",
         })
       );
 
@@ -240,21 +243,21 @@ describe("jobs slice", () => {
       const job = createTestJob({ id: "job1" });
       let state = {
         jobs: {
-          "job1": job,
-          "job2": createTestJob({ id: "job2" })
+          job1: job,
+          job2: createTestJob({ id: "job2" }),
         },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "done" as const,
             total: 5,
-            done: 5
+            done: 5,
           },
-          "job2": {
+          job2: {
             status: "downloading" as const,
             total: 3,
-            done: 1
-          }
-        }
+            done: 1,
+          },
+        },
       };
 
       state = jobsSlice.reducer(
@@ -274,21 +277,21 @@ describe("jobs slice", () => {
     it("should reset the state to initial", () => {
       let state = {
         jobs: {
-          "job1": createTestJob({ id: "job1" }),
-          "job2": createTestJob({ id: "job2" })
+          job1: createTestJob({ id: "job1" }),
+          job2: createTestJob({ id: "job2" }),
         },
         jobsStatus: {
-          "job1": {
+          job1: {
             status: "done" as const,
             total: 5,
-            done: 5
+            done: 5,
           },
-          "job2": {
+          job2: {
             status: "downloading" as const,
             total: 3,
-            done: 1
-          }
-        }
+            done: 1,
+          },
+        },
       };
 
       state = jobsSlice.reducer(state, jobsSlice.actions.clear());

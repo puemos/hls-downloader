@@ -51,9 +51,9 @@ Google removed the extension from the Chrome Web Store following a claim:
 1. Clone the repo
 2. Ensure you have Node and pnpm installed
 3. Run `pnpm install`
-4. Run `make build` (or `sh ./scripts/build.sh`) and verify it completes without errors
+4. Run `pnpm build` and verify it completes without errors
 5. Built files will be at `./dist/`
-6. The zip archive will be in `./extension-archive.zip`
+6. The zip archive will be in `./extension-chrome.zip` and `./extension-firefox.zip`
 
 ### Tests
 
@@ -61,10 +61,10 @@ Run `sh ./scripts/test.sh` to execute unit tests across all packages.
 
 ### Development
 
-Run `make dev` to start watchers for all packages while you edit. The
+Run `pnpm dev` to start watchers for all packages while you edit. The
 compiled extension will appear in `dist/` as you work.
 
-Run `make storybook` to launch Storybook for previewing popup and design-system components.
+Run `pnpm storybook` to launch Storybook for previewing popup and design-system components.
 
 ## Project Structure
 

@@ -7,7 +7,6 @@
 - Width for playlists and downloads cards
 - Security updates
 
-
 ## 4.1.1
 
 ### Fix

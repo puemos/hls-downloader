@@ -67,7 +67,9 @@ const PlaylistView = ({
     function getVideoDetails(item: Level) {
       return [
         item.width && item.height ? `${item.width}×${item.height}` : undefined,
-        item.bitrate ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps` : undefined,
+        item.bitrate
+          ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps`
+          : undefined,
         item.fps ? `${item.fps} fps` : undefined,
       ]
         .filter(Boolean)
@@ -76,7 +78,9 @@ const PlaylistView = ({
 
     function getAudioDetails(item: Level) {
       return [
-        item.bitrate ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps` : undefined,
+        item.bitrate
+          ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps`
+          : undefined,
       ]
         .filter(Boolean)
         .join(" · ");
@@ -159,7 +163,12 @@ const PlaylistView = ({
           </div>
         )}
         <div className="flex flex-row-reverse mt-2">
-          <Button onClick={onDownload} disabled={!canDownload} size="sm" variant="secondary">
+          <Button
+            onClick={onDownload}
+            disabled={!canDownload}
+            size="sm"
+            variant="secondary"
+          >
             Download
           </Button>
         </div>
