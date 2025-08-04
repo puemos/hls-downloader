@@ -104,6 +104,7 @@ export class IndexedDBBucket implements Bucket {
       throw Error();
     }
     this.db.close();
+    this.db = undefined;
     await deleteDB(this.id);
     return;
   }
