@@ -1,77 +1,83 @@
-### Before you fork...
+# HLS Downloader
 
-If you're looking for a template project, check out this repo: https://github.com/puemos/browser-extension-template
-
----
 ![Test Coverage](./coverage-badge.svg)
 
-<img height="150px" src="./store-assets/png/Small-Promo-Tile.png?raw=true">
-<img height="350px" src="store-assets/jpg/sceenshot-1.jpg?raw=true">
+<p align="center">
+  <img src="./store-assets/png/Small-Promo-Tile.png?raw=true" height="150" alt="HLS Downloader logo">
+</p>
+<p align="center">
+  <img src="store-assets/jpg/sceenshot-1.jpg?raw=true" height="350" alt="Screenshot of HLS Downloader in action">
+</p>
 
-<p>Capture and download <a href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming">HTTP Live streams (HLS)</a> from your browser</p>
-<p>This extension is completely free and published under the MIT license.</p>
-<br><br>
+An open-source browser extension to capture and save [HTTP Live Streaming](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) video.
 
-**Table of Contents**
+## Features
+- Detects active HLS playlists on any page
+- Lets you choose audio and video tracks before downloading
+- Merges segments into a single MP4 using `ffmpeg.wasm`
+- Works on Firefox and Chromium-based browsers
 
-- [Get it](#get-it)
+## Table of Contents
+- [Installation](#installation)
   - [Firefox](#firefox)
   - [Microsoft Edge](#microsoft-edge)
-  - [Google](#google)
-- [Build](#build)
-- [Installation](#installation)
+  - [Chrome](#chrome)
+  - [Manual](#manual)
 - [Usage](#usage)
+- [Build from Source](#build-from-source)
+- [Development](#development)
+- [Tests](#tests)
+- [Project Structure](#project-structure)
 - [Contributing](#contributing)
-- [Contributor Covenant Code of Conduct](#contributor-covenant-code-of-conduct)
+- [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
-<br>
-
-## Get it
+## Installation
 
 ### Firefox
-
 <a href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/" target="_blank">
- <img src="https://blog.mozilla.org/addons/files/2015/11/get-the-addon.png" alt="Firefox" height="50px" >
+  <img src="https://blog.mozilla.org/addons/files/2015/11/get-the-addon.png" alt="Firefox" height="50px">
 </a>
 
 ### Microsoft Edge
-
 <a href="https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc" target="_blank">
- <img src="https://developer.microsoft.com/store/badges/images/English_get-it-from-MS.png" alt="Microsoft Edge" height="50px" >
+  <img src="https://developer.microsoft.com/store/badges/images/English_get-it-from-MS.png" alt="Microsoft Edge" height="50px">
 </a>
 
-### Google
+### Chrome
+Currently unavailable in the Chrome Web Store following a copyright claim from **Globo Comunicação e Participações SA**.
 
-Google removed the extension from the Chrome Web Store following a claim:
+### Manual
+1. Download `hls-downloader-<version>-chromium.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).
+2. Extract the archive to a folder.
+3. Open `chrome://extensions/` in Chrome or another Chromium-based browser.
+4. Enable **Developer mode**.
+5. Click **Load unpacked** and choose the extracted folder.
 
-> Globo Comunicação e Participações SA informs that the denounced extension is practicing and/or supporting the practice of illegal activities related to Globo's Copyright Law. This extension allows full and high resolution downloads of Globo content from the Globoplay streaming platform. The disclosure and sale of clandestine services puts the safety of consumers at risk and contributes to organized crime.
+## Usage
+1. Navigate to a page playing an HLS video.
+2. Start playback and click the **HLS Downloader** icon.
+3. Pick a playlist from the **Sniffer** tab.
+4. Select the streams to grab.
+5. Press **Download** and save the generated MP4 when prompted.
 
-## Build
+## Build from Source
+1. Clone the repository.
+2. Ensure Node.js and pnpm are installed.
+3. Run `pnpm install`.
+4. Run `pnpm run build` and ensure it completes without errors.
+5. Build artifacts appear in `dist/` along with `extension-chrome.zip` and `extension-firefox.xpi`.
 
-1. Clone the repo
-2. Ensure you have Node and pnpm installed
-3. Run `pnpm install`
-4. Run `pnpm build` and verify it completes without errors
-5. Built files will be at `./dist/`
-6. The zip archive will be in `./extension-chrome.zip` and `./extension-firefox.zip`
+## Development
+- `pnpm run dev` starts watch mode and copies built assets to `dist/`.
+- `pnpm storybook` launches Storybook for previewing popup and design-system components.
 
-### Tests
-
-Run `pnpm test` to execute unit tests across all packages.
-
-Run `pnpm test:coverage` to generate a combined coverage report and badge locally. The badge is updated automatically on pushes to `master` and release tags.
-
-### Development
-
-Run `pnpm dev` to start watchers for all packages while you edit. The
-compiled extension will appear in `dist/` as you work.
-
-Run `pnpm storybook` to launch Storybook for previewing popup and design-system components.
+## Tests
+- `pnpm test` runs unit tests across all packages.
+- `pnpm test:coverage` generates a combined coverage report and updates the badge.
 
 ## Project Structure
-
-```
+```text
 src/
 ├── assets          # extension manifest and icons
 ├── background      # background scripts
@@ -80,55 +86,12 @@ src/
 └── popup           # React popup UI
 ```
 
-## Installation
-
-1. Download the `hls-downloader.crx` file from the latest release (https://github.com/puemos/hls-downloader/releases)
-2. Open `chrome://extensions/`
-3. Enable `Developer mode`
-4. Drop the `hls-downloader.crx` file into the page
-5. Enjoy!
-
-## Usage
-
-1. Browse to a page that plays an HLS video and start playback.
-2. Click the **HLS Downloader** icon. Detected playlists will appear in the
-   **Sniffer** tab.
-3. Choose **Select** next to the playlist you want to download.
-4. Pick the desired video and audio streams from the playlist view.
-5. Press **Download**. The extension fetches all segments and automatically
-   merges them into a single MP4 using the bundled `ffmpeg.wasm`.
-6. When processing completes, your browser will prompt you to save the merged
-   file.
-
-`ffmpeg` support is bundled with the extension so no external dependencies are
-required.
-
 ## Contributing
+See [CONTRIBUTING.md](./CONTRIBUTING.md) and additional automation guidelines in [AGENTS.md](./AGENTS.md).
 
-[Contributing guideline](./CONTRIBUTING.md)
-
-Additional automation guidelines can be found in [AGENTS.md](./AGENTS.md).
-
-`TL;DR`
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
-
-## Contributor Covenant Code of Conduct
-
-[Code of Conduct guideline](./CODE_OF_CONDUCT.md)
+## Code of Conduct
+See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
 ## License
+Licensed under the [MIT License](./LICENSE).
 
-The MIT License (MIT)
-
-Copyright (c) 2024 Shy Alter
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
