@@ -5,11 +5,14 @@
 ## 😎 Guides
 
 * [Install the extension](guides/install-the-extension.md)
-* [Capture a steam](guides/capture-a-steam.md)
+* [Capture a stream](guides/capture-a-stream.md)
+* [Download from a direct link](guides/download-from-a-direct-link.md)
+* [Configure settings](guides/configure-settings.md)
 
 ## 👩‍💻 Development
 
 * [Build](development/build.md)
+* [Architecture](development/architecture.md)
 * [Contributing](development/contributing.md)
 
 ## 🏦 Legal
