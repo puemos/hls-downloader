@@ -1,134 +1,180 @@
-### Before you fork...
+<!-- markdownlint-disable MD041 -->
+<h1 align="center">HLS Downloader</h1>
 
-If you're looking for a template project, check out this repo: https://github.com/puemos/browser-extension-template
+<p align="center">
+  Capture and download <a href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming">HTTP Live Streams (HLS)</a> straight from your browser.<br>
+  <strong>Free&nbsp;•&nbsp;Open&nbsp;Source&nbsp;•&nbsp;MIT Licensed</strong>
+</p>
+
+<p align="center">
+  <img alt="Test Coverage" src="./coverage-badge.svg">
+</p>
+
+<p align="center">
+  <img alt="Extension promo tile" src="./store-assets/png/Small-Promo-Tile.png?raw=true" height="150">
+</p>
+
+<p align="center">
+  <img alt="Popup screenshot" src="store-assets/jpg/sceenshot-1.jpg?raw=true" height="350">
+</p>
 
 ---
-![Test Coverage](./coverage-badge.svg)
 
-<img height="150px" src="./store-assets/png/Small-Promo-Tile.png?raw=true">
-<img height="350px" src="store-assets/jpg/sceenshot-1.jpg?raw=true">
+## ✨ Features
 
-<p>Capture and download <a href="https://en.wikipedia.org/wiki/HTTP_Live_Streaming">HTTP Live streams (HLS)</a> from your browser</p>
-<p>This extension is completely free and published under the MIT license.</p>
-<br><br>
+* **Automatic stream discovery**
+  Detects HLS playlists on the page the moment you open it—no DevTools sniffing required.
+* **Fine-grained quality control**
+  Pick any combination of video resolution (240p → 4K) and audio language/bit-rate *before* you download, so you never waste bandwidth on the wrong track.
+* **100% local merge with `ffmpeg.wasm`**
+  A WebAssembly build of FFmpeg runs right inside your tab, muxing the chosen audio + video into a single MP4.
+  * Nothing is uploaded, keeping your files private.
+* **Works everywhere you browse**  
+  Verified on Firefox, Edge, Chrome, Brave, Vivaldi, Arc, and other Chromium-based browsers—on Windows, macOS, and Linux.
 
-**Table of Contents**
+---
 
-- [Get it](#get-it)
-  - [Firefox](#firefox)
-  - [Microsoft Edge](#microsoft-edge)
-  - [Google](#google)
-- [Build](#build)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [Contributor Covenant Code of Conduct](#contributor-covenant-code-of-conduct)
-- [License](#license)
+## 📦 Get It
 
-<br>
+| Browser | Download / availability |
+| :-- | :-- |
+| Firefox | [<img src="https://blog.mozilla.org/addons/files/2015/11/get-the-addon.png" height="50" alt="Get it for Firefox">](https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/) |
+| Microsoft Edge | [<img src="https://developer.microsoft.com/store/badges/images/English_get-it-from-MS.png" height="50" alt="Get it for Edge">](https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc) |
+| Google Chrome | [Use manual installation](#installation) since: <br><br> <blockquote>Google removed the extension from the Chrome Web Store after a copyright complaint by <em>Globo Comunicação e Participações SA</em>.</blockquote> |
 
-## Get it
 
-### Firefox
+<sup>\*For Chrome/Brave/Vivaldi/etc. download the ZIP from the latest release and follow the manual-install steps below.</sup>
 
-<a href="https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/" target="_blank">
- <img src="https://blog.mozilla.org/addons/files/2015/11/get-the-addon.png" alt="Firefox" height="50px" >
-</a>
+---
 
-### Microsoft Edge
+## 🛠️ Installation
 
-<a href="https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc" target="_blank">
- <img src="https://developer.microsoft.com/store/badges/images/English_get-it-from-MS.png" alt="Microsoft Edge" height="50px" >
-</a>
+### Chromium browsers (Chrome, Brave, Vivaldi …)
 
-### Google
+> **Newer versions (≥ 4.1.2)** ship only a ZIP archive.
+> Older versions can still be installed from the CRX – see the collapsible notes.
 
-Google removed the extension from the Chrome Web Store following a claim:
+1. Download `extension-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).
+2. Extract the ZIP to a convenient folder.
+3. Open `chrome://extensions/` and enable **Developer mode** (top-right switch).
+4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).
+5. Enjoy 🎉
 
-> Globo Comunicação e Participações SA informs that the denounced extension is practicing and/or supporting the practice of illegal activities related to Globo's Copyright Law. This extension allows full and high resolution downloads of Globo content from the Globoplay streaming platform. The disclosure and sale of clandestine services puts the safety of consumers at risk and contributes to organized crime.
+<details>
+<summary>Manual install for versions < 4.1.2 (CRX)</summary>
 
-## Build
+1. Grab `hls-downloader.crx` from the corresponding legacy release.
+2. Open `chrome://extensions/`, enable **Developer mode**.
+3. Drag-and-drop the CRX onto the extensions page.
+4. Confirm any prompts.
 
-1. Clone the repo
-2. Ensure you have Node and pnpm installed
-3. Run `pnpm install`
-4. Run `pnpm build` and verify it completes without errors
-5. Built files will be at `./dist/`
-6. The zip archive will be in `./extension-chrome.zip` and `./extension-firefox.zip`
+</details>
 
-### Tests
+### Firefox (temporary or permanent)
 
-Run `pnpm test` to execute unit tests across all packages.
+**Option A – Temporary (for testing)**
 
-Run `pnpm test:coverage` to generate a combined coverage report and badge locally. The badge is updated automatically on pushes to `master` and release tags.
+1. Download `extension-firefox.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases) and extract it.
+2. Navigate to `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on…**, browse into the extracted folder, and select `manifest.json`.
+4. The add-on will stay active until you restart the browser.
 
-### Development
+**Option B – Permanent **
 
-Run `pnpm dev` to start watchers for all packages while you edit. The
-compiled extension will appear in `dist/` as you work.
+1. In **Add-ons Manager** (`about:addons`) choose the gear icon
+2. Click on **Install Add-on From File…** and pick the XPI.
 
-Run `pnpm storybook` to launch Storybook for previewing popup and design-system components.
+---
 
-## Project Structure
-
-```
-src/
-├── assets          # extension manifest and icons
-├── background      # background scripts
-├── core            # shared logic and Redux store
-├── design-system   # UI component library
-└── popup           # React popup UI
-```
-
-## Installation
-
-1. Download the `hls-downloader.crx` file from the latest release (https://github.com/puemos/hls-downloader/releases)
-2. Open `chrome://extensions/`
-3. Enable `Developer mode`
-4. Drop the `hls-downloader.crx` file into the page
-5. Enjoy!
-
-## Usage
+## 🎬 Usage
 
 1. Browse to a page that plays an HLS video and start playback.
-2. Click the **HLS Downloader** icon. Detected playlists will appear in the
-   **Sniffer** tab.
-3. Choose **Select** next to the playlist you want to download.
-4. Pick the desired video and audio streams from the playlist view.
-5. Press **Download**. The extension fetches all segments and automatically
-   merges them into a single MP4 using the bundled `ffmpeg.wasm`.
-6. When processing completes, your browser will prompt you to save the merged
-   file.
+2. Click the **HLS Downloader** icon – detected playlists appear in the **Sniffer** tab.
+3. Choose **Select** next to a playlist.
+4. Pick your video & audio streams, then press **Download**.
+5. Grab a coffee ☕ – `ffmpeg.wasm` merges everything and your browser prompts you to save the MP4 when done.
 
-`ffmpeg` support is bundled with the extension so no external dependencies are
-required.
+---
 
-## Contributing
+## 🧑‍💻 Development
 
-[Contributing guideline](./CONTRIBUTING.md)
+### Clone & Build
 
-Additional automation guidelines can be found in [AGENTS.md](./AGENTS.md).
+```bash
+git clone https://github.com/puemos/hls-downloader.git
+cd hls-downloader
+pnpm install
+pnpm build        # output → ./dist/
+```
 
-`TL;DR`
+```bash
+# - Bundled archives: `extension-chrome.zip`, `extension-firefox.zip`
+# - Run tests & generate coverage badge:
+```
 
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
+```bash
+pnpm test          # unit tests
+pnpm test:coverage # combined coverage + badge
+```
 
-## Contributor Covenant Code of Conduct
+### Live Development
 
-[Code of Conduct guideline](./CODE_OF_CONDUCT.md)
+```bash
+pnpm dev        # watches & rebuilds into dist/
+pnpm storybook  # preview popup & design-system components
+```
 
-## License
+### Project Structure
 
+```text
+src/
+├─ assets/          # extension manifest & icons
+├─ background/      # background scripts
+├─ core/            # shared logic & Redux store
+├─ design-system/   # UI component library
+└─ popup/           # React popup UI
+```
+
+---
+
+## 🤝 Contributing
+
+We ♥ PRs! See the [contributing guide](./CONTRIBUTING.md) and [automation guide](./AGENTS.md).
+
+```bash
+git checkout -b feature/my-awesome-idea
+# ...code...
+git commit -am "feat: add awesome idea"
+git push origin feature/my-awesome-idea
+# open PR 🎉
+```
+
+---
+
+## 📜 Code of Conduct
+
+**TLDR: Be kind**
+This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md).
+
+---
+
+## 📝 License
+
+<details>
+<summary>MIT License – click to expand</summary>
+
+```text
 The MIT License (MIT)
 
-Copyright (c) 2024 Shy Alter
+Copyright (c) 2025 Shy Alter
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+More: https://github.com/puemos/hls-downloader/blob/master/LICENSE
+```
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+</details>
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+---
+
+<p align="center">
+  <em>Made with ♥ by <a href="https://github.com/puemos">puemos</a></em>
+</p>
