@@ -11,6 +11,8 @@ const SettingsModule = () => {
     fetchAttempts,
     onSaveDialogToggle,
     saveDialog,
+    proxyEnabled,
+    onProxyToggle,
     concurrency,
   } = useSettingsController();
 
@@ -21,6 +23,8 @@ const SettingsModule = () => {
       onFetchAttemptsIncrease={onFetchAttemptsIncrease}
       onSaveDialogToggle={onSaveDialogToggle}
       saveDialog={saveDialog}
+      proxyEnabled={proxyEnabled}
+      onProxyToggle={onProxyToggle}
       onConcurrencyDecrease={onConcurrencyDecrease}
       onConcurrencyIncrease={onConcurrencyIncrease}
       concurrency={concurrency}

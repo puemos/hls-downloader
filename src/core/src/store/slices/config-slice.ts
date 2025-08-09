@@ -16,10 +16,15 @@ export interface ISetFetchAttemptsPayload {
   fetchAttempts: number;
 }
 
+export interface ISetProxyEnabledPayload {
+  proxyEnabled: boolean;
+}
+
 export interface IConfigState {
   concurrency: number;
   saveDialog: boolean;
   fetchAttempts: number;
+  proxyEnabled: boolean;
 }
 
 interface IConfigReducers {
@@ -35,6 +40,10 @@ interface IConfigReducers {
     IConfigState,
     PayloadAction<ISetFetchAttemptsPayload>
   >;
+  setProxyEnabled: CaseReducer<
+    IConfigState,
+    PayloadAction<ISetProxyEnabledPayload>
+  >;
   [key: string]: CaseReducer<IConfigState, PayloadAction<any>>;
 }
 
@@ -42,6 +51,7 @@ const initialConfigState: IConfigState = {
   concurrency: 2,
   saveDialog: false,
   fetchAttempts: 100,
+  proxyEnabled: false,
 };
 
 export const configSlice: Slice<IConfigState, IConfigReducers, "config"> =
@@ -57,6 +67,9 @@ export const configSlice: Slice<IConfigState, IConfigReducers, "config"> =
       },
       setFetchAttempts(state, action: PayloadAction<ISetFetchAttemptsPayload>) {
         state.fetchAttempts = action.payload.fetchAttempts;
+      },
+      setProxyEnabled(state, action: PayloadAction<ISetProxyEnabledPayload>) {
+        state.proxyEnabled = action.payload.proxyEnabled;
       },
     },
   });

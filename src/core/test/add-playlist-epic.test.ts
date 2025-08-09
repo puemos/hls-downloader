@@ -14,7 +14,12 @@ describe("addPlaylistEpic", () => {
         playlistsStatus: {},
       },
       levels: { levels: {} },
-      config: { concurrency: 2, saveDialog: false, fetchAttempts: 1 },
+      config: {
+        concurrency: 2,
+        saveDialog: false,
+        fetchAttempts: 1,
+        proxyEnabled: false,
+      },
       tabs: { current: { id: -1 } },
       jobs: { jobs: {}, jobsStatus: {} },
     };

@@ -6,9 +6,11 @@ interface ReturnType {
   concurrency: number;
   fetchAttempts: number;
   saveDialog: boolean;
+  proxyEnabled: boolean;
   onFetchAttemptsIncrease: () => void;
   onFetchAttemptsDecrease: () => void;
   onSaveDialogToggle: () => void;
+  onProxyToggle: () => void;
   onConcurrencyIncrease: () => void;
   onConcurrencyDecrease: () => void;
 }
@@ -23,6 +25,9 @@ const useSettingsController = (): ReturnType => {
   );
   const saveDialog = useSelector<RootState, boolean>(
     (state) => state.config.saveDialog
+  );
+  const proxyEnabled = useSelector<RootState, boolean>(
+    (state) => state.config.proxyEnabled
   );
 
   function onConcurrencyIncrease() {
@@ -60,15 +65,24 @@ const useSettingsController = (): ReturnType => {
       })
     );
   }
+  function onProxyToggle() {
+    dispatch(
+      configSlice.actions.setProxyEnabled({
+        proxyEnabled: !proxyEnabled,
+      })
+    );
+  }
   return {
     concurrency,
     onConcurrencyIncrease,
     onConcurrencyDecrease,
     fetchAttempts,
     saveDialog,
+    proxyEnabled,
     onFetchAttemptsIncrease,
     onFetchAttemptsDecrease,
     onSaveDialogToggle,
+    onProxyToggle,
   };
 };
 

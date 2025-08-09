@@ -5,9 +5,11 @@ interface Props {
   concurrency: number;
   fetchAttempts: number;
   saveDialog: boolean;
+  proxyEnabled: boolean;
   onFetchAttemptsIncrease: () => void;
   onFetchAttemptsDecrease: () => void;
   onSaveDialogToggle: () => void;
+  onProxyToggle: () => void;
   onConcurrencyIncrease: () => void;
   onConcurrencyDecrease: () => void;
 }
@@ -16,11 +18,13 @@ const SettingsView = ({
   concurrency,
   fetchAttempts,
   saveDialog,
+  proxyEnabled,
   onConcurrencyIncrease,
   onConcurrencyDecrease,
   onFetchAttemptsIncrease,
   onFetchAttemptsDecrease,
   onSaveDialogToggle,
+  onProxyToggle,
 }: Props) => {
   return (
     <div className="flex flex-col p-4 space-y-4">
@@ -82,6 +86,15 @@ const SettingsView = ({
             aria-label="toggle save dialog"
             onClick={onSaveDialogToggle}
             checked={saveDialog}
+          ></Switch>
+        </div>
+
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <p className="text-sm font-medium">System Proxy</p>
+          <Switch
+            aria-label="toggle system proxy"
+            onClick={onProxyToggle}
+            checked={proxyEnabled}
           ></Switch>
         </div>
       </div>

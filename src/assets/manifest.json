@@ -19,6 +19,7 @@
     "storage",
     "downloads",
     "tabs",
+    "proxy",
     "http://*/*",
     "https://*/*"
   ],
