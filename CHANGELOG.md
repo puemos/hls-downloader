@@ -1,160 +1,158 @@
-# HLS downloader changelog
+# HLS Downloader Changelog
+
+## 5.0.0
+
+### Features
+- Merge audio and video streams for complete media exports (#430) – addresses long‑standing “No Audio” reports (e.g. issue #23)
+- Display toolbar icon immediately after playlist confirmation for quicker access (#431)
+- New theme and redesigned About page (#432, #435)
+- Major UI overhaul of sniffer, playlist, settings, and downloads pages (#437)
+- Added Storybook scenarios covering core UI components (#438)
+- Sniffer can copy playlist URLs directly (#443)
+- Report link now opens via the browser Tabs API (#445)
+- Hover tooltips and improved truncation keep long playlist names from hiding the Save button (#444) – resolves issues #342 & #343
+- Normalized generated filenames and clearer save‑status feedback
+- More reliable retry logic for failed requests
+- Correct handling of map byte ranges and encrypted initialization segments (#442)
+- Automatically selects appropriate playlist levels (#447)
+
+### Fixes
+- Security updates
+
+### Chores
+- Added usage instructions and updated automation guidelines (#436)
+- Vitest setup with broad coverage for core, popup, controller, and hook logic (#446, #448, #449, #452–455)
+- Fetch-loader and crypto decryptor unit tests
+- Coverage reporting with badge generation (#456)
+- CI executes test suites automatically (#454)
+- Build-system improvements and npm workspace migration (#428)
 
 ## 4.1.2
 
-### Fix
-
+### Fixes
 - Width for playlists and downloads cards
 - Security updates
 
 ## 4.1.1
 
-### Fix
-
+### Fixes
 - Max width for playlists and downloads
 - Security updates
 
 ## 4.1.0
 
-### Add
-
+### Features
 - Direct downloads
 
-### Fix
-
+### Fixes
 - .ts as a file type (UI only)
 
 ## 4.0.2
 
-### Fix
-
+### Fixes
 - Security updates
 
 ## 4.0.1
 
-### Fix
-
+### Fixes
 - Security updates
 
 ## 4.0.0
 
-### Add
-
+### Features
 - Videos are transformed to mp4 on the fly
-
-### Change
-
 - Using https://github.com/puemos/browser-extension-template
 - Total new design
 
-### Fix
-
+### Fixes
 - Security updates
 
 ## 3.3.0
 
-Big thanks for @mayfield!!
+Big thanks to @mayfield!!
 
-### Add
-
+### Features
 - FPS info
 - Audio-only media support
 - Improve retry backoff
 
 ## 3.2.2
 
-### Fix
-
+### Fixes
 - Security updates
 
 ## 3.2.1
 
-### Fix
-
+### Fixes
 - Download fail on Firefox
 - Filter playlists
 - SaveAs dialog Switch
 
 ## 3.2.0
 
-### Add
-
+### Features
 - The extension will retry failed download attempts
 
 ## 3.1.2
 
-### Change
-
+### Chores
 - Yarn to NPM
 
 ## 3.1.1
 
-### Change
-
+### Chores
 - Paypal -> GitHub Sponsors
 
 ## 3.1.0
 
-### Add
-
+### Features
 - Direct download
 
-### Fix
-
+### Fixes
 - Several UI fixes
 
 ## 3.0.0
 
-### Add
-
+### Features
 - Unlimited Storage permission
 - Use IndexedDB for storing chunks
-- Downloads are seperated as Jobs
+- Downloads are separated as Jobs
 - New empty status design
 - Download progress UI
 
 ## 2.2.0
 
-### Add
-
+### Features
 - Cancel a download
 
 ## 1.7.2
 
-### Fix
-
-- [https://github.com/puemos/hls-downloader-chrome-extension/issues/51](After deleting a download the download page is crashing)
+### Fixes
+- [#51](https://github.com/puemos/hls-downloader-chrome-extension/issues/51) After deleting a download, the download page crashes
 
 ## 1.7.1
 
-### Change
-
+### Chores
 - Change copy button to use text
-- Refactor the github action to use chrome-webstore-upload-cli
+- Refactor the GitHub action to use chrome-webstore-upload-cli
 
 ## 1.7.0
 
-### Add
-
+### Features
 - Auto save
 - Use page title for the file name
-
-### Change
-
-- UI Enhancments
+- UI Enhancements
 - Updated to the latest style-components
 
 ## 1.6.3
 
-### Change
-
+### Features
 - New UI
 - Updated to the latest create-react-app
-- Use parcel in order to pack the background app
+- Use parcel to pack the background app
 - Refactor the stories
 
-### Fix
-
+### Fixes
 - URL resolve issues
 - [#45](https://github.com/puemos/hls-downloader-chrome-extension/issues/45)
 - [#43](https://github.com/puemos/hls-downloader-chrome-extension/issues/43)
@@ -162,76 +160,55 @@ Big thanks for @mayfield!!
 
 ## 1.5.0
 
-### Add
-
+### Features
 - Auto-download playlist
 
 ## 1.4.1
 
-### Change
-
-- Upgrade deps
+### Chores
+- Upgrade dependencies
 
 ## 1.4.0
 
-### Add
-
+### Features
 - AES decrypt
-
-### Change
-
-- Upgrade deps
 
 ## 1.3.1
 
-### Fix
-
+### Fixes
 - Badge indicator update on tab remove
 
 ## 1.3.0
 
-### Add
-
+### Features
 - Save as
 - Badge indicator
 
-### Change
-
-- update deps
+### Chores
+- Update dependencies
 
 ## 1.2.1
 
-### Change
-
-- update deps
+### Chores
+- Update dependencies
 
 ## 1.2.0
 
-### Add
+### Features
+- Rebranding
+- Copy playlist URL link
+- Storybook
+- Colors and styles
 
-- rebranding
-- copy playlist url link
-- storybook
-
-### Change
-
-- colors and styles
-
-### Fix
-
-- wildcard for playlists
+### Fixes
+- Wildcard for playlists
 
 ## 1.1.0
 
-### Add
-
+### Features
 - Timestamps for sniffer & downloads
-
-### Change
-
 - Tabs style
 
-### Fix
-
-- playlist relative uri
-- scrollbars
+### Fixes
+- Playlist relative URI
+- Scrollbars
