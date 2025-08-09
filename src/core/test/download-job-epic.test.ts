@@ -28,7 +28,9 @@ describe("downloadJobEpic", () => {
     };
     const decryptor = { decrypt: vi.fn() };
     const action$ = of(jobsSlice.actions.add({ job }));
-    const state = { config: { concurrency: 1, fetchAttempts: 1 } };
+    const state = {
+      config: { concurrency: 1, fetchAttempts: 1, proxyEnabled: false },
+    };
     const result = await firstValueFrom(
       downloadJobEpic(
         action$,

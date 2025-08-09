@@ -15,11 +15,13 @@ export const Default: Story = {
       concurrency={3}
       fetchAttempts={5}
       saveDialog={true}
+      proxyEnabled={true}
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
+      onProxyToggle={() => {}}
     />
   ),
 };
@@ -30,11 +32,13 @@ export const Minimal: Story = {
       concurrency={1}
       fetchAttempts={1}
       saveDialog={false}
+      proxyEnabled={false}
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
+      onProxyToggle={() => {}}
     />
   ),
 };

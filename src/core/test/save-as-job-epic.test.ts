@@ -16,7 +16,7 @@ describe("saveAsJobEpic", () => {
     const action$ = of(jobsSlice.actions.saveAs({ jobId: "1" }));
     const state = {
       jobs: { jobs: { "1": job } },
-      config: { saveDialog: true },
+      config: { saveDialog: true, proxyEnabled: false },
     };
     const result = await firstValueFrom(
       saveAsJobEpic(action$, { value: state } as any, { fs } as any)

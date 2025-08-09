@@ -328,6 +328,7 @@ export function createMockState(
     concurrency = 2,
     fetchAttempts = 5,
     saveDialog = false,
+    proxyEnabled = false,
     tabId = 1,
   } = options;
 
@@ -347,6 +348,7 @@ export function createMockState(
       concurrency,
       fetchAttempts,
       saveDialog,
+      proxyEnabled,
     },
     tabs: {
       current: {
