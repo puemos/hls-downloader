@@ -23,14 +23,14 @@
 ## ✨ Features
 
 * **Automatic stream discovery**
-  Detects HLS playlists on the page the moment you open it—no DevTools sniffing required.
+  Detects HLS playlists on the page the moment you open it. No DevTools sniffing required.
 * **Fine-grained quality control**
   Pick any combination of video resolution (240p → 4K) and audio language/bit-rate *before* you download, so you never waste bandwidth on the wrong track.
 * **100% local merge with `ffmpeg.wasm`**
   A WebAssembly build of FFmpeg runs right inside your tab, muxing the chosen audio + video into a single MP4.
   * Nothing is uploaded, keeping your files private.
 * **Works everywhere you browse**  
-  Verified on Firefox, Edge, Chrome, Brave, Vivaldi, Arc, and other Chromium-based browsers—on Windows, macOS, and Linux.
+  Verified on Firefox, Edge, Chrome, Brave, Vivaldi, Arc, and other Chromium-based browsers, on Windows, macOS, and Linux.
 
 ---
 
