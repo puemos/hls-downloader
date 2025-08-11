@@ -89,8 +89,8 @@ Currently not supported
 5. Enjoy 🎉
 
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" height="14" alt="Firefox logo" /> Firefox
-1. In **Add-ons Manager** (`about:addons`) choose the gear icon.  
-2. Click **Install Add-on From File…** and pick the XPI.
+1. Opem `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on...** and pick the XPI.
 
 ---
 
