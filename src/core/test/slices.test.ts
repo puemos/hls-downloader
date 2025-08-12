@@ -26,6 +26,11 @@ describe("store slices", () => {
       configSlice.actions.setFetchAttempts({ fetchAttempts: 10 })
     );
     expect(state.fetchAttempts).toBe(10);
+    state = configSlice.reducer(
+      state,
+      configSlice.actions.setProxyEnabled({ proxyEnabled: true })
+    );
+    expect(state.proxyEnabled).toBe(true);
   });
 
   it("jobs slice reducers", () => {
