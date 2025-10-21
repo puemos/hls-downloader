@@ -20,6 +20,16 @@
 
 ---
 
+## 📖 Table of Contents
+- [Features](#-features)
+- [Get It](#-get-it)
+- [Installation](#️-installation)
+- [Usage](#-usage)
+- [Development](#-development)
+- [Contribution](#-contributing)
+- [Code of Conduct](#-code-of-conduct)
+- [License](#-license)
+
 ## ✨ Features
 
 * **Automatic stream discovery**
