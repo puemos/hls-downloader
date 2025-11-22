@@ -54,6 +54,9 @@ export const Empty: Story = {
       clearPlaylists={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
       copyPlaylistsToClipboard={() => {}}
     />
   ),
@@ -68,6 +71,9 @@ export const WithItems: Story = {
       clearPlaylists={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
       copyPlaylistsToClipboard={() => {}}
     />
   ),
@@ -82,6 +88,9 @@ export const Selected: Story = {
       clearPlaylists={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
       copyPlaylistsToClipboard={() => {}}
     />
   ),
@@ -96,6 +105,26 @@ export const LongTitles: Story = {
       clearPlaylists={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
+      copyPlaylistsToClipboard={() => {}}
+    />
+  ),
+};
+
+export const WithManualInput: Story = {
+  render: () => (
+    <SnifferView
+      playlists={longPlaylists}
+      currentPlaylistId={undefined}
+      filter=""
+      clearPlaylists={() => {}}
+      setFilter={() => {}}
+      setCurrentPlaylistId={() => {}}
+      directURI="https://example.com/manual.m3u8"
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
       copyPlaylistsToClipboard={() => {}}
     />
   ),

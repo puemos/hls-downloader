@@ -10,7 +10,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "flex flex-col gap-2 rounded-lg border bg-card p-3 text-card-foreground shadow-sm",
+        "flex flex-col gap-2 rounded-lg border bg-card p-3 text-card-foreground shadow-md",
         interactive && "cursor-pointer hover:bg-muted transition-colors",
         className,
       )}

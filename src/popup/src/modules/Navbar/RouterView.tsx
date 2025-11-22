@@ -11,7 +11,7 @@ import SettingsModule from "../Settings/SettingsModule";
 import SnifferModule from "../Sniffer/SnifferModule";
 import { RouterContext } from "./RouterContext";
 import { TabOptions } from "./types";
-import DirectModule from "../Direct/DirectModule";
+import { Search, Download, Settings, Info } from "lucide-react";
 
 const RouterView = () => {
   const { tab, setTab } = useContext(RouterContext);
@@ -20,18 +20,38 @@ const RouterView = () => {
     <Tabs value={tab} defaultValue={tab} onValueChange={setTab}>
       <div className="flex justify-center">
         <TabsList>
-          <TabsTrigger value={TabOptions.SNIFTER}>Sniffer</TabsTrigger>
-          <TabsTrigger value={TabOptions.DIRECT}>Direct</TabsTrigger>
-          <TabsTrigger value={TabOptions.DOWNLOADS}>Downloads</TabsTrigger>
-          <TabsTrigger value={TabOptions.SETTINGS}>Settings</TabsTrigger>
-          <TabsTrigger value={TabOptions.ABOUT}>About</TabsTrigger>
+          <TabsTrigger
+            value={TabOptions.SNIFTER}
+            className="flex items-center gap-1"
+          >
+            <Search className="h-4 w-4" />
+            Sniffer
+          </TabsTrigger>
+          <TabsTrigger
+            value={TabOptions.DOWNLOADS}
+            className="flex items-center gap-1"
+          >
+            <Download className="h-4 w-4" />
+            Downloads
+          </TabsTrigger>
+          <TabsTrigger
+            value={TabOptions.SETTINGS}
+            className="flex items-center gap-1"
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </TabsTrigger>
+          <TabsTrigger
+            value={TabOptions.ABOUT}
+            className="flex items-center gap-1"
+          >
+            <Info className="h-4 w-4" />
+            About
+          </TabsTrigger>
         </TabsList>
       </div>
       <TabsContent value={TabOptions.SNIFTER}>
         <SnifferModule />
-      </TabsContent>
-      <TabsContent value={TabOptions.DIRECT}>
-        <DirectModule />
       </TabsContent>
       <TabsContent value={TabOptions.DOWNLOADS}>
         <DownloadsModule />

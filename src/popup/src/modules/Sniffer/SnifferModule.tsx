@@ -11,6 +11,9 @@ const SnifferModule = () => {
     playlists,
     currentPlaylistId,
     copyPlaylistsToClipboard,
+    directURI,
+    setDirectURI,
+    addDirectPlaylist,
   } = useSnifferController();
 
   return (
@@ -22,6 +25,9 @@ const SnifferModule = () => {
       setCurrentPlaylistId={setCurrentPlaylistId}
       playlists={playlists}
       currentPlaylistId={currentPlaylistId}
+      directURI={directURI}
+      setDirectURI={setDirectURI}
+      addDirectPlaylist={addDirectPlaylist}
     ></SnifferView>
   );
 };

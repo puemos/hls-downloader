@@ -1,6 +1,6 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
 import { Button, ScrollArea, Card } from "@hls-downloader/design-system";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Video, Music2, Subtitles, Clipboard } from "lucide-react";
 
 interface Props {
@@ -45,6 +45,11 @@ const PlaylistView = ({
   inspectionPending,
   encryptionBlocked,
 }: Props) => {
+  const [copied, setCopied] = useState<"video" | "audio" | "subtitle" | null>(
+    null,
+  );
+  const copyTimeout = useRef<NodeJS.Timeout | null>(null);
+
   if (!status) {
     return null;
   }
@@ -137,124 +142,157 @@ const PlaylistView = ({
         <div className="flex flex-col gap-4 p-1 pb-16">
           {videoLevels.length > 0 && (
             <Card className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Video className="h-4 w-4" /> Video
-              </div>
-              <div className="w-full border rounded-md">
-                <select
-                  className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
-                  value={selectedVideoId ?? ""}
-                  onChange={(e) => handleSelectVideo(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select video quality
-                  </option>
-                  {videoLevels.map((item) => {
-                    const details = getVideoDetails(item);
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {details || item.id}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Video className="h-4 w-4" /> Video
+                </div>
+                <div className="flex-1 min-w-[200px] border rounded-md">
+                  <select
+                    className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                    value={selectedVideoId ?? ""}
+                    onChange={(e) => handleSelectVideo(e.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select video quality
+                    </option>
+                    {videoLevels.map((item) => {
+                      const details = getVideoDetails(item);
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {details || item.id}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
                 <Button
                   type="button"
-                  size="sm"
+                  size="icon"
                   variant="ghost"
                   disabled={!selectedVideo?.uri}
                   onClick={() => {
                     if (!selectedVideo?.uri) return;
+                    if (copyTimeout.current) clearTimeout(copyTimeout.current);
                     void navigator.clipboard?.writeText(selectedVideo.uri);
+                    setCopied("video");
+                    copyTimeout.current = setTimeout(
+                      () => setCopied(null),
+                      1200,
+                    );
                   }}
+                  aria-label="Copy video URL"
                 >
-                  <Clipboard className="h-4 w-4 mr-2" />
-                  Copy URL
+                  <Clipboard className="h-4 w-4" />
                 </Button>
+                {copied === "video" && (
+                  <span className="text-[11px] text-muted-foreground">
+                    Copied
+                  </span>
+                )}
               </div>
             </Card>
           )}
 
           {audioLevels.length > 0 && (
             <Card className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Music2 className="h-4 w-4" /> Audio
-              </div>
-              <div className="w-full border rounded-md">
-                <select
-                  className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
-                  value={selectedAudioId ?? ""}
-                  onChange={(e) => handleSelectAudio(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select audio track
-                  </option>
-                  {audioLevels.map((item) => {
-                    const details = getAudioDetails(item);
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {details || item.id}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Music2 className="h-4 w-4" /> Audio
+                </div>
+                <div className="flex-1 min-w-[200px] border rounded-md">
+                  <select
+                    className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                    value={selectedAudioId ?? ""}
+                    onChange={(e) => handleSelectAudio(e.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select audio track
+                    </option>
+                    {audioLevels.map((item) => {
+                      const details = getAudioDetails(item);
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {details || item.id}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
                 <Button
                   type="button"
-                  size="sm"
+                  size="icon"
                   variant="ghost"
                   disabled={!selectedAudio?.uri}
                   onClick={() => {
                     if (!selectedAudio?.uri) return;
+                    if (copyTimeout.current) clearTimeout(copyTimeout.current);
                     void navigator.clipboard?.writeText(selectedAudio.uri);
+                    setCopied("audio");
+                    copyTimeout.current = setTimeout(
+                      () => setCopied(null),
+                      1200,
+                    );
                   }}
+                  aria-label="Copy audio URL"
                 >
-                  <Clipboard className="h-4 w-4 mr-2" />
-                  Copy URL
+                  <Clipboard className="h-4 w-4" />
                 </Button>
+                {copied === "audio" && (
+                  <span className="text-[11px] text-muted-foreground">
+                    Copied
+                  </span>
+                )}
               </div>
             </Card>
           )}
 
           {subtitleLevels.length > 0 && (
             <Card className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Subtitles className="h-4 w-4" /> Subtitles / CC
-              </div>
-              <div className="w-full border rounded-md">
-                <select
-                  className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
-                  value={selectedSubtitleId ?? ""}
-                  onChange={(e) => onSelectSubtitle(e.target.value)}
-                >
-                  <option value="">No subtitles</option>
-                  {subtitleLevels.map((item) => {
-                    const details = getSubtitleDetails(item);
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {details || item.id}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Subtitles className="h-4 w-4" /> Subtitles / CC
+                </div>
+                <div className="flex-1 min-w-[200px] border rounded-md">
+                  <select
+                    className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                    value={selectedSubtitleId ?? ""}
+                    onChange={(e) => onSelectSubtitle(e.target.value)}
+                  >
+                    <option value="">No subtitles</option>
+                    {subtitleLevels.map((item) => {
+                      const details = getSubtitleDetails(item);
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {details || item.id}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
                 <Button
                   type="button"
-                  size="sm"
+                  size="icon"
                   variant="ghost"
                   disabled={!selectedSubtitle?.uri}
                   onClick={() => {
                     if (!selectedSubtitle?.uri) return;
+                    if (copyTimeout.current) clearTimeout(copyTimeout.current);
                     void navigator.clipboard?.writeText(selectedSubtitle.uri);
+                    setCopied("subtitle");
+                    copyTimeout.current = setTimeout(
+                      () => setCopied(null),
+                      1200,
+                    );
                   }}
+                  aria-label="Copy subtitles URL"
                 >
-                  <Clipboard className="h-4 w-4 mr-2" />
-                  Copy URL
+                  <Clipboard className="h-4 w-4" />
                 </Button>
+                {copied === "subtitle" && (
+                  <span className="text-[11px] text-muted-foreground">
+                    Copied
+                  </span>
+                )}
               </div>
             </Card>
           )}
