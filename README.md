@@ -38,7 +38,7 @@
 
 | Browser | Download / availability |
 | :-- | :-- |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" height="14" alt="Google Chrome logo" />&nbsp;&nbsp;Google Chrome | Not supported because it only allows Manifest V3. I'm working on a solution. |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" height="14" alt="Google Chrome logo" />&nbsp;&nbsp;Google Chrome | Experimental MV3 build available from source (see Development section). |
 | <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" height="14" alt="Firefox logo" />&nbsp;&nbsp;Firefox | [Get it on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/) or [use manual installation](#-firefox)|
 | <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" height="14" alt="Microsoft Edge logo" />&nbsp;&nbsp;Microsoft Edge | [Get it from Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc) |
 | <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Brave_lion_icon.svg" height="14" alt="Brave logo" />&nbsp;&nbsp;Brave | [Use manual installation](#-brave) |
@@ -92,6 +92,8 @@ Currently not supported
 1. Opem `about:debugging#/runtime/this-firefox`.
 2. Click **Load Temporary Add-on...** and pick the XPI.
 
+[For Dear Testers](./FOR-DEAR-TESTERS.md) – concise build/install steps for Firefox & Chromium reviewers.
+
 ---
 
 ## 🎬 Usage
@@ -124,6 +126,25 @@ pnpm run build    # outputs → ./dist/, extension-chrome.zip, extension-firefox
 # verify build artifacts then clean up
 pnpm run clean
 ```
+
+**MV2 vs MV3 builds**
+
+The default build targets Manifest V2 (Firefox and legacy Chromium workflows). To produce a Manifest V3 bundle for Chromium-based browsers:
+
+```bash
+MV_TARGET=mv3 pnpm run build   # writes manifest v3 + offscreen page to dist/
+pnpm run clean                 # optional: remove artifacts after testing
+```
+
+You can generate both flavors at once with pre-named artifacts:
+
+```bash
+pnpm run build:all          # outputs dist/mv2 + dist/mv3
+# zips: extension-mv2-chrome.zip / extension-mv2-firefox.xpi  (MV2 contents at archive root)
+#       extension-mv3-chrome.zip / extension-mv3-firefox.xpi  (MV3 contents at archive root)
+```
+
+> Tip: If pnpm is missing, run `corepack enable && corepack prepare pnpm@10.11.0 --activate` to match the locked toolchain.
 
 Run tests & generate coverage badge:
 

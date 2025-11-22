@@ -2,9 +2,21 @@ import "fake-indexeddb/auto";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 // Mock webextension-polyfill
-vi.mock("webextension-polyfill", () => ({
-  downloads: { download: vi.fn() },
-}));
+vi.mock("webextension-polyfill", () => {
+  const downloads = { download: vi.fn() };
+  const storage = {
+    local: {
+      get: vi.fn().mockResolvedValue({}),
+      set: vi.fn().mockResolvedValue(undefined),
+      remove: vi.fn().mockResolvedValue(undefined),
+    },
+  };
+  return {
+    default: { downloads, storage },
+    downloads,
+    storage,
+  };
+});
 
 // Mock FFmpeg since we can't load it in tests
 vi.mock("@ffmpeg/ffmpeg", () => ({
@@ -61,6 +73,7 @@ describe("IndexedDBFS", () => {
   });
 
   afterEach(async () => {
+    await IndexedDBFS.cleanup();
     vi.clearAllMocks();
   });
 

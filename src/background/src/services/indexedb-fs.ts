@@ -7,12 +7,59 @@ import {
 } from "idb";
 
 import { Bucket, IFS } from "@hls-downloader/core/lib/services";
-import { downloads } from "webextension-polyfill";
+import browser from "webextension-polyfill";
 import filenamify from "filenamify";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 
 const buckets: Record<string, IndexedDBBucket> = {};
+const chromeApi = (globalThis as any).chrome;
+const browserApi = (browser as any) ?? (globalThis as any).browser ?? chromeApi;
+const BUCKET_META_KEY = "bucketMeta";
+
+type BucketMeta = {
+  videoLength: number;
+  audioLength: number;
+};
+
+let bucketMetaCache: Record<string, BucketMeta> | null = null;
+
+async function loadBucketMetaCache(): Promise<Record<string, BucketMeta>> {
+  if (bucketMetaCache) {
+    return bucketMetaCache;
+  }
+
+  const storageArea = getStorageArea();
+  const res = storageArea ? await storageArea.get(BUCKET_META_KEY) : {};
+  const meta = (res[BUCKET_META_KEY] as Record<string, BucketMeta>) || {};
+  bucketMetaCache = meta;
+  return meta;
+}
+
+async function setBucketMeta(id: string, meta: BucketMeta) {
+  const cache = await loadBucketMetaCache();
+  cache[id] = meta;
+  bucketMetaCache = cache;
+  const storageArea = getStorageArea();
+  if (storageArea) {
+    await storageArea.set({ [BUCKET_META_KEY]: cache });
+  }
+}
+
+async function deleteBucketMeta(id: string) {
+  const cache = await loadBucketMetaCache();
+  delete cache[id];
+  bucketMetaCache = cache;
+  const storageArea = getStorageArea();
+  if (storageArea) {
+    await storageArea.set({ [BUCKET_META_KEY]: cache });
+  }
+}
+
+async function getBucketMeta(id: string): Promise<BucketMeta | undefined> {
+  const cache = await loadBucketMetaCache();
+  return cache[id];
+}
 
 interface ChunksDB extends DBSchema {
   chunks: {
@@ -24,29 +71,6 @@ interface ChunksDB extends DBSchema {
     indexes: { index: number };
   };
 }
-
-const storageManager = (function () {
-  let storage = {};
-
-  return {
-    setItem: function (key: string | number, value: any) {
-      storage[key] = JSON.stringify(value);
-    },
-
-    getItem: function (key: string | number) {
-      const value = storage[key];
-      return value ? JSON.parse(value) : null;
-    },
-
-    removeItem: function (key: string | number) {
-      delete storage[key];
-    },
-
-    clear: function () {
-      storage = {};
-    },
-  };
-})();
 
 // Singleton FFmpeg instance
 class FFmpegSingleton {
@@ -79,6 +103,7 @@ export class IndexedDBBucket implements Bucket {
   readonly fileName: string;
   readonly objectStoreName = "chunks";
   private db?: IDBPDatabase<ChunksDB>;
+  private isDeleted = false;
 
   constructor(
     readonly videoLength: number,
@@ -100,16 +125,23 @@ export class IndexedDBBucket implements Bucket {
   }
 
   async deleteDB() {
+    if (!this.db && !this.isDeleted) {
+      await this.openDB();
+    }
     if (!this.db) {
       throw Error();
     }
     this.db.close();
     this.db = undefined;
+    this.isDeleted = true;
     await deleteDB(this.id);
     return;
   }
 
   async openDB() {
+    if (this.isDeleted) {
+      throw Error();
+    }
     const objectStoreName = this.objectStoreName;
     const db = await openDB<ChunksDB>(this.id, 1, {
       upgrade(db) {
@@ -124,12 +156,19 @@ export class IndexedDBBucket implements Bucket {
     this.db = db;
   }
 
-  async write(index: number, data: ArrayBuffer): Promise<void> {
-    const typedArray = new Uint8Array(data);
-
+  private async ensureDb() {
+    if (this.isDeleted) {
+      throw Error();
+    }
     if (!this.db) {
       await this.openDB();
     }
+  }
+
+  async write(index: number, data: ArrayBuffer): Promise<void> {
+    const typedArray = new Uint8Array(data);
+
+    await this.ensureDb();
     await this.db!.add(this.objectStoreName, {
       data: typedArray,
       index,
@@ -138,9 +177,7 @@ export class IndexedDBBucket implements Bucket {
   }
 
   async stream() {
-    if (!this.db) {
-      throw Error();
-    }
+    await this.ensureDb();
     const store = this.db
       .transaction(this.objectStoreName)
       .objectStore(this.objectStoreName);
@@ -180,8 +217,17 @@ export class IndexedDBBucket implements Bucket {
   async getLink(
     onProgress?: (progress: number, message: string) => void
   ): Promise<string> {
-    if (!this.db) {
-      throw Error();
+    await this.ensureDb();
+
+    if (shouldUseOffscreen()) {
+      return await requestObjectUrlOffscreen(
+        {
+          bucketId: this.id,
+          videoLength: this.videoLength,
+          audioLength: this.audioLength,
+        },
+        onProgress
+      );
     }
 
     try {
@@ -198,9 +244,7 @@ export class IndexedDBBucket implements Bucket {
   private async streamToMp4Blob(
     onProgress?: (progress: number, message: string) => void
   ) {
-    if (!this.db) {
-      throw Error();
-    }
+    await this.ensureDb();
 
     const ffmpeg = await FFmpegSingleton.getInstance();
 
@@ -384,16 +428,22 @@ export class IndexedDBBucket implements Bucket {
 }
 
 const cleanup: IFS["cleanup"] = async function () {
-  const dbsString = storageManager.getItem("dbs");
-  if (!dbsString) {
-    return;
-  }
+  const meta = await loadBucketMetaCache();
+  const dbNames = Object.keys(meta);
 
-  const dbNames: string[] = JSON.parse(dbsString);
   for (const dbName of dbNames) {
     const db = await openDB(dbName, 1);
     db.close();
     await deleteDB(dbName);
+  }
+
+  bucketMetaCache = {};
+  const storageArea = getStorageArea();
+  if (storageArea) {
+    await storageArea.set({ [BUCKET_META_KEY]: {} });
+  }
+  for (const id of Object.keys(buckets)) {
+    delete buckets[id];
   }
 };
 
@@ -402,21 +452,34 @@ const createBucket: IFS["createBucket"] = async function (
   videoLength: number,
   audioLength: number
 ) {
+  await setBucketMeta(id, { videoLength, audioLength });
   buckets[id] = new IndexedDBBucket(videoLength, audioLength, id);
-
-  storageManager.setItem("dbs", JSON.stringify(Object.keys(buckets)));
   return Promise.resolve();
 };
 
 const deleteBucket: IFS["deleteBucket"] = async function (id: string) {
-  await buckets[id].deleteDB();
+  const bucket = await getBucket(id);
+  if (bucket) {
+    await bucket.deleteDB();
+  }
   delete buckets[id];
-  storageManager.setItem("dbs", JSON.stringify(Object.keys(buckets)));
+  await deleteBucketMeta(id);
   return Promise.resolve();
 };
 
-const getBucket: IFS["getBucket"] = function (id: string) {
-  return Promise.resolve(buckets[id]);
+const getBucket: IFS["getBucket"] = async function (id: string) {
+  if (buckets[id]) {
+    return buckets[id];
+  }
+
+  const meta = await getBucketMeta(id);
+  if (!meta) {
+    return;
+  }
+
+  const bucket = new IndexedDBBucket(meta.videoLength, meta.audioLength, id);
+  buckets[id] = bucket;
+  return bucket;
 };
 
 const saveAs: IFS["saveAs"] = async function (
@@ -427,10 +490,13 @@ const saveAs: IFS["saveAs"] = async function (
   if (link === "") {
     return Promise.resolve();
   }
-  window.URL = window.URL || window.webkitURL;
+  const downloadsApi = getDownloadsApi();
+  if (!downloadsApi?.download) {
+    throw new Error("Downloads API unavailable");
+  }
   const filename = filenamify(path ?? "stream.mp4").normalize("NFC");
 
-  await downloads.download({
+  await downloadsApi.download({
     url: link,
     saveAs: dialog,
     conflictAction: "uniquify",
@@ -447,3 +513,85 @@ export const IndexedDBFS: IFS = {
   saveAs,
   cleanup,
 };
+
+function shouldUseOffscreen() {
+  return Boolean(
+    chromeApi?.offscreen &&
+      typeof chromeApi.offscreen.createDocument === "function" &&
+      typeof document === "undefined"
+  );
+}
+
+async function ensureOffscreenDocument() {
+  if (!chromeApi?.offscreen?.createDocument) {
+    return;
+  }
+
+  const hasDocument = await chromeApi.offscreen.hasDocument?.();
+  if (hasDocument) {
+    return;
+  }
+
+  await chromeApi.offscreen.createDocument({
+    url: "offscreen.html",
+    reasons: [chromeApi.offscreen.Reason.BLOBS],
+    justification: "Create object URLs for download blobs",
+  });
+}
+
+async function requestObjectUrlOffscreen(
+  payload: { bucketId: string; videoLength: number; audioLength: number },
+  onProgress?: (progress: number, message: string) => void
+) {
+  await ensureOffscreenDocument();
+
+  const requestId =
+    crypto.randomUUID?.() ??
+    `req-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+
+  const progressListener = (message: any) => {
+    if (
+      message?.target === "background" &&
+      message.type === "offscreen-progress" &&
+      message.requestId === requestId
+    ) {
+      onProgress?.(message.progress, message.message);
+    }
+  };
+
+  chromeApi?.runtime?.onMessage?.addListener(progressListener);
+
+  return await new Promise<string>((resolve, reject) => {
+    chromeApi.runtime.sendMessage(
+      {
+        target: "offscreen",
+        type: "create-object-url",
+        bucketId: payload.bucketId,
+        videoLength: payload.videoLength,
+        audioLength: payload.audioLength,
+        requestId,
+      },
+      (response: { ok: boolean; url?: string; message?: string }) => {
+        chromeApi?.runtime?.onMessage?.removeListener(progressListener);
+        const lastError = chromeApi?.runtime?.lastError;
+        if (lastError) {
+          reject(new Error(lastError.message));
+          return;
+        }
+        if (!response?.ok || !response.url) {
+          reject(new Error(response?.message || "Failed to create object URL"));
+          return;
+        }
+        resolve(response.url);
+      }
+    );
+  });
+}
+
+function getStorageArea() {
+  return browserApi?.storage?.local ?? chromeApi?.storage?.local;
+}
+
+function getDownloadsApi() {
+  return browserApi?.downloads ?? chromeApi?.downloads;
+}

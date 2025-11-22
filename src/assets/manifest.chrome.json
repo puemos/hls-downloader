@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "HLS Downloader",
+  "description": "HTTP Live Stream downloader",
+  "version": "5.0.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "HLS Downloader"
+  },
+  "icons": {
+    "16": "assets/icons/16.png",
+    "48": "assets/icons/48.png",
+    "128": "assets/icons/128.png",
+    "256": "assets/icons/256.png"
+  },
+  "permissions": [
+    "downloads",
+    "offscreen",
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "webRequest"
+  ],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/**/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
