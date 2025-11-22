@@ -2,9 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 
-const outDir =
-  process.env.DIST_DIR ??
-  resolve(__dirname, "../../dist"); /* default shared dist */
+const outDirName = process.env.DIST_DIR ?? "dist";
+const outDir = resolve(__dirname, "../../", outDirName); /* default shared dist */
 
 export default defineConfig({
   build: {

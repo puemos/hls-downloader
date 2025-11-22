@@ -4,9 +4,8 @@ import { resolve } from "path";
 export default defineConfig(({ mode }) => {
   const target = process.env.MV_TARGET === "mv3" ? "mv3" : "mv2";
   const isMv3 = target === "mv3";
-  const outDir =
-    process.env.DIST_DIR ??
-    resolve(__dirname, "../../dist"); /* default shared dist */
+  const outDirName = process.env.DIST_DIR ?? "dist";
+  const outDir = resolve(__dirname, "../../", outDirName); /* default shared dist */
 
   return {
     build: {
