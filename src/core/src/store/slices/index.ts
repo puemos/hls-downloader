@@ -4,3 +4,5 @@ export * from "./config-slice";
 export * from "./tabs-slice";
 export * from "./jobs-slice";
 export * from "./subtitles-slice";
+export * from "./level-inspections-slice";
+export * from "./playlist-preferences-slice";

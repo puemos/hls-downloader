@@ -16,10 +16,15 @@ export interface ISetFetchAttemptsPayload {
   fetchAttempts: number;
 }
 
+export interface ISetPreferredAudioLanguagePayload {
+  preferredAudioLanguage: string | null;
+}
+
 export interface IConfigState {
   concurrency: number;
   saveDialog: boolean;
   fetchAttempts: number;
+  preferredAudioLanguage: string | null;
 }
 
 interface IConfigReducers {
@@ -35,6 +40,10 @@ interface IConfigReducers {
     IConfigState,
     PayloadAction<ISetFetchAttemptsPayload>
   >;
+  setPreferredAudioLanguage: CaseReducer<
+    IConfigState,
+    PayloadAction<ISetPreferredAudioLanguagePayload>
+  >;
   [key: string]: CaseReducer<IConfigState, PayloadAction<any>>;
 }
 
@@ -42,6 +51,7 @@ const initialConfigState: IConfigState = {
   concurrency: 2,
   saveDialog: false,
   fetchAttempts: 100,
+  preferredAudioLanguage: null,
 };
 
 export const configSlice: Slice<IConfigState, IConfigReducers, "config"> =
@@ -57,6 +67,12 @@ export const configSlice: Slice<IConfigState, IConfigReducers, "config"> =
       },
       setFetchAttempts(state, action: PayloadAction<ISetFetchAttemptsPayload>) {
         state.fetchAttempts = action.payload.fetchAttempts;
+      },
+      setPreferredAudioLanguage(
+        state,
+        action: PayloadAction<ISetPreferredAudioLanguagePayload>,
+      ) {
+        state.preferredAudioLanguage = action.payload.preferredAudioLanguage;
       },
     },
   });

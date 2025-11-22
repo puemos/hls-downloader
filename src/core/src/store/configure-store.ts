@@ -9,7 +9,7 @@ const _dummy: Middleware = () => (next) => (action) => next(action);
 
 export function createStore(
   dependencies: Dependencies,
-  preloadedState: RootState = rootReducer(undefined, { type: "init" }),
+  preloadedState?: Partial<RootState>,
 ) {
   const epicMiddleware = createEpicMiddleware<
     RootAction,

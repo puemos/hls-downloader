@@ -83,6 +83,11 @@ export function createMockParser(
   return {
     parseMasterPlaylist: vi.fn().mockReturnValue(levels),
     parseLevelPlaylist: vi.fn().mockReturnValue(fragments),
+    inspectLevelEncryption: vi.fn().mockReturnValue({
+      methods: [],
+      keyUris: [],
+      iv: null,
+    }),
   };
 }
 

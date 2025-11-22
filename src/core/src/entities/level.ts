@@ -15,5 +15,10 @@ export class Level {
     readonly characteristics?: string,
     readonly instreamId?: string,
     readonly channels?: string,
+    readonly isDefault?: boolean,
+    readonly autoSelect?: boolean,
+    readonly forced?: boolean,
+    readonly groupId?: string,
+    readonly audioGroupId?: string,
   ) {}
 }
