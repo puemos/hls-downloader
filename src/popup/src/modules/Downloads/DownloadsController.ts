@@ -26,12 +26,12 @@ const jobsFilter =
 
 const useDownloadsController = (): ReturnType => {
   const [currentJobId, setCurrentJobId] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [filter, setFilter] = useState("");
 
   const jobsRecord = useSelector<RootState, Record<string, Job | null>>(
-    (state) => state.jobs.jobs
+    (state) => state.jobs.jobs,
   );
 
   const jobs = Object.values(jobsRecord)

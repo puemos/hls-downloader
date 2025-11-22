@@ -28,7 +28,7 @@ export function createMockLoader(
     textResponse?: string;
     bufferResponse?: ArrayBuffer;
     shouldFail?: boolean;
-  } = {}
+  } = {},
 ): ILoader {
   const {
     textResponse = "",
@@ -64,7 +64,7 @@ export function createMockDecryptor(): IDecryptor {
       .mockImplementation(
         (data: ArrayBuffer, keyData: ArrayBuffer, iv: Uint8Array) => {
           return Promise.resolve(new ArrayBuffer(data.byteLength));
-        }
+        },
       ),
   };
 }
@@ -76,7 +76,7 @@ export function createMockParser(
   options: {
     levels?: Level[];
     fragments?: Fragment[];
-  } = {}
+  } = {},
 ): IParser {
   const { levels = [], fragments = [] } = options;
 
@@ -92,7 +92,7 @@ export function createMockParser(
 export function createMockBucket(
   options: {
     link?: string;
-  } = {}
+  } = {},
 ): Bucket {
   const { link = "mock-link" } = options;
 
@@ -108,7 +108,7 @@ export function createMockBucket(
             onProgress(100, "Complete");
           }
           return Promise.resolve(link);
-        }
+        },
       ),
   };
 }
@@ -119,7 +119,7 @@ export function createMockBucket(
 export function createMockFS(
   options: {
     bucket?: Bucket;
-  } = {}
+  } = {},
 ): IFS {
   const { bucket = createMockBucket() } = options;
 
@@ -141,7 +141,7 @@ export function createMockDependencies(
     decryptor?: IDecryptor;
     parser?: IParser;
     fs?: IFS;
-  } = {}
+  } = {},
 ): Dependencies {
   const {
     loader = createMockLoader(),
@@ -167,7 +167,7 @@ export function createTestFragment(
     uri?: string;
     keyUri?: string | null;
     keyIv?: Uint8Array | null;
-  } = {}
+  } = {},
 ): Fragment {
   const {
     index = 0,
@@ -193,7 +193,7 @@ export function createTestLevel(
     height?: number;
     bitrate?: number;
     fps?: number;
-  } = {}
+  } = {},
 ): Level {
   const {
     id = `level-${Math.random().toString(36).substring(2, 9)}`,
@@ -219,7 +219,7 @@ export function createTestPlaylist(
     pageTitle?: string;
     initiator?: string;
     tabId?: number;
-  } = {}
+  } = {},
 ): Playlist {
   const {
     id = `playlist-${Math.random().toString(36).substring(2, 9)}`,
@@ -245,7 +245,7 @@ export function createTestJob(
     height?: number;
     bitrate?: number;
     link?: string;
-  } = {}
+  } = {},
 ): Job {
   const {
     id = `job-${Math.random().toString(36).substring(2, 9)}`,
@@ -270,7 +270,7 @@ export function createTestJob(
     width,
     height,
     bitrate,
-    link
+    link,
   );
 }
 
@@ -284,7 +284,7 @@ export function createTestJobStatus(
     done?: number;
     saveProgress?: number;
     saveMessage?: string;
-  } = {}
+  } = {},
 ): JobStatus {
   const {
     status = "downloading",
@@ -317,7 +317,7 @@ export function createMockState(
     fetchAttempts?: number;
     saveDialog?: boolean;
     tabId?: number;
-  } = {}
+  } = {},
 ): any {
   const {
     playlists = {},

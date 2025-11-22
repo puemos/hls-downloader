@@ -7,3 +7,4 @@ export * from "./add-playlist-epic";
 export * from "./delete-job-epic";
 export * from "./on-init";
 export * from "./cancel-job-delete-job-epic";
+export * from "./download-subtitle-epic";

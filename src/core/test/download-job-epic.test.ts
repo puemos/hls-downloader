@@ -37,8 +37,8 @@ describe("downloadJobEpic", () => {
           fs,
           loader,
           decryptor,
-        } as any
-      )
+        } as any,
+      ),
     );
     expect(fs.createBucket).toHaveBeenCalledWith("1", 1, 0);
     expect(result).toEqual(jobsSlice.actions.incDownloadStatus({ jobId: "1" }));

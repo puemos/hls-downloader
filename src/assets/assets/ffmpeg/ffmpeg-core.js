@@ -84,8 +84,8 @@ var createFFmpegCore = (() => {
       if (mainScriptUrlOrBlob) {
         const { wasmURL: wasmURL, workerURL: workerURL } = JSON.parse(
           atob(
-            mainScriptUrlOrBlob.slice(mainScriptUrlOrBlob.lastIndexOf("#") + 1)
-          )
+            mainScriptUrlOrBlob.slice(mainScriptUrlOrBlob.lastIndexOf("#") + 1),
+          ),
         );
         if (path.endsWith(".wasm")) return wasmURL;
         if (path.endsWith(".worker.js")) return workerURL;
@@ -133,7 +133,7 @@ var createFFmpegCore = (() => {
       if (scriptDirectory.indexOf("blob:") !== 0) {
         scriptDirectory = scriptDirectory.substr(
           0,
-          scriptDirectory.replace(/[?#].*/, "").lastIndexOf("/") + 1
+          scriptDirectory.replace(/[?#].*/, "").lastIndexOf("/") + 1,
         );
       } else {
         scriptDirectory = "";
@@ -373,7 +373,7 @@ var createFFmpegCore = (() => {
               err("falling back to ArrayBuffer instantiation");
               return instantiateArrayBuffer(binaryFile, imports, callback);
             });
-          }
+          },
         );
       } else {
         return instantiateArrayBuffer(binaryFile, imports, callback);
@@ -407,7 +407,7 @@ var createFFmpegCore = (() => {
         wasmBinary,
         wasmBinaryFile,
         info,
-        receiveInstantiationResult
+        receiveInstantiationResult,
       ).catch(readyPromiseReject);
       return {};
     }
@@ -549,7 +549,7 @@ var createFFmpegCore = (() => {
             filename ? UTF8ToString(filename) : "unknown filename",
             line,
             func ? UTF8ToString(func) : "unknown function",
-          ]
+          ],
       );
     }
     function ExceptionInfo(excPtr) {
@@ -649,7 +649,7 @@ var createFFmpegCore = (() => {
           trailingSlash = path.substr(-1) === "/";
         path = PATH.normalizeArray(
           path.split("/").filter((p) => !!p),
-          !isAbsolute
+          !isAbsolute,
         ).join("/");
         if (!path && !isAbsolute) {
           path = ".";
@@ -714,7 +714,7 @@ var createFFmpegCore = (() => {
         }
         resolvedPath = PATH.normalizeArray(
           resolvedPath.split("/").filter((p) => !!p),
-          !resolvedAbsolute
+          !resolvedAbsolute,
         ).join("/");
         return (resolvedAbsolute ? "/" : "") + resolvedPath || ".";
       },
@@ -808,7 +808,7 @@ var createFFmpegCore = (() => {
         stringy,
         u8array,
         0,
-        u8array.length
+        u8array.length,
       );
       if (dontAddNull) u8array.length = numBytesWritten;
       return u8array;
@@ -1041,7 +1041,7 @@ var createFFmpegCore = (() => {
           newCapacity,
           (prevCapacity *
             (prevCapacity < CAPACITY_DOUBLING_MAX ? 2 : 1.125)) >>>
-            0
+            0,
         );
         if (prevCapacity != 0) newCapacity = Math.max(newCapacity, 256);
         var oldContents = node.contents;
@@ -1059,7 +1059,7 @@ var createFFmpegCore = (() => {
           node.contents = new Uint8Array(newSize);
           if (oldContents) {
             node.contents.set(
-              oldContents.subarray(0, Math.min(newSize, node.usedBytes))
+              oldContents.subarray(0, Math.min(newSize, node.usedBytes)),
             );
           }
           node.usedBytes = newSize;
@@ -1193,7 +1193,7 @@ var createFFmpegCore = (() => {
             } else if (position + length <= node.usedBytes) {
               node.contents.set(
                 buffer.subarray(offset, offset + length),
-                position
+                position,
               );
               return length;
             }
@@ -1202,7 +1202,7 @@ var createFFmpegCore = (() => {
           if (node.contents.subarray && buffer.subarray) {
             node.contents.set(
               buffer.subarray(offset, offset + length),
-              position
+              position,
             );
           } else {
             for (var i = 0; i < length; i++) {
@@ -1230,7 +1230,7 @@ var createFFmpegCore = (() => {
           MEMFS.expandFileStorage(stream.node, offset + length);
           stream.node.usedBytes = Math.max(
             stream.node.usedBytes,
-            offset + length
+            offset + length,
           );
         },
         mmap: function (stream, length, position, prot, flags) {
@@ -1251,7 +1251,7 @@ var createFFmpegCore = (() => {
                 contents = Array.prototype.slice.call(
                   contents,
                   position,
-                  position + length
+                  position + length,
                 );
               }
             }
@@ -1277,7 +1277,7 @@ var createFFmpegCore = (() => {
         (arrayBuffer) => {
           assert(
             arrayBuffer,
-            `Loading data file "${url}" failed (no arrayBuffer).`
+            `Loading data file "${url}" failed (no arrayBuffer).`,
           );
           onload(new Uint8Array(arrayBuffer));
           if (dep) removeRunDependency(dep);
@@ -1288,7 +1288,7 @@ var createFFmpegCore = (() => {
           } else {
             throw `Loading data file "${url}" failed.`;
           }
-        }
+        },
       );
       if (dep) addRunDependency(dep);
     }
@@ -1315,7 +1315,7 @@ var createFFmpegCore = (() => {
       onerror,
       dontCreateFile,
       canOwn,
-      preFinish
+      preFinish,
     ) {
       var fullname = name ? PATH_FS.resolve(PATH.join2(parent, name)) : parent;
       var dep = getUniqueRunDependency(`cp ${fullname}`);
@@ -1329,7 +1329,7 @@ var createFFmpegCore = (() => {
               byteArray,
               canRead,
               canWrite,
-              canOwn
+              canOwn,
             );
           }
           if (onload) onload();
@@ -1392,7 +1392,7 @@ var createFFmpegCore = (() => {
                 parent,
                 parts[i],
                 WORKERFS.DIR_MODE,
-                0
+                0,
               );
             }
             parent = createdParents[curr];
@@ -1412,9 +1412,9 @@ var createFFmpegCore = (() => {
               WORKERFS.FILE_MODE,
               0,
               file,
-              file.lastModifiedDate
+              file.lastModifiedDate,
             );
-          }
+          },
         );
         (mount.opts["blobs"] || []).forEach(function (obj) {
           WORKERFS.createNode(
@@ -1422,7 +1422,7 @@ var createFFmpegCore = (() => {
             base(obj["name"]),
             WORKERFS.FILE_MODE,
             0,
-            obj["data"]
+            obj["data"],
           );
         });
         (mount.opts["packages"] || []).forEach(function (pack) {
@@ -1433,7 +1433,7 @@ var createFFmpegCore = (() => {
               base(name),
               WORKERFS.FILE_MODE,
               0,
-              pack["blob"].slice(file.start, file.end)
+              pack["blob"].slice(file.start, file.end),
             );
           });
         });
@@ -1861,7 +1861,7 @@ var createFFmpegCore = (() => {
         FS.syncFSRequests++;
         if (FS.syncFSRequests > 1) {
           err(
-            `warning: ${FS.syncFSRequests} FS.syncfs operations in flight at once, probably just doing extra work`
+            `warning: ${FS.syncFSRequests} FS.syncfs operations in flight at once, probably just doing extra work`,
           );
         }
         var mounts = FS.getMounts(FS.root.mount);
@@ -2141,7 +2141,7 @@ var createFFmpegCore = (() => {
         }
         return PATH_FS.resolve(
           FS.getPath(link.parent),
-          link.node_ops.readlink(link)
+          link.node_ops.readlink(link),
         );
       },
       stat: (path, dontFollow) => {
@@ -2380,7 +2380,7 @@ var createFFmpegCore = (() => {
           buffer,
           offset,
           length,
-          position
+          position,
         );
         if (!seeking) stream.position += bytesRead;
         return bytesRead;
@@ -2416,7 +2416,7 @@ var createFFmpegCore = (() => {
           offset,
           length,
           position,
-          canOwn
+          canOwn,
         );
         if (!seeking) stream.position += bytesWritten;
         return bytesWritten;
@@ -2464,7 +2464,7 @@ var createFFmpegCore = (() => {
           buffer,
           offset,
           length,
-          mmapFlags
+          mmapFlags,
         );
       },
       munmap: (stream) => 0,
@@ -2578,7 +2578,7 @@ var createFFmpegCore = (() => {
             },
           },
           {},
-          "/proc/self/fd"
+          "/proc/self/fd",
         );
       },
       createStandardStreams: () => {
@@ -2703,7 +2703,7 @@ var createFFmpegCore = (() => {
       createFile: (parent, name, properties, canRead, canWrite) => {
         var path = PATH.join2(
           typeof parent == "string" ? parent : FS.getPath(parent),
-          name
+          name,
         );
         var mode = FS_getMode(canRead, canWrite);
         return FS.create(path, mode);
@@ -2734,7 +2734,7 @@ var createFFmpegCore = (() => {
       createDevice: (parent, name, input, output) => {
         var path = PATH.join2(
           typeof parent == "string" ? parent : FS.getPath(parent),
-          name
+          name,
         );
         var mode = FS_getMode(!!input, !!output);
         if (!FS.createDevice.major) FS.createDevice.major = 64;
@@ -2790,7 +2790,7 @@ var createFFmpegCore = (() => {
           return true;
         if (typeof XMLHttpRequest != "undefined") {
           throw new Error(
-            "Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread."
+            "Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.",
           );
         } else if (read_) {
           try {
@@ -2829,7 +2829,7 @@ var createFFmpegCore = (() => {
               !((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304)
             )
               throw new Error(
-                "Couldn't load " + url + ". Status: " + xhr.status
+                "Couldn't load " + url + ". Status: " + xhr.status,
               );
             var datalength = Number(xhr.getResponseHeader("Content-length"));
             var header;
@@ -2848,11 +2848,11 @@ var createFFmpegCore = (() => {
                     from +
                     ", " +
                     to +
-                    ") or no bytes requested!"
+                    ") or no bytes requested!",
                 );
               if (to > datalength - 1)
                 throw new Error(
-                  "only " + datalength + " bytes available! programmer error!"
+                  "only " + datalength + " bytes available! programmer error!",
                 );
               var xhr = new XMLHttpRequest();
               xhr.open("GET", url, false);
@@ -2867,7 +2867,7 @@ var createFFmpegCore = (() => {
                 !((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304)
               )
                 throw new Error(
-                  "Couldn't load " + url + ". Status: " + xhr.status
+                  "Couldn't load " + url + ". Status: " + xhr.status,
                 );
               if (xhr.response !== undefined) {
                 return new Uint8Array(xhr.response || []);
@@ -2891,7 +2891,7 @@ var createFFmpegCore = (() => {
               datalength = this.getter(0).length;
               chunkSize = datalength;
               out(
-                "LazyFiles on gzip forces download of the whole file when length is accessed"
+                "LazyFiles on gzip forces download of the whole file when length is accessed",
               );
             }
             this._length = datalength;
@@ -3066,7 +3066,7 @@ var createFFmpegCore = (() => {
       readfds,
       writefds,
       exceptfds,
-      timeout
+      timeout,
     ) {
       try {
         var total = 0;
@@ -3246,7 +3246,7 @@ var createFFmpegCore = (() => {
               var result = /ws[s]?:\/\/([^:]+):(\d+)/.exec(ws.url);
               if (!result) {
                 throw new Error(
-                  "WebSocket URL must be in the format ws(s)://address:port"
+                  "WebSocket URL must be in the format ws(s)://address:port",
                 );
               }
               addr = result[1];
@@ -3318,7 +3318,7 @@ var createFFmpegCore = (() => {
                 "t".charCodeAt(0),
                 (sock.sport & 65280) >> 8,
                 sock.sport & 255,
-              ])
+              ]),
             );
           }
           return peer;
@@ -3512,7 +3512,7 @@ var createFFmpegCore = (() => {
             var dest = SOCKFS.websocket_sock_ops.getPeer(
               sock,
               sock.daddr,
-              sock.dport
+              sock.dport,
             );
             if (dest) {
               if (dest.socket.readyState === dest.socket.CONNECTING) {
@@ -3615,7 +3615,7 @@ var createFFmpegCore = (() => {
               var dest = SOCKFS.websocket_sock_ops.getPeer(
                 sock,
                 sock.daddr,
-                sock.dport
+                sock.dport,
               );
               if (!dest) {
                 throw new FS.ErrnoError(53);
@@ -3644,7 +3644,7 @@ var createFFmpegCore = (() => {
             queued.data = new Uint8Array(
               queuedBuffer,
               queuedOffset + bytesRead,
-              bytesRemaining
+              bytesRemaining,
             );
             sock.recv_queue.unshift(queued);
           }
@@ -3796,7 +3796,7 @@ var createFFmpegCore = (() => {
             newsock.family,
             DNS.lookup_name(newsock.daddr),
             newsock.dport,
-            addrlen
+            addrlen,
           );
         }
         return newsock.stream.fd;
@@ -4055,10 +4055,10 @@ var createFFmpegCore = (() => {
             type = FS.isChrdev(child.mode)
               ? 2
               : FS.isDir(child.mode)
-              ? 4
-              : FS.isLink(child.mode)
-              ? 10
-              : 8;
+                ? 4
+                : FS.isLink(child.mode)
+                  ? 10
+                  : 8;
           }
           HEAP64[(dirp + pos) >> 3] = BigInt(id);
           HEAP64[(dirp + pos + 8) >> 3] = BigInt((idx + 1) * struct_size);
@@ -4086,7 +4086,7 @@ var createFFmpegCore = (() => {
           sock.family,
           DNS.lookup_name(sock.daddr),
           sock.dport,
-          addrlen
+          addrlen,
         );
         return 0;
       } catch (e) {
@@ -4102,7 +4102,7 @@ var createFFmpegCore = (() => {
           sock.family,
           DNS.lookup_name(sock.saddr || "0.0.0.0"),
           sock.sport,
-          addrlen
+          addrlen,
         );
         return 0;
       } catch (e) {
@@ -4270,7 +4270,7 @@ var createFFmpegCore = (() => {
             sock.family,
             DNS.lookup_name(msg.addr),
             msg.port,
-            addrlen
+            addrlen,
           );
         }
         HEAPU8.set(msg.buffer, buf);
@@ -4316,7 +4316,7 @@ var createFFmpegCore = (() => {
           message,
           length,
           dest.addr,
-          dest.port
+          dest.port,
         );
       } catch (e) {
         if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
@@ -4426,7 +4426,7 @@ var createFFmpegCore = (() => {
         HEAP32[(tmPtr + 8) >> 2],
         HEAP32[(tmPtr + 4) >> 2],
         HEAP32[tmPtr >> 2],
-        0
+        0,
       );
       var dst = HEAP32[(tmPtr + 32) >> 2];
       var guessedOffset = date.getTimezoneOffset();
@@ -4436,7 +4436,7 @@ var createFFmpegCore = (() => {
       var dstOffset = Math.min(winterOffset, summerOffset);
       if (dst < 0) {
         HEAP32[(tmPtr + 32) >> 2] = Number(
-          summerOffset != winterOffset && dstOffset == guessedOffset
+          summerOffset != winterOffset && dstOffset == guessedOffset,
         );
       } else if (dst > 0 != (dstOffset == guessedOffset)) {
         var nonDstOffset = Math.max(winterOffset, summerOffset);
@@ -4525,7 +4525,7 @@ var createFFmpegCore = (() => {
       while ((ch = HEAPU8[sigPtr++])) {
         buf += (ch != 105) & buf;
         readEmAsmArgsArray.push(
-          ch == 105 ? HEAP32[buf] : (ch == 106 ? HEAP64 : HEAPF64)[buf++ >> 1]
+          ch == 105 ? HEAP32[buf] : (ch == 106 ? HEAP64 : HEAPF64)[buf++ >> 1],
         );
         ++buf;
       }
@@ -4573,11 +4573,11 @@ var createFFmpegCore = (() => {
         var overGrownHeapSize = oldSize * (1 + 0.2 / cutDown);
         overGrownHeapSize = Math.min(
           overGrownHeapSize,
-          requestedSize + 100663296
+          requestedSize + 100663296,
         );
         var newSize = Math.min(
           maxHeapSize,
-          alignUp(Math.max(requestedSize, overGrownHeapSize), 65536)
+          alignUp(Math.max(requestedSize, overGrownHeapSize), 65536),
         );
         var replacement = emscripten_realloc_buffer(newSize);
         if (replacement) {
@@ -4679,10 +4679,10 @@ var createFFmpegCore = (() => {
           var type = stream.tty
             ? 2
             : FS.isDir(stream.mode)
-            ? 3
-            : FS.isLink(stream.mode)
-            ? 7
-            : 4;
+              ? 3
+              : FS.isLink(stream.mode)
+                ? 7
+                : 4;
         }
         HEAP8[pbuf >> 0] = type;
         HEAP16[(pbuf + 2) >> 1] = flags;
@@ -5015,7 +5015,7 @@ var createFFmpegCore = (() => {
       for (var rule in EXPANSION_RULES_1) {
         pattern = pattern.replace(
           new RegExp(rule, "g"),
-          EXPANSION_RULES_1[rule]
+          EXPANSION_RULES_1[rule],
         );
       }
       var WEEKDAYS = [
@@ -5084,7 +5084,7 @@ var createFFmpegCore = (() => {
       function getWeekBasedYear(date) {
         var thisDate = addDays(
           new Date(date.tm_year + 1900, 0, 1),
-          date.tm_yday
+          date.tm_yday,
         );
         var janFourthThisYear = new Date(thisDate.getFullYear(), 0, 4);
         var janFourthNextYear = new Date(thisDate.getFullYear() + 1, 0, 4);
@@ -5143,9 +5143,9 @@ var createFFmpegCore = (() => {
                 isLeapYear(date.tm_year + 1900)
                   ? MONTH_DAYS_LEAP
                   : MONTH_DAYS_REGULAR,
-                date.tm_mon - 1
+                date.tm_mon - 1,
               ),
-            3
+            3,
           );
         },
         "%m": function (date) {
@@ -5178,7 +5178,7 @@ var createFFmpegCore = (() => {
         },
         "%V": function (date) {
           var val = Math.floor(
-            (date.tm_yday + 7 - ((date.tm_wday + 6) % 7)) / 7
+            (date.tm_yday + 7 - ((date.tm_wday + 6) % 7)) / 7,
           );
           if ((date.tm_wday + 371 - date.tm_yday - 2) % 7 <= 2) {
             val++;
@@ -5230,7 +5230,7 @@ var createFFmpegCore = (() => {
         if (pattern.includes(rule)) {
           pattern = pattern.replace(
             new RegExp(rule, "g"),
-            EXPANSION_RULES_2[rule](date)
+            EXPANSION_RULES_2[rule](date),
           );
         }
       }
@@ -5369,7 +5369,7 @@ var createFFmpegCore = (() => {
     var _malloc = (Module["_malloc"] = function () {
       return (_malloc = Module["_malloc"] = Module["asm"]["ta"]).apply(
         null,
-        arguments
+        arguments,
       );
     });
     var ___errno_location = function () {
@@ -5384,13 +5384,13 @@ var createFFmpegCore = (() => {
     var _ffmpeg = (Module["_ffmpeg"] = function () {
       return (_ffmpeg = Module["_ffmpeg"] = Module["asm"]["ya"]).apply(
         null,
-        arguments
+        arguments,
       );
     });
     var _ffprobe = (Module["_ffprobe"] = function () {
       return (_ffprobe = Module["_ffprobe"] = Module["asm"]["za"]).apply(
         null,
-        arguments
+        arguments,
       );
     });
     var _htonl = function () {
@@ -5399,7 +5399,7 @@ var createFFmpegCore = (() => {
     var _emscripten_builtin_memalign = function () {
       return (_emscripten_builtin_memalign = Module["asm"]["Ba"]).apply(
         null,
-        arguments
+        arguments,
       );
     };
     var _setThrew = function () {
@@ -5414,7 +5414,7 @@ var createFFmpegCore = (() => {
     var ___cxa_is_pointer_type = function () {
       return (___cxa_is_pointer_type = Module["asm"]["Fa"]).apply(
         null,
-        arguments
+        arguments,
       );
     };
     var _ff_h264_cabac_tables = (Module["_ff_h264_cabac_tables"] = 1546732);

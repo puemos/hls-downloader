@@ -4,7 +4,7 @@ export const writeToBucketFactory = (fs: IFS) => {
   const run = async (
     bucketID: string,
     index: number,
-    data: ArrayBuffer
+    data: ArrayBuffer,
   ): Promise<void> => {
     const bucket = await fs.getBucket(bucketID);
     await bucket.write(index, data);

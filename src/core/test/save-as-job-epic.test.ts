@@ -19,13 +19,13 @@ describe("saveAsJobEpic", () => {
       config: { saveDialog: true },
     };
     const result = await firstValueFrom(
-      saveAsJobEpic(action$, { value: state } as any, { fs } as any)
+      saveAsJobEpic(action$, { value: state } as any, { fs } as any),
     );
     expect(fs.saveAs).toHaveBeenCalledWith("file.mp4", "link", {
       dialog: true,
     });
     expect(result).toEqual(
-      jobsSlice.actions.saveAsSuccess({ jobId: "1", link: "link" })
+      jobsSlice.actions.saveAsSuccess({ jobId: "1", link: "link" }),
     );
   });
 });

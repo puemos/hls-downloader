@@ -8,7 +8,7 @@ describe("deleteJobEpic", () => {
     const fs = { deleteBucket: vi.fn().mockResolvedValue(undefined) };
     const action$ = of(jobsSlice.actions.delete({ jobId: "1" }));
     const result = await firstValueFrom(
-      deleteJobEpic(action$, {} as any, { fs } as any)
+      deleteJobEpic(action$, {} as any, { fs } as any),
     );
     expect(fs.deleteBucket).toHaveBeenCalledWith("1");
     expect(result).toEqual(jobsSlice.actions.deleteSuccess({ jobId: "1" }));

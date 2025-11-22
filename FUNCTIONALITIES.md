@@ -9,6 +9,7 @@ This document outlines what the extension delivers today across detection, selec
 
 ## Playlist Parsing and Selection
 - **Master playlist parsing**: Retrieves master manifests and extracts stream and audio renditions, including bitrate, resolution, and FPS, sorted from highest to lowest quality.
+- **Subtitle/CC detection**: Parses SUBTITLES and CLOSED-CAPTIONS media groups when provided, exposing downloadable subtitle tracks alongside audio/video.
 - **Level filtering**: Only playlists that parse successfully move to the “ready” state and appear in the UI lists.
 - **Quality selection**: Users can pick one video rendition and, when available, a separate audio rendition before downloading.
 - **Metadata visibility**: For selected levels, the UI shows URIs plus technical metadata (bitrate, resolution, FPS).
@@ -21,6 +22,7 @@ This document outlines what the extension delivers today across detection, selec
 - **FFmpeg-based muxing**: Uses ffmpeg.wasm to concatenate and mux audio/video fragments into MP4. Supports video-only or audio-only cases gracefully.
 - **Offscreen support for MV3**: Creates an offscreen document (when available) to generate object URLs for downloads without blocking the service worker.
 - **Save flow**: Downloads API saves the produced MP4, honoring the user’s save dialog preference and uniquifying filenames when conflicts occur.
+- **Subtitle export**: When a subtitle/CC track is selected, its playlist is fetched and concatenated to a `.vtt` file that is saved via the browser downloads API.
 
 ## UI Modules
 - **Sniffer tab**: Lists detected playlists with filter, copy-URLs, clear-all, and per-item drill-in to select tracks.
@@ -38,4 +40,3 @@ This document outlines what the extension delivers today across detection, selec
 ## Build and Compatibility
 - **Manifest variants**: Supports MV2 and MV3 builds; MV3 uses offscreen documents for blob URL creation.
 - **Browser coverage**: Works across Firefox and Chromium-based browsers with manual load options where stores are unavailable.
-

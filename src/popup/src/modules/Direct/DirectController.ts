@@ -37,7 +37,7 @@ const useSnifferController = () => {
         uri: directURI,
         createdAt: Date.now(),
         initiator: "Direct",
-      })
+      }),
     );
   }
 

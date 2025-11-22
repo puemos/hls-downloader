@@ -32,7 +32,7 @@ describe("root epic", () => {
 
     // Execute
     const result = await firstValueFrom(
-      rootEpic(action$, { value: mockState } as any, mockDependencies)
+      rootEpic(action$, { value: mockState } as any, mockDependencies),
     );
 
     // Verify
@@ -56,7 +56,7 @@ describe("root epic", () => {
 
     // Create an action that will trigger a chain of epic responses
     const action$ = of(
-      playlistsSlice.actions.fetchPlaylistLevels({ playlistID: "1" })
+      playlistsSlice.actions.fetchPlaylistLevels({ playlistID: "1" }),
     );
 
     // Create array to collect results
@@ -66,7 +66,7 @@ describe("root epic", () => {
     const subscription = rootEpic(
       action$,
       { value: mockState } as any,
-      mockDependencies
+      mockDependencies,
     ).subscribe((action) => {
       results.push(action);
 
@@ -74,7 +74,7 @@ describe("root epic", () => {
       if (results.length === 2) {
         // We should get fetchPlaylistLevelsSuccess and add levels actions
         expect(results[0].type).toBe(
-          playlistsSlice.actions.fetchPlaylistLevelsSuccess.type
+          playlistsSlice.actions.fetchPlaylistLevelsSuccess.type,
         );
         expect(results[1].type).toBe(levelsSlice.actions.add.type);
 
@@ -100,7 +100,7 @@ describe("root epic", () => {
 
     // Execute
     const result = await firstValueFrom(
-      rootEpic(action$, { value: mockState } as any, mockDependencies)
+      rootEpic(action$, { value: mockState } as any, mockDependencies),
     );
 
     // Verify
@@ -111,7 +111,7 @@ describe("root epic", () => {
   it("supports dynamic epic addition and updates", () => {
     // Create a custom epic to test dynamic epic addition
     const customEpic: Epic<RootAction, RootAction, RootState, Dependencies> = (
-      action$
+      action$,
     ) =>
       action$.pipe(
         // Map any action to a test action
@@ -126,7 +126,7 @@ describe("root epic", () => {
               error: (err) => observer.error(err),
               complete: () => observer.complete(),
             });
-          })
+          }),
       );
 
     // Get the private BehaviorSubject from root epic
@@ -137,7 +137,7 @@ describe("root epic", () => {
     const output$ = rootEpic(
       action$,
       { value: mockState } as any,
-      mockDependencies
+      mockDependencies,
     );
 
     const results: any[] = [];

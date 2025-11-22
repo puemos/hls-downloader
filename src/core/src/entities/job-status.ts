@@ -1,4 +1,10 @@
-type JobStatusType = "downloading" | "done" | "ready" | "init" | "saving";
+type JobStatusType =
+  | "downloading"
+  | "done"
+  | "ready"
+  | "init"
+  | "saving"
+  | "error";
 
 export interface JobStatus {
   status: JobStatusType;
@@ -6,4 +12,5 @@ export interface JobStatus {
   done: number;
   saveProgress?: number;
   saveMessage?: string;
+  errorMessage?: string;
 }

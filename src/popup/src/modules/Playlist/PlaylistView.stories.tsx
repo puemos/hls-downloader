@@ -18,7 +18,7 @@ const videoLevel = new Level(
   1280,
   720,
   3000000,
-  30
+  30,
 );
 const audioLevel = new Level("audio", "a1", "p1", "audio.m3u8");
 

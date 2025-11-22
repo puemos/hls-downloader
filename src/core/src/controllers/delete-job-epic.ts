@@ -19,7 +19,7 @@ export const deleteJobEpic: Epic<
     }),
     mergeMap(
       (jobId) => from(deleteBucketFactory(fs)(jobId)),
-      (jobId) => ({ jobId })
+      (jobId) => ({ jobId }),
     ),
-    mergeMap(({ jobId }) => of(jobsSlice.actions.deleteSuccess({ jobId })))
+    mergeMap(({ jobId }) => of(jobsSlice.actions.deleteSuccess({ jobId }))),
   );

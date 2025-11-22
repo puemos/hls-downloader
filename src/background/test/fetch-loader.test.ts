@@ -74,7 +74,7 @@ describe("FetchLoader", () => {
       globalThis.fetch = fetchMock;
 
       await expect(fetchText("https://example.com", 0)).rejects.toThrow(
-        "Attempts less then 1"
+        "Attempts less then 1",
       );
       expect(fetchMock).not.toHaveBeenCalled();
     });

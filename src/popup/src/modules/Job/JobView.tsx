@@ -33,10 +33,12 @@ const JobView = ({
     return null;
   }
 
+  const isError = status?.status === "error";
+
   return (
     <div
       className={cn(
-        "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm min-w-0 overflow-hidden"
+        "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm min-w-0 overflow-hidden",
       )}
     >
       <div className="flex flex-col items-start justify-between w-full mb-1 min-w-0">
@@ -79,6 +81,11 @@ const JobView = ({
         {["saving"].includes(status?.status!) && (
           <JobSavingView status={status!} />
         )}
+        {isError && (
+          <div className="w-full rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">
+            {status?.errorMessage || "Download failed. Please retry or delete."}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-row-reverse w-full gap-2 flex-shrink-0">
@@ -102,7 +109,7 @@ const JobView = ({
             <Trash2Icon className="w-4 h-4 mr-2" /> Cancel
           </Button>
         )}
-        {["ready", "done", "saving"].includes(status?.status!) && (
+        {["ready", "done", "saving", "error"].includes(status?.status!) && (
           <Button size="sm" variant="secondary" onClick={deleteJob}>
             <Trash2Icon className="w-4 h-4 mr-2" /> Delete
           </Button>

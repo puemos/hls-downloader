@@ -7,10 +7,13 @@ interface Props {
   status: PlaylistStatus | null;
   videoLevels: Level[];
   audioLevels: Level[];
+  subtitleLevels: Level[];
   selectedVideoId?: string;
   selectedAudioId?: string;
+  selectedSubtitleId?: string;
   onSelectVideo: (id: string) => void;
   onSelectAudio: (id: string) => void;
+  onSelectSubtitle: (id: string) => void;
   onDownload: () => void;
   canDownload: boolean;
 }
@@ -19,10 +22,13 @@ const PlaylistView = ({
   status,
   videoLevels,
   audioLevels,
+  subtitleLevels,
   selectedVideoId,
   selectedAudioId,
+  selectedSubtitleId,
   onSelectVideo,
   onSelectAudio,
+  onSelectSubtitle,
   onDownload,
   canDownload,
 }: Props) => {
@@ -93,75 +99,109 @@ const PlaylistView = ({
       return id || "Unknown";
     }
 
+    function getSubtitleDetails(item: Level) {
+      return [
+        item.language,
+        item.name && item.name !== item.language ? item.name : undefined,
+        item.characteristics,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }
+
     return (
-      <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
-        {videoLevels.length > 0 && (
-          <div className="border rounded-md p-3 space-y-2">
-            <h3 className="text-sm font-semibold">Video</h3>
-            <select
-              value={selectedVideoId}
-              onChange={(e) => handleSelectVideo(e.target.value)}
-              className="w-full rounded-md border p-2 text-sm bg-transparent"
-            >
-              <option value="" disabled>
-                Select video quality
-              </option>
-              {videoLevels.map((item) => {
-                const details = getVideoDetails(item);
-                return (
-                  <option key={item.id} value={item.id}>
-                    {getDisplayText(item.id, details)}
-                  </option>
-                );
-              })}
-            </select>
-            {selectedVideo && (
-              <>
-                {selectedVideo.uri && (
-                  <div className="text-xs break-all text-muted-foreground">
-                    {selectedVideo.uri}
-                  </div>
-                )}
-                <Metadata metadata={selectedVideo} />
-              </>
-            )}
-          </div>
-        )}
-        {videoLevels.length > 0 && audioLevels.length > 0 && (
-          <Separator className="my-2" />
-        )}
-        {audioLevels.length > 0 && (
-          <div className="border rounded-md p-3 space-y-2">
-            <h3 className="text-sm font-semibold">Audio</h3>
-            <select
-              value={selectedAudioId}
-              onChange={(e) => handleSelectAudio(e.target.value)}
-              className="w-full rounded-md border p-2 text-sm bg-transparent"
-            >
-              <option value="" disabled>
-                Select audio quality
-              </option>
-              {audioLevels.map((item) => {
-                const details = getAudioDetails(item);
-                return (
-                  <option key={item.id} value={item.id}>
-                    {getDisplayText(item.id, details)}
-                  </option>
-                );
-              })}
-            </select>
-            {selectedAudio && (
-              <>
-                {selectedAudio.uri && (
-                  <div className="text-xs break-all text-muted-foreground">
-                    {selectedAudio.uri}
-                  </div>
-                )}
-                <Metadata metadata={selectedAudio} />
-              </>
-            )}
-          </div>
-        )}
+      <ScrollArea>
+        <div className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
+          {videoLevels.length > 0 && (
+            <div className="border rounded-md p-3 space-y-2">
+              <h3 className="text-sm font-semibold">Video</h3>
+              <select
+                value={selectedVideoId}
+                onChange={(e) => handleSelectVideo(e.target.value)}
+                className="w-full rounded-md border p-2 text-sm bg-transparent"
+              >
+                <option value="" disabled>
+                  Select video quality
+                </option>
+                {videoLevels.map((item) => {
+                  const details = getVideoDetails(item);
+                  return (
+                    <option key={item.id} value={item.id}>
+                      {getDisplayText(item.id, details)}
+                    </option>
+                  );
+                })}
+              </select>
+              {selectedVideo && (
+                <>
+                  {selectedVideo.uri && (
+                    <div className="text-xs break-all text-muted-foreground">
+                      {selectedVideo.uri}
+                    </div>
+                  )}
+                  <Metadata metadata={selectedVideo} />
+                </>
+              )}
+            </div>
+          )}
+          {audioLevels.length > 0 && (
+            <div className="border rounded-md p-3 space-y-2">
+              <h3 className="text-sm font-semibold">Audio</h3>
+              <select
+                value={selectedAudioId}
+                onChange={(e) => handleSelectAudio(e.target.value)}
+                className="w-full rounded-md border p-2 text-sm bg-transparent"
+              >
+                <option value="" disabled>
+                  Select audio quality
+                </option>
+                {audioLevels.map((item) => {
+                  const details = getAudioDetails(item);
+                  return (
+                    <option key={item.id} value={item.id}>
+                      {getDisplayText(item.id, details)}
+                    </option>
+                  );
+                })}
+              </select>
+              {selectedAudio && (
+                <>
+                  {selectedAudio.uri && (
+                    <div className="text-xs break-all text-muted-foreground">
+                      {selectedAudio.uri}
+                    </div>
+                  )}
+                  <Metadata metadata={selectedAudio} />
+                </>
+              )}
+            </div>
+          )}
+          {subtitleLevels.length > 0 && (
+            <div className="border rounded-md p-3 space-y-2">
+              <h3 className="text-sm font-semibold">Subtitles / CC</h3>
+              <select
+                value={selectedSubtitleId ?? ""}
+                onChange={(e) => onSelectSubtitle(e.target.value)}
+                className="w-full rounded-md border p-2 text-sm bg-transparent"
+              >
+                <option value="">No subtitles</option>
+                {subtitleLevels.map((item) => {
+                  const details = getSubtitleDetails(item);
+                  return (
+                    <option key={item.id} value={item.id}>
+                      {details || item.id}
+                    </option>
+                  );
+                })}
+              </select>
+              {selectedSubtitleId && (
+                <div className="text-xs text-muted-foreground break-all">
+                  {subtitleLevels.find((s) => s.id === selectedSubtitleId)?.uri}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         <div className="flex flex-row-reverse mt-2">
           <Button
             onClick={onDownload}

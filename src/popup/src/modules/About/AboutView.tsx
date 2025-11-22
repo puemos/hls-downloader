@@ -74,7 +74,7 @@ const AboutView = ({ version, name, description }: Props) => {
           variant="secondary"
           onClick={() =>
             open(
-              "https://github.com/puemos/hls-downloader/blob/master/PRIVACY.md"
+              "https://github.com/puemos/hls-downloader/blob/master/PRIVACY.md",
             )
           }
         >

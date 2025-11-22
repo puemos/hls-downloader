@@ -19,10 +19,10 @@ describe("addPlaylistEpic", () => {
       jobs: { jobs: {}, jobsStatus: {} },
     };
     const result = await firstValueFrom(
-      addPlaylistEpic(action$, { value: state } as any, {} as any)
+      addPlaylistEpic(action$, { value: state } as any, {} as any),
     );
     expect(result).toEqual(
-      playlistsSlice.actions.fetchPlaylistLevels({ playlistID: "1" })
+      playlistsSlice.actions.fetchPlaylistLevels({ playlistID: "1" }),
     );
   });
 });
