@@ -9,7 +9,7 @@ export function setTabListener(store: ReturnType<typeof createStore>) {
         tab: {
           id: details.tabId,
         },
-      })
+      }),
     );
   });
 }

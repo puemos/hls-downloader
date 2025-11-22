@@ -5,7 +5,11 @@ export default defineConfig(({ mode }) => {
   const target = process.env.MV_TARGET === "mv3" ? "mv3" : "mv2";
   const isMv3 = target === "mv3";
   const outDirName = process.env.DIST_DIR ?? "dist";
-  const outDir = resolve(__dirname, "../../", outDirName); /* default shared dist */
+  const outDir = resolve(
+    __dirname,
+    "../../",
+    outDirName,
+  ); /* default shared dist */
 
   return {
     build: {

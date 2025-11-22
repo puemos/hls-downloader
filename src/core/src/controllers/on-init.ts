@@ -15,5 +15,5 @@ export const fsCleanupOnInitEpic: Epic<
   action$.pipe(
     ofType("init/start"),
     mergeMap(() => from(fsCleanupFactory(fs)())),
-    mergeMap(() => of(createAction("init/done")()))
+    mergeMap(() => of(createAction("init/done")())),
   );

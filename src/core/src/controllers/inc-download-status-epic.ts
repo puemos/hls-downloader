@@ -24,7 +24,7 @@ export const incDownloadStatusEpic: Epic<
         }),
         jobsSlice.actions.saveAs({
           jobId: id,
-        })
+        }),
       );
-    })
+    }),
   );

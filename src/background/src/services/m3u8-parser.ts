@@ -63,7 +63,10 @@ export const M3u8Parser: IParser = {
     const parser = new Parser();
     parser.push(string);
     const playlists = parser.manifest?.playlists ?? [];
-    const audioPlaylists = parser.manifest?.mediaGroups?.AUDIO ?? {};
+    const mediaGroups = parser.manifest?.mediaGroups ?? {};
+    const audioPlaylists = mediaGroups.AUDIO ?? {};
+    const subtitlePlaylists = mediaGroups.SUBTITLES ?? {};
+    const closedCaptions = mediaGroups["CLOSED-CAPTIONS"] ?? {};
     const results = playlists.map((playlist) => ({
       type: "stream" as LevelType,
       id: v4(),
@@ -87,11 +90,61 @@ export const M3u8Parser: IParser = {
             fps: undefined,
             width: undefined,
             height: undefined,
+            language: entry.language ?? entry.lang,
+            name: entry.name ?? label,
+            characteristics: entry.characteristics,
+            channels: entry.channels,
           };
         });
-      }
+      },
     );
 
-    return results.concat(audioResults);
+    const subtitleResults = Object.entries(subtitlePlaylists).flatMap(
+      ([groupId, entries]) => {
+        return Object.entries(entries)
+          .map(([label, entry]) => {
+            if (!entry.uri) {
+              return null;
+            }
+            return {
+              type: "subtitle" as LevelType,
+              id: `${label}-${groupId}`,
+              playlistID: baseurl,
+              uri: buildAbsoluteURL(baseurl, entry.uri),
+              language: entry.language ?? entry.lang,
+              name: entry.name ?? label,
+              characteristics: entry.characteristics,
+            };
+          })
+          .flatMap((entry) => (entry ? [entry] : []));
+      },
+    );
+
+    const closedCaptionResults = Object.entries(closedCaptions).flatMap(
+      ([groupId, entries]) => {
+        return Object.entries(entries)
+          .map(([label, entry]) => {
+            if (!entry.uri) {
+              return null;
+            }
+            return {
+              type: "subtitle" as LevelType,
+              id: `${label}-${groupId}-cc`,
+              playlistID: baseurl,
+              uri: buildAbsoluteURL(baseurl, entry.uri),
+              language: entry.language ?? entry.lang,
+              name: entry.name ?? label,
+              characteristics: entry.characteristics,
+              instreamId: entry.instreamId,
+            };
+          })
+          .flatMap((entry) => (entry ? [entry] : []));
+      },
+    );
+
+    return results
+      .concat(audioResults)
+      .concat(subtitleResults)
+      .concat(closedCaptionResults);
   },
 };

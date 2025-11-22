@@ -15,7 +15,7 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
       }
 
       const contentTypeHeader = details.responseHeaders?.find(
-        (h) => h.name.toLowerCase() === "content-type"
+        (h) => h.name.toLowerCase() === "content-type",
       );
 
       const contentType = contentTypeHeader?.value?.toLowerCase() || "";
@@ -49,7 +49,7 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
           initiator: tab.url,
           pageTitle: tab.title,
           createdAt: Date.now(),
-        })
+        }),
       );
 
       const unsubscribe = store.subscribe(() => {
@@ -81,6 +81,6 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
         "https://*/*.m3u8?*",
       ],
     },
-    ["responseHeaders"]
+    ["responseHeaders"],
   );
 }

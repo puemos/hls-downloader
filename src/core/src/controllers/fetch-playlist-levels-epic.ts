@@ -22,20 +22,20 @@ export const fetchPlaylistLevelsEpic: Epic<
         from(
           getLevelsFactory(loader, parser)(
             uri,
-            store$.value.config.fetchAttempts
-          )
+            store$.value.config.fetchAttempts,
+          ),
         ),
       ({ id }, levels) => ({
         levels,
         playlistID: id,
-      })
+      }),
     ),
     mergeMap(({ playlistID, levels }) => {
       if (levels.length === 0) {
         return of(
           playlistsSlice.actions.fetchPlaylistLevelsFailed({
             playlistID,
-          })
+          }),
         );
       }
       return of(
@@ -44,7 +44,7 @@ export const fetchPlaylistLevelsEpic: Epic<
         }),
         levelsSlice.actions.add({
           levels,
-        })
+        }),
       );
-    })
+    }),
   );

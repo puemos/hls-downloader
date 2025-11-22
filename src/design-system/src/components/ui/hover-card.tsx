@@ -13,7 +13,7 @@ const HoverCardContent = React.forwardRef<
     ref={ref}
     className={cn(
       "z-50 w-64 rounded-md border bg-popover p-2 text-popover-foreground shadow-md outline-none",
-      className
+      className,
     )}
     {...props}
   />

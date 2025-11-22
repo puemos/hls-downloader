@@ -25,14 +25,14 @@ describe("jobs slice", () => {
 
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.add({ job })
+        jobsSlice.actions.add({ job }),
       );
 
       expect(nextState.jobs["job1"]).toEqual(job);
       expect(nextState.jobsStatus["job1"]).toBeDefined();
       expect(nextState.jobsStatus["job1"]?.status).toBe("downloading");
       expect(nextState.jobsStatus["job1"]?.total).toBe(
-        job.videoFragments.length + job.audioFragments.length
+        job.videoFragments.length + job.audioFragments.length,
       );
       expect(nextState.jobsStatus["job1"]?.done).toBe(0);
     });
@@ -58,7 +58,7 @@ describe("jobs slice", () => {
 
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.add({ job })
+        jobsSlice.actions.add({ job }),
       );
 
       expect(nextState.jobsStatus["job1"]?.total).toBe(5); // 2 video + 3 audio
@@ -82,7 +82,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.incDownloadStatus({ jobId: "job1" })
+        jobsSlice.actions.incDownloadStatus({ jobId: "job1" }),
       );
 
       expect(state.jobsStatus["job1"]?.done).toBe(3);
@@ -106,7 +106,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.finishDownload({ jobId: "job1" })
+        jobsSlice.actions.finishDownload({ jobId: "job1" }),
       );
 
       expect(state.jobsStatus["job1"]?.status).toBe("ready");
@@ -131,7 +131,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.saveAs({ jobId: "job1" })
+        jobsSlice.actions.saveAs({ jobId: "job1" }),
       );
 
       expect(state.jobsStatus["job1"]?.status).toBe("saving");
@@ -158,7 +158,7 @@ describe("jobs slice", () => {
         jobsSlice.actions.saveAsSuccess({
           jobId: "job1",
           link: "file://test.mp4",
-        })
+        }),
       );
 
       expect(state.jobs["job1"]?.link).toBe("file://test.mp4");
@@ -180,7 +180,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.saveAsSuccess({ jobId: "job1" })
+        jobsSlice.actions.saveAsSuccess({ jobId: "job1" }),
       );
 
       expect(state.jobs["job1"]?.link).toBeUndefined();
@@ -209,7 +209,7 @@ describe("jobs slice", () => {
           jobId: "job1",
           progress: 75,
           message: "Preparing file",
-        })
+        }),
       );
 
       expect(state.jobsStatus["job1"]?.saveProgress).toBe(75);
@@ -230,7 +230,7 @@ describe("jobs slice", () => {
           jobId: "job1",
           progress: 75,
           message: "Preparing file",
-        })
+        }),
       );
 
       expect(state.jobsStatus["job1"]).toBeUndefined();
@@ -262,7 +262,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.deleteSuccess({ jobId: "job1" })
+        jobsSlice.actions.deleteSuccess({ jobId: "job1" }),
       );
 
       expect(state.jobs["job1"]).toBeUndefined();
@@ -307,7 +307,7 @@ describe("jobs slice", () => {
       const initialState = { jobs: {}, jobsStatus: {} };
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.download({ jobId: "job1" })
+        jobsSlice.actions.download({ jobId: "job1" }),
       );
       expect(nextState).toEqual(initialState);
     });
@@ -316,7 +316,7 @@ describe("jobs slice", () => {
       const initialState = { jobs: {}, jobsStatus: {} };
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.cancel({ jobId: "job1" })
+        jobsSlice.actions.cancel({ jobId: "job1" }),
       );
       expect(nextState).toEqual(initialState);
     });
@@ -325,7 +325,7 @@ describe("jobs slice", () => {
       const initialState = { jobs: {}, jobsStatus: {} };
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.delete({ jobId: "job1" })
+        jobsSlice.actions.delete({ jobId: "job1" }),
       );
       expect(nextState).toEqual(initialState);
     });

@@ -10,6 +10,9 @@ export class Job {
     readonly width?: number,
     readonly height?: number,
     readonly bitrate?: number,
-    readonly link?: string
+    readonly link?: string,
+    readonly subtitleText?: string,
+    readonly subtitleLanguage?: string,
+    readonly subtitleName?: string,
   ) {}
 }

@@ -7,6 +7,7 @@ type OffscreenRequest = {
   requestId?: string;
   videoLength?: number;
   audioLength?: number;
+  subtitle?: { text: string; language?: string; name?: string };
 };
 
 type OffscreenResponse =
@@ -26,18 +27,22 @@ chrome.runtime.onMessage.addListener(
           sendResponse({
             ok: false,
             message: (error as Error)?.message || "Failed to create object URL",
-          })
+          }),
         );
       return true;
     }
-  }
+  },
 );
 
 async function handleCreateObjectUrl(
-  message: OffscreenRequest
+  message: OffscreenRequest,
 ): Promise<OffscreenResponse> {
   if (!message.bucketId) {
     return { ok: false, message: "Missing bucketId" };
+  }
+
+  if (message.subtitle) {
+    await IndexedDBFS.setSubtitleText(message.bucketId, message.subtitle);
   }
 
   let bucket = await IndexedDBFS.getBucket(message.bucketId);
@@ -49,9 +54,12 @@ async function handleCreateObjectUrl(
       await IndexedDBFS.createBucket(
         message.bucketId,
         message.videoLength,
-        message.audioLength
+        message.audioLength,
       );
       bucket = await IndexedDBFS.getBucket(message.bucketId);
+      if (message.subtitle) {
+        await IndexedDBFS.setSubtitleText(message.bucketId, message.subtitle);
+      }
     }
   }
 

@@ -27,6 +27,10 @@ export interface IFinishJobDownloadPayload {
 export interface IIncJobDownloadStatusPayload {
   jobId: string;
 }
+export interface IDownloadJobFailedPayload {
+  jobId: string;
+  message: string;
+}
 export interface ISaveAsJobPayload {
   jobId: string;
 }
@@ -54,6 +58,10 @@ interface IJobsReducers {
   incDownloadStatus: CaseReducer<
     IJobsState,
     PayloadAction<IIncJobDownloadStatusPayload>
+  >;
+  downloadFailed: CaseReducer<
+    IJobsState,
+    PayloadAction<IDownloadJobFailedPayload>
   >;
   saveAs: CaseReducer<IJobsState, PayloadAction<ISaveAsJobPayload>>;
   saveAsSuccess: CaseReducer<
@@ -105,9 +113,17 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
       jobStatus.done = jobStatus.total;
       jobStatus.status = "ready";
     },
+    downloadFailed(state, action: PayloadAction<IDownloadJobFailedPayload>) {
+      const { jobId, message } = action.payload;
+      const jobStatus = state.jobsStatus[jobId];
+      if (jobStatus) {
+        jobStatus.status = "error";
+        jobStatus.errorMessage = message;
+      }
+    },
     incDownloadStatus(
       state,
-      action: PayloadAction<IIncJobDownloadStatusPayload>
+      action: PayloadAction<IIncJobDownloadStatusPayload>,
     ) {
       const { jobId: jobId } = action.payload;
       const jobStatus = state.jobsStatus[jobId]!;

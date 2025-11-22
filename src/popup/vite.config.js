@@ -3,7 +3,11 @@ import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 
 const outDirName = process.env.DIST_DIR ?? "dist";
-const outDir = resolve(__dirname, "../../", outDirName); /* default shared dist */
+const outDir = resolve(
+  __dirname,
+  "../../",
+  outDirName,
+); /* default shared dist */
 
 export default defineConfig({
   build: {

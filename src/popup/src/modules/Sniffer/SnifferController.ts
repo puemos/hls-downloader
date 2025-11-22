@@ -63,7 +63,7 @@ const useSnifferController = (): ReturnType => {
   const playlists = Object.values(playlistsRecord)
     .filter(isPlaylist)
     .filter(
-      (playlist) => playlistsStatusRecord[playlist.id]?.status === "ready"
+      (playlist) => playlistsStatusRecord[playlist.id]?.status === "ready",
     )
     .filter(playlistFilter(filter));
 
