@@ -43,14 +43,6 @@ export async function muxStreams({
   }
   await writeSubtitles(ffmpeg, subtitleText);
 
-  console.log("[mux] start", {
-    hasVideo,
-    hasAudio,
-    includeSubtitles,
-    subtitleLanguage,
-    outputFileName,
-  });
-
   const args: string[] = ["-y"];
 
   if (hasVideo) {
@@ -98,8 +90,6 @@ export async function muxStreams({
   }
 
   args.push("-shortest", outputFileName);
-
-  console.log("[mux] args", args);
 
   try {
     await ffmpeg.exec(args);

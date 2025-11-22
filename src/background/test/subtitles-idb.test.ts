@@ -1,24 +1,17 @@
-import { describe, expect, beforeEach, test, vi } from "vitest";
-import FDBFactory from "fake-indexeddb/lib/FDBFactory";
-import { setSubtitleText, getSubtitleText } from "../src/services/indexedb-fs";
+import "fake-indexeddb/auto";
+import { describe, expect, afterEach, test, vi } from "vitest";
+import { openDB } from "idb";
+import {
+  IndexedDBFS,
+  setSubtitleText,
+  getSubtitleText,
+} from "../src/services/indexedb-fs";
 
 vi.mock("webextension-polyfill", () => {
-  const storageStore: Record<string, any> = {};
   const storageMock = {
     local: {
-      get: vi.fn(async (key: string | string[]) => {
-        if (Array.isArray(key)) {
-          const res: Record<string, any> = {};
-          key.forEach((k) => {
-            res[k] = storageStore[k];
-          });
-          return res;
-        }
-        return { [key]: storageStore[key] };
-      }),
-      set: vi.fn(async (obj: Record<string, any>) => {
-        Object.assign(storageStore, obj);
-      }),
+      get: vi.fn(async () => ({})),
+      set: vi.fn(async () => undefined),
     },
   };
 
@@ -35,29 +28,51 @@ vi.mock("webextension-polyfill", () => {
 });
 
 describe("subtitle storage in IDB", () => {
-  beforeEach(() => {
-    // Reset indexedDB for each test
-    // @ts-expect-error fake-indexeddb provides IndexedDB implementation
-    globalThis.indexedDB = new FDBFactory();
+  afterEach(async () => {
+    await IndexedDBFS.cleanup();
+    vi.clearAllMocks();
   });
 
-  test("stores and retrieves subtitle text from IDB by job id", async () => {
+  test("stores subtitles in IndexedDB by job id", async () => {
     const jobId = "job-123";
-    await setSubtitleText(jobId, {
+    const subtitleRecord = {
       text: "WEBVTT\n\n1\n00:00:00.000 --> 00:00:02.000\nHello",
       language: "en",
       name: "English",
-    });
+    };
+    const { storage } =
+      (await vi.importMock("webextension-polyfill")) as unknown as {
+        storage: {
+          local: { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn> };
+        };
+      };
+
+    await setSubtitleText(jobId, subtitleRecord);
+
+    const db = await openDB("subtitles", 1);
+    const stored = await db.get("subtitles", jobId);
+    db.close();
+
+    expect(stored).toEqual({ id: jobId, ...subtitleRecord });
 
     const subtitle = await getSubtitleText(jobId);
-
-    expect(subtitle).toBeDefined();
-    expect(subtitle?.text).toContain("Hello");
-    expect(subtitle?.language).toBe("en");
+    expect(subtitle).toEqual(subtitleRecord);
+    expect(storage.local.get).not.toHaveBeenCalled();
+    expect(storage.local.set).not.toHaveBeenCalled();
   });
 
   test("returns undefined for missing subtitle entry", async () => {
     const subtitle = await getSubtitleText("missing-id");
     expect(subtitle).toBeUndefined();
+  });
+
+  test("removes subtitles from IndexedDB during cleanup", async () => {
+    const jobId = "cleanup-id";
+    await setSubtitleText(jobId, { text: "some text", language: "fr" });
+    expect(await getSubtitleText(jobId)).toBeDefined();
+
+    await IndexedDBFS.cleanup();
+
+    expect(await getSubtitleText(jobId)).toBeUndefined();
   });
 });

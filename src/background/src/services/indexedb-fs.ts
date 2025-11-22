@@ -16,7 +16,8 @@ const buckets: Record<string, IndexedDBBucket> = {};
 const chromeApi = (globalThis as any).chrome;
 const browserApi = (browser as any) ?? (globalThis as any).browser ?? chromeApi;
 const BUCKET_META_KEY = "bucketMeta";
-const SUBTITLE_META_KEY = "subtitleMeta";
+const SUBTITLE_DB_NAME = "subtitles";
+const SUBTITLE_STORE_NAME = "subtitles";
 
 type BucketMeta = {
   videoLength: number;
@@ -71,6 +72,47 @@ interface ChunksDB extends DBSchema {
     key: number;
     indexes: { index: number };
   };
+}
+
+type SubtitleRecord = {
+  id: string;
+  text: string;
+  language?: string;
+  name?: string;
+};
+
+interface SubtitlesDB extends DBSchema {
+  subtitles: {
+    key: string;
+    value: SubtitleRecord;
+  };
+}
+
+let subtitlesDbPromise: Promise<IDBPDatabase<SubtitlesDB>> | null = null;
+
+async function getSubtitlesDb(): Promise<IDBPDatabase<SubtitlesDB>> {
+  if (!subtitlesDbPromise) {
+    subtitlesDbPromise = openDB<SubtitlesDB>(SUBTITLE_DB_NAME, 1, {
+      upgrade(db) {
+        db.createObjectStore(SUBTITLE_STORE_NAME, { keyPath: "id" });
+      },
+    });
+  }
+  return subtitlesDbPromise;
+}
+
+async function deleteSubtitlesDb() {
+  if (subtitlesDbPromise) {
+    try {
+      const db = await subtitlesDbPromise;
+      db.close();
+    } catch (_error) {
+      // ignore
+    } finally {
+      subtitlesDbPromise = null;
+    }
+  }
+  await deleteDB(SUBTITLE_DB_NAME);
 }
 
 // Singleton FFmpeg instance
@@ -250,16 +292,8 @@ export class IndexedDBBucket implements Bucket {
 
     const ffmpeg = await FFmpegSingleton.getInstance();
 
-    ffmpeg.on("log", ({ message }) => console.log(message));
-
     const subtitle = await getSubtitleText(this.id);
     const includeSubtitles = subtitle !== undefined;
-    console.log("[mux] bucket", {
-      bucketId: this.id,
-      includeSubtitles,
-      subtitleLanguage: subtitle?.language,
-      subtitleHasText: subtitle?.text !== undefined,
-    });
     // write somewhere predictable (avoid path/punctuation issues)
     const outputFileName = includeSubtitles ? "output.mkv" : "output.mp4";
 
@@ -338,11 +372,12 @@ const cleanup: IFS["cleanup"] = async function () {
   bucketMetaCache = {};
   const storageArea = getStorageArea();
   if (storageArea) {
-    await storageArea.set({ [BUCKET_META_KEY]: {}, [SUBTITLE_META_KEY]: {} });
+    await storageArea.set({ [BUCKET_META_KEY]: {} });
   }
   for (const id of Object.keys(buckets)) {
     delete buckets[id];
   }
+  await deleteSubtitlesDb();
 };
 
 const createBucket: IFS["createBucket"] = async function (
@@ -501,57 +536,32 @@ function getDownloadsApi() {
   return browserApi?.downloads ?? chromeApi?.downloads;
 }
 
-async function loadSubtitleCache(): Promise<
-  Record<string, { text: string; language?: string; name?: string }>
-> {
-  const storageArea = getStorageArea();
-  const res = storageArea ? await storageArea.get(SUBTITLE_META_KEY) : {};
-  const cache =
-    (res[SUBTITLE_META_KEY] as Record<
-      string,
-      { text: string; language?: string; name?: string }
-    >) || {};
-  return cache;
-}
-
 async function setSubtitleText(
   id: string,
   subtitle: { text: string; language?: string; name?: string },
 ) {
-  const cache = await loadSubtitleCache();
-  cache[id] = subtitle;
-  const storageArea = getStorageArea();
-  if (storageArea) {
-    await storageArea.set({ [SUBTITLE_META_KEY]: cache });
-  }
-  console.log("[subtitle] stored", {
-    id,
-    hasText: subtitle.text !== undefined,
-    language: subtitle.language,
-  });
+  const db = await getSubtitlesDb();
+  await db.put(SUBTITLE_STORE_NAME, { ...subtitle, id });
 }
 
 async function getSubtitleText(
   id: string,
 ): Promise<{ text: string; language?: string; name?: string } | undefined> {
-  const cache = await loadSubtitleCache();
-  const hit = cache[id];
-  console.log("[subtitle] loaded", {
-    id,
-    found: Boolean(hit),
-    hasText: hit?.text !== undefined,
-    language: hit?.language,
-  });
+  const db = await getSubtitlesDb();
+  const record = await db.get(SUBTITLE_STORE_NAME, id);
+  const hit = record
+    ? {
+        text: record.text,
+        language: record.language,
+        name: record.name,
+      }
+    : undefined;
   return hit;
 }
 
 async function deleteSubtitleText(id: string) {
-  const cache = await loadSubtitleCache();
-  delete cache[id];
-  const storageArea = getStorageArea();
-  if (storageArea) {
-    await storageArea.set({ [SUBTITLE_META_KEY]: cache });
-  }
+  const db = await getSubtitlesDb();
+  await db.delete(SUBTITLE_STORE_NAME, id);
 }
 
 export { setSubtitleText, getSubtitleText };
