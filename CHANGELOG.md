@@ -1,5 +1,20 @@
 # HLS Downloader Changelog
 
+# HLS Downloader Changelog
+
+## 5.1.0
+
+### Features
+- Manifest V3 support for Chromium browsers using an offscreen document to create blob URLs in the service-worker background.
+- Dual build pipeline with separate MV2 (Firefox/Chromium) and MV3 (Chromium) artifacts and clearer tester instructions.
+
+### Fixes
+- Ensure MV2 background bundles emit as `background.js` and package popup/background files into the root of the ZIP/XPI for direct installs.
+
+### Chores
+- CI builds both MV2 and MV3 targets; release uploads MV2 Firefox/Chromium and MV3 Chromium artifacts.
+- Added “For Dear Testers” guide for Firefox/Chromium reviewers and clarified MV3 Chromium-only caveat.
+
 ## 5.0.0
 
 ### Features
