@@ -60,7 +60,10 @@ describe("persistState", () => {
       const result = await getState();
 
       expect(mockGet).toHaveBeenCalledWith(["state"]);
-      expect(result).toEqual({ config: { foo: "bar" } });
+      expect(result).toEqual({
+        config: { foo: "bar", preferredAudioLanguage: null },
+        playlistPreferences: undefined,
+      });
     });
 
     it("returns undefined when no state exists", async () => {
@@ -94,7 +97,10 @@ describe("persistState", () => {
 
       const result = await getState();
 
-      expect(result).toEqual({ config: { setting1: "value1" } });
+      expect(result).toEqual({
+        config: { setting1: "value1", preferredAudioLanguage: null },
+        playlistPreferences: undefined,
+      });
       expect(result).not.toHaveProperty("downloads");
       expect(result).not.toHaveProperty("ui");
     });
