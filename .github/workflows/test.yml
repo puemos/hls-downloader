@@ -18,6 +18,8 @@ jobs:
           node-version: "22"
       - name: Enable corepack
         run: corepack enable
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@10.11.0 --activate
       - name: Install dependencies
         run: pnpm install
       - name: Build MV2
