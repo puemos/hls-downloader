@@ -7,7 +7,6 @@ type OffscreenRequest = {
   requestId?: string;
   videoLength?: number;
   audioLength?: number;
-  subtitle?: { text: string; language?: string; name?: string };
 };
 
 type OffscreenResponse =
@@ -41,10 +40,6 @@ async function handleCreateObjectUrl(
     return { ok: false, message: "Missing bucketId" };
   }
 
-  if (message.subtitle) {
-    await IndexedDBFS.setSubtitleText(message.bucketId, message.subtitle);
-  }
-
   let bucket = await IndexedDBFS.getBucket(message.bucketId);
   if (!bucket) {
     if (
@@ -57,9 +52,6 @@ async function handleCreateObjectUrl(
         message.audioLength,
       );
       bucket = await IndexedDBFS.getBucket(message.bucketId);
-      if (message.subtitle) {
-        await IndexedDBFS.setSubtitleText(message.bucketId, message.subtitle);
-      }
     }
   }
 

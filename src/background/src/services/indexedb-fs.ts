@@ -225,18 +225,9 @@ export class IndexedDBBucket implements Bucket {
   }
 
   async getLink(
-    onProgress?: (progress: number, message: string) => void,
-    subtitle?: { text: string; language?: string; name?: string },
+    onProgress?: (progress: number, message: string) => void
   ): Promise<string> {
     await this.ensureDb();
-
-    if (subtitle) {
-      subtitleMemory[this.id] = {
-        text: subtitle.text,
-        language: subtitle.language,
-        name: subtitle.name,
-      };
-    }
 
     if (shouldUseOffscreen()) {
       return await requestObjectUrlOffscreen(
@@ -244,14 +235,13 @@ export class IndexedDBBucket implements Bucket {
           bucketId: this.id,
           videoLength: this.videoLength,
           audioLength: this.audioLength,
-          subtitle,
         },
-        onProgress,
+        onProgress
       );
     }
 
     try {
-      const mp4Blob = await this.streamToMp4Blob(onProgress);
+      const mp4Blob = await this.streamToMp4Blob(onProgress, subtitle);
       const url = URL.createObjectURL(mp4Blob);
       return url;
     } catch (error) {
@@ -262,7 +252,7 @@ export class IndexedDBBucket implements Bucket {
   }
 
   private async streamToMp4Blob(
-    onProgress?: (progress: number, message: string) => void,
+    onProgress?: (progress: number, message: string) => void
   ) {
     await this.ensureDb();
 
@@ -464,7 +454,6 @@ async function requestObjectUrlOffscreen(
     bucketId: string;
     videoLength: number;
     audioLength: number;
-    subtitle?: { text: string; language?: string; name?: string };
   },
   onProgress?: (progress: number, message: string) => void,
 ) {
@@ -494,7 +483,6 @@ async function requestObjectUrlOffscreen(
         bucketId: payload.bucketId,
         videoLength: payload.videoLength,
         audioLength: payload.audioLength,
-        subtitle: payload.subtitle,
         requestId,
       },
       (response: { ok: boolean; url?: string; message?: string }) => {
