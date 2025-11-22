@@ -32,6 +32,5 @@ jobs:
             extension-mv2-chrome.zip
             extension-mv2-firefox.xpi
             extension-mv3-chrome.zip
-            extension-mv3-firefox.xpi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

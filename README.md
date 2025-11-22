@@ -129,7 +129,7 @@ pnpm run clean
 
 **MV2 vs MV3 builds**
 
-The default build targets Manifest V2 (Firefox and legacy Chromium workflows). To produce a Manifest V3 bundle for Chromium-based browsers:
+The default build targets Manifest V2 (Firefox and legacy Chromium workflows). To produce a Manifest V3 bundle for Chromium-based browsers (Firefox does not fully support MV3 background service workers yet):
 
 ```bash
 MV_TARGET=mv3 pnpm run build   # writes manifest v3 + offscreen page to dist/
@@ -141,7 +141,7 @@ You can generate both flavors at once with pre-named artifacts:
 ```bash
 pnpm run build:all          # outputs dist/mv2 + dist/mv3
 # zips: extension-mv2-chrome.zip / extension-mv2-firefox.xpi  (MV2 contents at archive root)
-#       extension-mv3-chrome.zip / extension-mv3-firefox.xpi  (MV3 contents at archive root)
+#       extension-mv3-chrome.zip                            (MV3 contents at archive root; Chromium only)
 ```
 
 > Tip: If pnpm is missing, run `corepack enable && corepack prepare pnpm@10.11.0 --activate` to match the locked toolchain.

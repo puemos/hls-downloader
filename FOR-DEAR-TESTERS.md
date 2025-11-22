@@ -21,7 +21,8 @@ A short guide for Mozilla/Chromium QA to build and exercise the extension locall
   ```bash
   pnpm run build:mv3
   ```  
-  Outputs `dist/mv3/` plus `extension-mv3-chrome.zip` (MV3-labeled XPI also emitted if needed for testing).
+  Outputs `dist/mv3/` plus `extension-mv3-chrome.zip`.  
+  (Firefox MV3 service workers are not fully supported yet; use MV2 for Firefox.)
 
 Artifacts are flat-packaged (files at archive root), ready for direct install.
 
