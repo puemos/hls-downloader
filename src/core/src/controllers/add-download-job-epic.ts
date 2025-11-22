@@ -113,11 +113,6 @@ export const addDownloadJobEpic: Epic<
         playlist,
         container,
       }) => {
-        console.log("[add-download-job] subtitle selection", {
-          subtitleLevelId: subtitleLevel?.id,
-          hasSubtitleText: subtitleText !== null && subtitleText !== undefined,
-          container,
-        });
         const jobId =
           (crypto as any)?.randomUUID?.() ??
           `job-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;

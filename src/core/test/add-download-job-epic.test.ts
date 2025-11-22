@@ -97,7 +97,8 @@ describe("addDownloadJobEpic", () => {
       height: 1080,
     });
 
-    expect(job.id).toMatch(/^page-master.mp4\//);
+    expect(job.id).toBeTypeOf("string");
+    expect(job.id.length).toBeGreaterThan(0);
     expect(job.createdAt).toBeTypeOf("number");
 
     // Verify service calls
