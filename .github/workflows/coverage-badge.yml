@@ -8,6 +8,8 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,8 +21,12 @@ jobs:
           node-version: '22'
       - name: Enable corepack
         run: corepack enable
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@10.11.0 --activate
       - name: Install dependencies
         run: pnpm install
+      - name: Clean workspace
+        run: pnpm run clean
       - name: Build MV2
         run: pnpm run build:mv2
       - name: Build MV3
@@ -32,3 +38,5 @@ jobs:
         with:
           add: coverage-badge.svg
           message: 'chore: update coverage badge'
+          author_name: github-actions[bot]
+          author_email: 41898282+github-actions[bot]@users.noreply.github.com
