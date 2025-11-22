@@ -259,7 +259,7 @@ export class IndexedDBBucket implements Bucket {
   }
 
   async getLink(
-    onProgress?: (progress: number, message: string) => void
+    onProgress?: (progress: number, message: string) => void,
   ): Promise<string> {
     await this.ensureDb();
 
@@ -270,7 +270,7 @@ export class IndexedDBBucket implements Bucket {
           videoLength: this.videoLength,
           audioLength: this.audioLength,
         },
-        onProgress
+        onProgress,
       );
     }
 
@@ -286,7 +286,7 @@ export class IndexedDBBucket implements Bucket {
   }
 
   private async streamToMp4Blob(
-    onProgress?: (progress: number, message: string) => void
+    onProgress?: (progress: number, message: string) => void,
   ) {
     await this.ensureDb();
 

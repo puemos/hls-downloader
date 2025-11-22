@@ -40,12 +40,13 @@ describe("subtitle storage in IDB", () => {
       language: "en",
       name: "English",
     };
-    const { storage } =
-      (await vi.importMock("webextension-polyfill")) as unknown as {
-        storage: {
-          local: { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn> };
-        };
+    const { storage } = (await vi.importMock(
+      "webextension-polyfill",
+    )) as unknown as {
+      storage: {
+        local: { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn> };
       };
+    };
 
     await setSubtitleText(jobId, subtitleRecord);
 
