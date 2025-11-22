@@ -17,10 +17,6 @@ const chromeApi = (globalThis as any).chrome;
 const browserApi = (browser as any) ?? (globalThis as any).browser ?? chromeApi;
 const BUCKET_META_KEY = "bucketMeta";
 const SUBTITLE_META_KEY = "subtitleMeta";
-const subtitleMemory: Record<
-  string,
-  { text: string; language?: string; name?: string }
-> = {};
 
 type BucketMeta = {
   videoLength: number;
@@ -28,10 +24,6 @@ type BucketMeta = {
 };
 
 let bucketMetaCache: Record<string, BucketMeta> | null = null;
-let subtitleCache: Record<
-  string,
-  { text: string; language?: string; name?: string }
-> | null = null;
 
 async function loadBucketMetaCache(): Promise<Record<string, BucketMeta>> {
   if (bucketMetaCache) {
@@ -241,7 +233,7 @@ export class IndexedDBBucket implements Bucket {
     }
 
     try {
-      const mp4Blob = await this.streamToMp4Blob(onProgress, subtitle);
+      const mp4Blob = await this.streamToMp4Blob(onProgress);
       const url = URL.createObjectURL(mp4Blob);
       return url;
     } catch (error) {
@@ -344,7 +336,6 @@ const cleanup: IFS["cleanup"] = async function () {
   }
 
   bucketMetaCache = {};
-  subtitleCache = {};
   const storageArea = getStorageArea();
   if (storageArea) {
     await storageArea.set({ [BUCKET_META_KEY]: {}, [SUBTITLE_META_KEY]: {} });
@@ -513,9 +504,6 @@ function getDownloadsApi() {
 async function loadSubtitleCache(): Promise<
   Record<string, { text: string; language?: string; name?: string }>
 > {
-  if (subtitleCache) {
-    return subtitleCache;
-  }
   const storageArea = getStorageArea();
   const res = storageArea ? await storageArea.get(SUBTITLE_META_KEY) : {};
   const cache =
@@ -523,7 +511,6 @@ async function loadSubtitleCache(): Promise<
       string,
       { text: string; language?: string; name?: string }
     >) || {};
-  subtitleCache = cache;
   return cache;
 }
 
@@ -533,8 +520,6 @@ async function setSubtitleText(
 ) {
   const cache = await loadSubtitleCache();
   cache[id] = subtitle;
-  subtitleCache = cache;
-  subtitleMemory[id] = subtitle;
   const storageArea = getStorageArea();
   if (storageArea) {
     await storageArea.set({ [SUBTITLE_META_KEY]: cache });
@@ -549,21 +534,8 @@ async function setSubtitleText(
 async function getSubtitleText(
   id: string,
 ): Promise<{ text: string; language?: string; name?: string } | undefined> {
-  const memoryHit = subtitleMemory[id];
-  if (memoryHit) {
-    console.log("[subtitle] loaded (memory)", {
-      id,
-      found: true,
-      hasText: memoryHit.text !== undefined,
-      language: memoryHit.language,
-    });
-    return memoryHit;
-  }
   const cache = await loadSubtitleCache();
   const hit = cache[id];
-  if (hit) {
-    subtitleMemory[id] = hit;
-  }
   console.log("[subtitle] loaded", {
     id,
     found: Boolean(hit),
@@ -574,16 +546,12 @@ async function getSubtitleText(
 }
 
 async function deleteSubtitleText(id: string) {
-  if (!subtitleCache) {
-    await loadSubtitleCache();
-  }
-  if (!subtitleCache) {
-    return;
-  }
-  delete subtitleCache[id];
-  delete subtitleMemory[id];
+  const cache = await loadSubtitleCache();
+  delete cache[id];
   const storageArea = getStorageArea();
   if (storageArea) {
-    await storageArea.set({ [SUBTITLE_META_KEY]: subtitleCache });
+    await storageArea.set({ [SUBTITLE_META_KEY]: cache });
   }
 }
+
+export { setSubtitleText, getSubtitleText };
