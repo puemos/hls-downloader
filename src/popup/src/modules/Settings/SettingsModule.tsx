@@ -12,6 +12,8 @@ const SettingsModule = () => {
     onSaveDialogToggle,
     saveDialog,
     concurrency,
+    preferredAudioLanguage,
+    onSetPreferredAudioLanguage,
   } = useSettingsController();
 
   return (
@@ -24,6 +26,8 @@ const SettingsModule = () => {
       onConcurrencyDecrease={onConcurrencyDecrease}
       onConcurrencyIncrease={onConcurrencyIncrease}
       concurrency={concurrency}
+      preferredAudioLanguage={preferredAudioLanguage}
+      onSetPreferredAudioLanguage={onSetPreferredAudioLanguage}
     ></SettingsView>
   );
 };

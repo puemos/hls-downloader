@@ -20,6 +20,8 @@ export const Default: Story = {
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
+      preferredAudioLanguage={"eng"}
+      onSetPreferredAudioLanguage={() => {}}
     />
   ),
 };
@@ -35,6 +37,8 @@ export const Minimal: Story = {
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
+      preferredAudioLanguage={null}
+      onSetPreferredAudioLanguage={() => {}}
     />
   ),
 };
