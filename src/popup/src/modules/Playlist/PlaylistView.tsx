@@ -1,7 +1,7 @@
 import { Level, PlaylistStatus } from "@hls-downloader/core/lib/entities";
-import { Button, ScrollArea, Separator } from "@hls-downloader/design-system";
+import { Button, ScrollArea, Card } from "@hls-downloader/design-system";
 import React from "react";
-import { Metadata } from "../../components/Metadata";
+import { Video, Music2, Subtitles, Clipboard } from "lucide-react";
 
 interface Props {
   status: PlaylistStatus | null;
@@ -16,6 +16,16 @@ interface Props {
   onSelectSubtitle: (id: string) => void;
   onDownload: () => void;
   canDownload: boolean;
+  encryptionSummaries: {
+    label: string;
+    supported: boolean;
+    method: string | null;
+    keyUris: string[];
+    pending: boolean;
+    message?: string;
+  }[];
+  inspectionPending: boolean;
+  encryptionBlocked: boolean;
 }
 
 const PlaylistView = ({
@@ -31,6 +41,9 @@ const PlaylistView = ({
   onSelectSubtitle,
   onDownload,
   canDownload,
+  encryptionSummaries: _encryptionSummaries,
+  inspectionPending,
+  encryptionBlocked,
 }: Props) => {
   if (!status) {
     return null;
@@ -61,6 +74,9 @@ const PlaylistView = ({
   if (status.status === "ready") {
     const selectedVideo = videoLevels.find((v) => v.id === selectedVideoId);
     const selectedAudio = audioLevels.find((a) => a.id === selectedAudioId);
+    const selectedSubtitle = subtitleLevels.find(
+      (s) => s.id === selectedSubtitleId,
+    );
 
     function handleSelectVideo(id: string) {
       onSelectVideo(id);
@@ -84,19 +100,17 @@ const PlaylistView = ({
 
     function getAudioDetails(item: Level) {
       return [
+        item.language,
+        item.name && item.name !== item.language ? item.name : undefined,
+        item.channels ? `${item.channels}ch` : undefined,
         item.bitrate
           ? `${(item.bitrate / 1024 / 1024).toFixed(1)} mbps`
           : undefined,
+        item.isDefault ? "default" : undefined,
+        item.autoSelect ? "auto" : undefined,
       ]
         .filter(Boolean)
         .join(" · ");
-    }
-
-    function getDisplayText(id: string, details: string) {
-      if (details) {
-        return `${details} (${id || "Unknown"})`;
-      }
-      return id || "Unknown";
     }
 
     function getSubtitleDetails(item: Level) {
@@ -109,106 +123,146 @@ const PlaylistView = ({
         .join(" · ");
     }
 
+    const footerMessage = [
+      !canDownload && encryptionBlocked
+        ? "Download blocked by encryption."
+        : null,
+      !canDownload && inspectionPending ? "Checking encryption..." : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+
     return (
-      <ScrollArea>
-        <div className="h-[calc(100vh-10rem)] w-full max-w-full flex flex-col gap-4">
+      <ScrollArea className="h-[calc(100vh-10rem)]">
+        <div className="flex flex-col gap-4 p-1 pb-16">
           {videoLevels.length > 0 && (
-            <div className="border rounded-md p-3 space-y-2">
-              <h3 className="text-sm font-semibold">Video</h3>
-              <select
-                value={selectedVideoId}
-                onChange={(e) => handleSelectVideo(e.target.value)}
-                className="w-full rounded-md border p-2 text-sm bg-transparent"
-              >
-                <option value="" disabled>
-                  Select video quality
-                </option>
-                {videoLevels.map((item) => {
-                  const details = getVideoDetails(item);
-                  return (
-                    <option key={item.id} value={item.id}>
-                      {getDisplayText(item.id, details)}
-                    </option>
-                  );
-                })}
-              </select>
-              {selectedVideo && (
-                <>
-                  {selectedVideo.uri && (
-                    <div className="text-xs break-all text-muted-foreground">
-                      {selectedVideo.uri}
-                    </div>
-                  )}
-                  <Metadata metadata={selectedVideo} />
-                </>
-              )}
-            </div>
+            <Card className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Video className="h-4 w-4" /> Video
+              </div>
+              <div className="w-full border rounded-md">
+                <select
+                  className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                  value={selectedVideoId ?? ""}
+                  onChange={(e) => handleSelectVideo(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Select video quality
+                  </option>
+                  {videoLevels.map((item) => {
+                    const details = getVideoDetails(item);
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {details || item.id}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={!selectedVideo?.uri}
+                  onClick={() => {
+                    if (!selectedVideo?.uri) return;
+                    void navigator.clipboard?.writeText(selectedVideo.uri);
+                  }}
+                >
+                  <Clipboard className="h-4 w-4 mr-2" />
+                  Copy URL
+                </Button>
+              </div>
+            </Card>
           )}
+
           {audioLevels.length > 0 && (
-            <div className="border rounded-md p-3 space-y-2">
-              <h3 className="text-sm font-semibold">Audio</h3>
-              <select
-                value={selectedAudioId}
-                onChange={(e) => handleSelectAudio(e.target.value)}
-                className="w-full rounded-md border p-2 text-sm bg-transparent"
-              >
-                <option value="" disabled>
-                  Select audio quality
-                </option>
-                {audioLevels.map((item) => {
-                  const details = getAudioDetails(item);
-                  return (
-                    <option key={item.id} value={item.id}>
-                      {getDisplayText(item.id, details)}
-                    </option>
-                  );
-                })}
-              </select>
-              {selectedAudio && (
-                <>
-                  {selectedAudio.uri && (
-                    <div className="text-xs break-all text-muted-foreground">
-                      {selectedAudio.uri}
-                    </div>
-                  )}
-                  <Metadata metadata={selectedAudio} />
-                </>
-              )}
-            </div>
+            <Card className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Music2 className="h-4 w-4" /> Audio
+              </div>
+              <div className="w-full border rounded-md">
+                <select
+                  className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                  value={selectedAudioId ?? ""}
+                  onChange={(e) => handleSelectAudio(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Select audio track
+                  </option>
+                  {audioLevels.map((item) => {
+                    const details = getAudioDetails(item);
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {details || item.id}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={!selectedAudio?.uri}
+                  onClick={() => {
+                    if (!selectedAudio?.uri) return;
+                    void navigator.clipboard?.writeText(selectedAudio.uri);
+                  }}
+                >
+                  <Clipboard className="h-4 w-4 mr-2" />
+                  Copy URL
+                </Button>
+              </div>
+            </Card>
           )}
+
           {subtitleLevels.length > 0 && (
-            <div className="border rounded-md p-3 space-y-2">
-              <h3 className="text-sm font-semibold">Subtitles / CC</h3>
-              <select
-                value={selectedSubtitleId ?? ""}
-                onChange={(e) => onSelectSubtitle(e.target.value)}
-                className="w-full rounded-md border p-2 text-sm bg-transparent"
-              >
-                <option value="">No subtitles</option>
-                {subtitleLevels.map((item) => {
-                  const details = getSubtitleDetails(item);
-                  return (
-                    <option key={item.id} value={item.id}>
-                      {details || item.id}
-                    </option>
-                  );
-                })}
-              </select>
-              {selectedSubtitleId && (
-                <div className="text-xs text-muted-foreground break-all">
-                  {subtitleLevels.find((s) => s.id === selectedSubtitleId)?.uri}
-                </div>
-              )}
-            </div>
+            <Card className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Subtitles className="h-4 w-4" /> Subtitles / CC
+              </div>
+              <div className="w-full border rounded-md">
+                <select
+                  className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                  value={selectedSubtitleId ?? ""}
+                  onChange={(e) => onSelectSubtitle(e.target.value)}
+                >
+                  <option value="">No subtitles</option>
+                  {subtitleLevels.map((item) => {
+                    const details = getSubtitleDetails(item);
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {details || item.id}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={!selectedSubtitle?.uri}
+                  onClick={() => {
+                    if (!selectedSubtitle?.uri) return;
+                    void navigator.clipboard?.writeText(selectedSubtitle.uri);
+                  }}
+                >
+                  <Clipboard className="h-4 w-4 mr-2" />
+                  Copy URL
+                </Button>
+              </div>
+            </Card>
           )}
         </div>
-        <div className="flex flex-row-reverse mt-2">
-          <Button
-            onClick={onDownload}
-            disabled={!canDownload}
-            size="sm"
-            variant="secondary"
-          >
+
+        <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 bg-background/90 px-1 py-3 backdrop-blur">
+          <div className="text-xs text-muted-foreground">{footerMessage}</div>
+          <Button onClick={onDownload} disabled={!canDownload} size="sm">
             Download
           </Button>
         </div>
