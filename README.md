@@ -108,17 +108,24 @@ Currently not supported
 
 ### Clone & Build
 
+Requires Node.js 20+ (includes [Corepack](https://nodejs.org/api/corepack.html)) and the `zip` command.
+
 ```bash
 git clone https://github.com/puemos/hls-downloader.git
 cd hls-downloader
-pnpm install
-pnpm build        # output → ./dist/
+
+# install the pinned pnpm version
+corepack enable
+corepack prepare pnpm@10.11.0 --activate
+
+pnpm install --frozen-lockfile
+pnpm run build    # outputs → ./dist/, extension-chrome.zip, extension-firefox.xpi
+
+# verify build artifacts then clean up
+pnpm run clean
 ```
 
-```bash
-# - Bundled archives: `extension-chrome.zip`, `extension-firefox.zip`
-# - Run tests & generate coverage badge:
-```
+Run tests & generate coverage badge:
 
 ```bash
 pnpm test          # unit tests
