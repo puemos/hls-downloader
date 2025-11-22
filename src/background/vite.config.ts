@@ -26,11 +26,6 @@ export default defineConfig(({ mode }) => {
       minify: false,
       outDir,
       emptyOutDir: false,
-      rollupOptions: {
-        output: {
-          entryFileNames: "[name].js",
-        },
-      },
     },
     define: {
       "process.env.NODE_ENV": JSON.stringify(mode),
