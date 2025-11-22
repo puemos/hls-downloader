@@ -1,5 +1,11 @@
 import { Playlist } from "@hls-downloader/core/lib/entities";
-import { Button, Input, ScrollArea, cn } from "@hls-downloader/design-system";
+import {
+  Button,
+  Card,
+  Input,
+  ScrollArea,
+  cn,
+} from "@hls-downloader/design-system";
 import { Banana } from "lucide-react";
 import React from "react";
 import PlaylistModule from "../Playlist/PlaylistModule";
@@ -74,12 +80,11 @@ const DirectView = ({
       {!currentPlaylistId && playlists.length > 0 && (
         <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full">
           {playlists.map((item) => (
-            <div
+            <Card
               key={item.id}
               onClick={() => setCurrentPlaylistId(item.id)}
-              className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted",
-              )}
+              interactive
+              className="mb-2 text-left text-sm"
             >
               <div className="flex flex-col w-full gap-1">
                 <div className="flex items-center">
@@ -95,7 +100,7 @@ const DirectView = ({
               <div className="text-xs break-all text-muted-foreground">
                 {item.uri}
               </div>
-            </div>
+            </Card>
           ))}
         </ScrollArea>
       )}

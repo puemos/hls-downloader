@@ -6,6 +6,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   ScrollArea,
+  Card,
   cn,
 } from "@hls-downloader/design-system";
 import { Banana } from "lucide-react";
@@ -84,19 +85,18 @@ const SnifferView = ({
       {!currentPlaylistId && playlists.length > 0 && (
         <ScrollArea className="h-[calc(100vh-10rem)] w-full max-w-full">
           {playlists.map((item) => (
-            <div
+            <Card
               key={item.id}
               onClick={() => setCurrentPlaylistId(item.id)}
-              className={cn(
-                "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm cursor-pointer hover:bg-muted w-full overflow-hidden",
-              )}
+              interactive
+              className={cn("mb-2 w-full overflow-hidden text-left text-sm")}
             >
               <div className="flex flex-col w-full gap-1 min-w-0">
-                <div className="flex items-center w-full min-w-0">
-                  <div className="flex items-center gap-2">
-                    <div className="font-semibold">{item.pageTitle}</div>
+                <div className="flex items-start justify-between gap-2 min-w-0">
+                  <div className="font-semibold truncate min-w-0">
+                    {item.pageTitle}
                   </div>
-                  <div className={cn("ml-auto text-xs")}>
+                  <div className="text-[11px] text-muted-foreground shrink-0 whitespace-nowrap">
                     {new Date(item.createdAt!).toLocaleString()}
                   </div>
                 </div>
@@ -125,7 +125,7 @@ const SnifferView = ({
                   </ScrollArea>
                 </HoverCardContent>
               </HoverCard>
-            </div>
+            </Card>
           ))}
         </ScrollArea>
       )}
