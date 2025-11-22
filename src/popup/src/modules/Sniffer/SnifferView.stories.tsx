@@ -1,30 +1,11 @@
-import React from "React";
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Provider } from "react-redux";
 import { Playlist } from "@hls-downloader/core/lib/entities";
 import SnifferView from "./SnifferView";
-
-// Create a mock store for Storybook
-const mockStore = {
-  getState: () => ({
-    playlistsStatus: {},
-  }),
-  dispatch: (action: any) => action,
-  subscribe: () => () => {},
-  replaceReducer: () => {},
-  [Symbol.observable]: () => mockStore,
-};
 
 const meta: Meta<typeof SnifferView> = {
   title: "popup/views/SnifferView",
   component: SnifferView,
-  decorators: [
-    (Story) => (
-      <Provider store={mockStore as any}>
-        <Story />
-      </Provider>
-    ),
-  ],
 };
 
 export default meta;
@@ -47,6 +28,23 @@ const samplePlaylists = [
   ),
 ];
 
+const longPlaylists = [
+  new Playlist(
+    "1",
+    "https://example.com/playlist1.m3u8",
+    Date.now(),
+    "A very long video title that should truncate nicely without hiding the timestamp on the right edge",
+    "super-long-initiator-string-that-might-wrap",
+  ),
+  new Playlist(
+    "2",
+    "https://example.com/playlist2.m3u8",
+    Date.now(),
+    "Another lengthy title to test wrapping and truncation in the playlist cards within the Sniffer view",
+    "another-long-initiator",
+  ),
+];
+
 export const Empty: Story = {
   render: () => (
     <SnifferView
@@ -56,6 +54,10 @@ export const Empty: Story = {
       clearPlaylists={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
+      copyPlaylistsToClipboard={() => {}}
     />
   ),
 };
@@ -69,6 +71,10 @@ export const WithItems: Story = {
       clearPlaylists={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
+      copyPlaylistsToClipboard={() => {}}
     />
   ),
 };
@@ -82,6 +88,44 @@ export const Selected: Story = {
       clearPlaylists={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
+      copyPlaylistsToClipboard={() => {}}
+    />
+  ),
+};
+
+export const LongTitles: Story = {
+  render: () => (
+    <SnifferView
+      playlists={longPlaylists}
+      currentPlaylistId={undefined}
+      filter=""
+      clearPlaylists={() => {}}
+      setFilter={() => {}}
+      setCurrentPlaylistId={() => {}}
+      directURI=""
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
+      copyPlaylistsToClipboard={() => {}}
+    />
+  ),
+};
+
+export const WithManualInput: Story = {
+  render: () => (
+    <SnifferView
+      playlists={longPlaylists}
+      currentPlaylistId={undefined}
+      filter=""
+      clearPlaylists={() => {}}
+      setFilter={() => {}}
+      setCurrentPlaylistId={() => {}}
+      directURI="https://example.com/manual.m3u8"
+      setDirectURI={() => {}}
+      addDirectPlaylist={() => {}}
+      copyPlaylistsToClipboard={() => {}}
     />
   ),
 };

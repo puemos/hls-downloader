@@ -8,3 +8,5 @@ export * from "./delete-job-epic";
 export * from "./on-init";
 export * from "./cancel-job-delete-job-epic";
 export * from "./download-subtitle-epic";
+export * from "./inspect-level-epic";
+export * from "./remove-playlist-epic";

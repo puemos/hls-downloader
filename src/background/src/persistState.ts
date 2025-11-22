@@ -8,13 +8,33 @@ export async function saveState(state: RootState) {
   await storage.local.set({ state });
 }
 
-export async function getState(): Promise<RootState | undefined> {
+export async function getState(): Promise<Partial<RootState> | undefined> {
   const res = await storage.local.get(["state"]);
-  const state: RootState = res.state;
-  if (!state) {
+  const state = res.state as Partial<RootState> | undefined;
+  if (!state || !state.config) {
     return;
   }
-  return {
-    config: state.config,
+  const preferredAudioLanguage =
+    (state.config as any).preferredAudioLanguage ??
+    (state.config as any).preferredAudioLanguages?.[0] ??
+    (state.config as any).preferredAudioLanguages;
+  const config =
+    preferredAudioLanguage === undefined
+      ? { ...state.config }
+      : {
+          ...state.config,
+          preferredAudioLanguage:
+            typeof preferredAudioLanguage === "string"
+              ? preferredAudioLanguage
+              : null,
+        };
+  const persistedState: Partial<RootState> = {
+    config,
   };
+
+  if (state.playlistPreferences) {
+    persistedState.playlistPreferences = state.playlistPreferences;
+  }
+
+  return persistedState;
 }

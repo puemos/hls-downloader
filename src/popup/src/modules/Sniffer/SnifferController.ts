@@ -15,6 +15,9 @@ interface ReturnType {
   setFilter: (filter: string) => void;
   setCurrentPlaylistId: (playlistId?: string) => void;
   copyPlaylistsToClipboard: () => void;
+  directURI: string;
+  setDirectURI: (uri: string) => void;
+  addDirectPlaylist: () => void;
 }
 
 const playlistFilter =
@@ -45,6 +48,7 @@ const useSnifferController = (): ReturnType => {
     string | undefined
   >(undefined);
   const [filter, setFilter] = useState("");
+  const [directURI, setDirectURI] = useState("");
   const dispatch = useDispatch();
   const playlistsRecord = useSelector<
     RootState,
@@ -60,10 +64,25 @@ const useSnifferController = (): ReturnType => {
     dispatch(playlistsSlice.actions.clearPlaylists());
   }
 
+  function addDirectPlaylist() {
+    if (!directURI) return;
+    dispatch(
+      playlistsSlice.actions.addPlaylist({
+        id: directURI,
+        uri: directURI,
+        createdAt: Date.now(),
+        initiator: "Direct",
+      }),
+    );
+    setCurrentPlaylistId(directURI);
+  }
+
   const playlists = Object.values(playlistsRecord)
     .filter(isPlaylist)
     .filter(
-      (playlist) => playlistsStatusRecord[playlist.id]?.status === "ready",
+      (playlist) =>
+        playlistsStatusRecord[playlist.id]?.status === "ready" ||
+        playlist.initiator === "Direct",
     )
     .filter(playlistFilter(filter));
 
@@ -82,6 +101,9 @@ const useSnifferController = (): ReturnType => {
     playlists,
     currentPlaylistId,
     copyPlaylistsToClipboard,
+    directURI,
+    setDirectURI,
+    addDirectPlaylist,
   };
 };
 

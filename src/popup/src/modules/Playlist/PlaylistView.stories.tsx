@@ -20,7 +20,37 @@ const videoLevel = new Level(
   3000000,
   30,
 );
-const audioLevel = new Level("audio", "a1", "p1", "audio.m3u8");
+const audioLevel = new Level(
+  "audio",
+  "a1",
+  "p1",
+  "audio.m3u8",
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  "eng",
+  "English",
+  undefined,
+  undefined,
+  "6",
+  true,
+  true,
+  undefined,
+  "audio",
+);
+const subtitleLevel = new Level(
+  "subtitle",
+  "s1",
+  "p1",
+  "subtitle.m3u8",
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  "eng",
+  "English",
+);
 
 export const Ready: Story = {
   render: () => (
@@ -28,10 +58,26 @@ export const Ready: Story = {
       status={{ status: "ready" }}
       videoLevels={[videoLevel]}
       audioLevels={[audioLevel]}
+      subtitleLevels={[subtitleLevel]}
+      selectedVideoId="v1"
+      selectedAudioId="a1"
+      selectedSubtitleId="s1"
       onSelectVideo={() => {}}
       onSelectAudio={() => {}}
+      onSelectSubtitle={() => {}}
       onDownload={() => {}}
       canDownload={true}
+      encryptionSummaries={[
+        {
+          label: "Video",
+          supported: true,
+          method: "AES-128",
+          keyUris: ["https://example.com/key"],
+          pending: false,
+        },
+      ]}
+      inspectionPending={false}
+      encryptionBlocked={false}
     />
   ),
 };
@@ -42,10 +88,15 @@ export const Fetching: Story = {
       status={{ status: "fetching" }}
       videoLevels={[]}
       audioLevels={[]}
+      subtitleLevels={[]}
       onSelectVideo={() => {}}
       onSelectAudio={() => {}}
+      onSelectSubtitle={() => {}}
       onDownload={() => {}}
       canDownload={false}
+      encryptionSummaries={[]}
+      inspectionPending={false}
+      encryptionBlocked={false}
     />
   ),
 };
@@ -56,10 +107,27 @@ export const DisabledDownload: Story = {
       status={{ status: "ready" }}
       videoLevels={[videoLevel]}
       audioLevels={[audioLevel]}
+      subtitleLevels={[subtitleLevel]}
+      selectedVideoId="v1"
+      selectedAudioId="a1"
+      selectedSubtitleId=""
       onSelectVideo={() => {}}
       onSelectAudio={() => {}}
+      onSelectSubtitle={() => {}}
       onDownload={() => {}}
       canDownload={false}
+      encryptionSummaries={[
+        {
+          label: "Video",
+          supported: false,
+          method: "SAMPLE-AES",
+          keyUris: ["https://example.com/key"],
+          pending: false,
+          message: "Unsupported encryption method: SAMPLE-AES",
+        },
+      ]}
+      inspectionPending={false}
+      encryptionBlocked={true}
     />
   ),
 };

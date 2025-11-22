@@ -13,3 +13,4 @@ export * from "./fs-cleanup";
 export * from "./download-subtitle-track";
 export * from "./get-subtitle-text";
 export * from "./store-subtitle-text";
+export * from "./inspect-level-encryption";

@@ -156,6 +156,7 @@ describe("use-cases", () => {
     const parser: IParser = {
       parseMasterPlaylist: vi.fn(),
       parseLevelPlaylist: vi.fn().mockReturnValue(fragments),
+      inspectLevelEncryption: vi.fn(),
     };
     const level = new Level(
       "stream",
@@ -187,6 +188,7 @@ describe("use-cases", () => {
     const parser: IParser = {
       parseMasterPlaylist: vi.fn().mockReturnValue(levels),
       parseLevelPlaylist: vi.fn(),
+      inspectLevelEncryption: vi.fn(),
     };
     const run = getLevelsFactory(loader, parser);
     const result = await run("http://example.com/master.m3u8", 9);
@@ -209,6 +211,7 @@ describe("use-cases", () => {
     const parser: IParser = {
       parseMasterPlaylist: vi.fn(),
       parseLevelPlaylist: vi.fn(),
+      inspectLevelEncryption: vi.fn(),
     };
     const run = getLevelsFactory(loader, parser);
     await expect(run("uri", 1)).rejects.toThrow("LevelManifest");

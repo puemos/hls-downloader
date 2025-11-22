@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { M3u8Parser } from "./m3u8-parser";
+import { M3u8Parser } from "../src/services/m3u8-parser";
 
 const base = "http://example.com/";
 
@@ -30,8 +30,8 @@ seg1.ts
 
 const masterPlaylist = `#EXTM3U
 #EXT-X-VERSION:3
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="eng",DEFAULT=YES,AUTOSELECT=YES,URI="eng.m3u8"
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="spa",DEFAULT=NO,AUTOSELECT=YES,URI="spa.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="eng",LANGUAGE="eng",DEFAULT=YES,AUTOSELECT=YES,CHANNELS="6",URI="eng.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="spa",LANGUAGE="spa",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="spa.m3u8"
 #EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=640x360,FRAME-RATE=30,AUDIO="audio"
 low.m3u8
 #EXT-X-STREAM-INF:BANDWIDTH=1400000,RESOLUTION=1280x720,FRAME-RATE=60,AUDIO="audio"
@@ -77,6 +77,7 @@ describe("M3u8Parser", () => {
       fps: 30,
       width: 640,
       height: 360,
+      audioGroupId: "audio",
     });
     expect(typeof stream0.id).toBe("string");
 
@@ -88,6 +89,7 @@ describe("M3u8Parser", () => {
       fps: 60,
       width: 1280,
       height: 720,
+      audioGroupId: "audio",
     });
     expect(typeof stream1.id).toBe("string");
 
@@ -100,6 +102,13 @@ describe("M3u8Parser", () => {
       fps: undefined,
       width: undefined,
       height: undefined,
+      language: "eng",
+      name: "eng",
+      characteristics: undefined,
+      channels: "6",
+      isDefault: true,
+      autoSelect: true,
+      groupId: "audio",
     });
 
     expect(audioSpa).toEqual({
@@ -111,6 +120,29 @@ describe("M3u8Parser", () => {
       fps: undefined,
       width: undefined,
       height: undefined,
+      language: "spa",
+      name: "spa",
+      characteristics: undefined,
+      channels: "2",
+      isDefault: false,
+      autoSelect: true,
+      groupId: "audio",
     });
+  });
+
+  it("inspects level encryption", () => {
+    const encryptedPlaylist = `#EXTM3U
+#EXT-X-TARGETDURATION:8
+#EXT-X-KEY:METHOD=AES-128,URI="enc.key",IV=0x00000000000000000000000000000001
+#EXTINF:8,
+file0.ts
+`;
+    const inspection = M3u8Parser.inspectLevelEncryption(
+      encryptedPlaylist,
+      base,
+    );
+    expect(inspection.methods).toEqual(["AES-128"]);
+    expect(inspection.keyUris).toEqual([`${base}enc.key`]);
+    expect(inspection.iv).toEqual("0x00000000000000000000000000000001");
   });
 });

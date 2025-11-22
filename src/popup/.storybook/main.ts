@@ -25,6 +25,8 @@ const config: StorybookConfig = {
             __dirname,
             "../../design-system/src",
           ),
+          "@hls-downloader/core/lib": resolve(__dirname, "../../core/src"),
+          "@hls-downloader/core": resolve(__dirname, "../../core/src"),
         },
       },
     });

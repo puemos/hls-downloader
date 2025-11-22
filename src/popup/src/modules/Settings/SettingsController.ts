@@ -11,6 +11,8 @@ interface ReturnType {
   onSaveDialogToggle: () => void;
   onConcurrencyIncrease: () => void;
   onConcurrencyDecrease: () => void;
+  preferredAudioLanguage: string | null;
+  onSetPreferredAudioLanguage: (lang: string | null) => void;
 }
 
 const useSettingsController = (): ReturnType => {
@@ -23,6 +25,9 @@ const useSettingsController = (): ReturnType => {
   );
   const saveDialog = useSelector<RootState, boolean>(
     (state) => state.config.saveDialog,
+  );
+  const preferredAudioLanguage = useSelector<RootState, string | null>(
+    (state) => state.config.preferredAudioLanguage,
   );
 
   function onConcurrencyIncrease() {
@@ -60,6 +65,14 @@ const useSettingsController = (): ReturnType => {
       }),
     );
   }
+  function onSetPreferredAudioLanguage(lang: string | null) {
+    const normalized = (lang ?? "").trim();
+    dispatch(
+      configSlice.actions.setPreferredAudioLanguage({
+        preferredAudioLanguage: normalized || null,
+      }),
+    );
+  }
   return {
     concurrency,
     onConcurrencyIncrease,
@@ -69,6 +82,8 @@ const useSettingsController = (): ReturnType => {
     onFetchAttemptsIncrease,
     onFetchAttemptsDecrease,
     onSaveDialogToggle,
+    preferredAudioLanguage,
+    onSetPreferredAudioLanguage,
   };
 };
 

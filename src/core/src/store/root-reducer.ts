@@ -8,6 +8,8 @@ import {
   tabsSlice,
   jobsSlice,
 } from "./slices";
+import { levelInspectionsSlice } from "./slices/level-inspections-slice";
+import { playlistPreferencesSlice } from "./slices/playlist-preferences-slice";
 import { subtitlesSlice } from "./slices/subtitles-slice";
 
 export const rootReducer = combineReducers({
@@ -17,6 +19,8 @@ export const rootReducer = combineReducers({
   tabs: tabsSlice.reducer,
   jobs: jobsSlice.reducer,
   subtitles: subtitlesSlice.reducer,
+  levelInspections: levelInspectionsSlice.reducer,
+  playlistPreferences: playlistPreferencesSlice.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -28,4 +32,6 @@ export type RootAction =
   | ActionType<typeof configSlice.actions>
   | ActionType<typeof levelsSlice.actions>
   | ActionType<typeof playlistsSlice.actions>
-  | ActionType<typeof subtitlesSlice.actions>;
+  | ActionType<typeof subtitlesSlice.actions>
+  | ActionType<typeof levelInspectionsSlice.actions>
+  | ActionType<typeof playlistPreferencesSlice.actions>;

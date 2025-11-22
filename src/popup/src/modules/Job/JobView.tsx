@@ -1,14 +1,22 @@
 import { Job, JobStatus, LevelStatus } from "@hls-downloader/core/lib/entities";
 import {
   Button,
+  Card,
   Progress,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
   ScrollArea,
   cn,
+  Badge,
 } from "@hls-downloader/design-system";
-import { Trash2Icon, DownloadIcon } from "lucide-react";
+import {
+  Trash2Icon,
+  DownloadIcon,
+  AlertTriangle,
+  Loader2,
+  Copy,
+} from "lucide-react";
 import React from "react";
 import { Metadata } from "../../components/Metadata";
 
@@ -34,19 +42,60 @@ const JobView = ({
   }
 
   const isError = status?.status === "error";
+  const isDownloading = status?.status === "downloading";
+  const isSaving = status?.status === "saving";
+  const isReady = ["ready", "done"].includes(status?.status ?? "");
+  const footerHint =
+    isSaving && status?.saveMessage
+      ? status.saveMessage
+      : isSaving
+        ? ""
+        : isDownloading
+          ? "Downloading..."
+          : isError
+            ? "Error"
+            : isReady
+              ? "Ready to save"
+              : "";
+  const headerStatusLabel =
+    status?.status === "init"
+      ? "Pending"
+      : status?.status === "downloading"
+        ? "Downloading"
+        : status?.status === "saving"
+          ? "Saving"
+          : status?.status === "done"
+            ? "Completed"
+            : status?.status === "ready"
+              ? "Ready"
+              : status?.status === "error"
+                ? "Error"
+                : "Queued";
+  const headerStatusVariant =
+    status?.status === "error"
+      ? "destructive"
+      : ["ready", "done"].includes(status?.status ?? "")
+        ? "secondary"
+        : "outline";
 
   return (
-    <div
-      className={cn(
-        "flex flex-col mb-2 items-start gap-2 rounded-lg border p-3 text-left text-sm min-w-0 overflow-hidden",
-      )}
-    >
-      <div className="flex flex-col items-start justify-between w-full mb-1 min-w-0">
-        <div className="flex flex-col w-full min-w-0">
+    <Card className="mb-2 items-start text-left text-sm min-w-0 overflow-hidden gap-3">
+      <div className="flex items-start justify-between w-full gap-2 min-w-0">
+        <div className="flex flex-col min-w-0">
           <HoverCard>
             <HoverCardTrigger asChild>
-              <div className="block mr-1 min-w-0 max-w-full truncate">
-                {job.filename}
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="block mr-1 min-w-0 max-w-full truncate text-sm font-semibold">
+                  {job.filename}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => navigator.clipboard?.writeText(job.filename)}
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
               </div>
             </HoverCardTrigger>
             <HoverCardContent>
@@ -55,15 +104,16 @@ const JobView = ({
               </ScrollArea>
             </HoverCardContent>
           </HoverCard>
-          <div className="text-muted-foreground min-w-0 max-w-full break-all">
-            <span className="block">
-              {new Date(job.createdAt!).toLocaleString()}
-            </span>
+          <div className="text-[11px] text-muted-foreground min-w-0 max-w-full break-all">
+            {new Date(job.createdAt!).toLocaleString()}
           </div>
         </div>
+        <Badge variant={headerStatusVariant} className="shrink-0">
+          {headerStatusLabel}
+        </Badge>
       </div>
 
-      <div className="w-full mb-1 min-w-0">
+      <div className="w-full min-w-0">
         <Metadata
           metadata={{
             type: "stream",
@@ -74,48 +124,56 @@ const JobView = ({
         />
       </div>
 
-      <div className="w-full mb-2">
-        {["downloading"].includes(status?.status!) && (
-          <JobProgressView status={status!} />
-        )}
-        {["saving"].includes(status?.status!) && (
-          <JobSavingView status={status!} />
-        )}
+      <div className="w-full space-y-2">
+        {isDownloading && <JobProgressView status={status!} />}
+        {isSaving && <JobSavingView status={status!} />}
         {isError && (
-          <div className="w-full rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">
-            {status?.errorMessage || "Download failed. Please retry or delete."}
+          <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">
+            <AlertTriangle className="h-4 w-4 mt-px" />
+            <div className="min-w-0">
+              {status?.errorMessage ||
+                "Download failed. Please retry or delete."}
+            </div>
           </div>
         )}
       </div>
 
-      <div className="flex flex-row-reverse w-full gap-2 flex-shrink-0">
-        {["ready", "done", "saving"].includes(status?.status!) && (
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={saveAsJob}
-            disabled={status?.status === "saving"}
-          >
-            <DownloadIcon className="w-4 h-4 mr-2" /> Save
-          </Button>
-        )}
-        {["init"].includes(status?.status!) && (
-          <Button size="sm" variant="secondary" onClick={downloadJob}>
-            <DownloadIcon className="w-4 h-4 mr-2" /> Download
-          </Button>
-        )}
-        {["downloading"].includes(status?.status!) && (
-          <Button size="sm" variant="secondary" onClick={cancelJob}>
-            <Trash2Icon className="w-4 h-4 mr-2" /> Cancel
-          </Button>
-        )}
-        {["ready", "done", "saving", "error"].includes(status?.status!) && (
-          <Button size="sm" variant="secondary" onClick={deleteJob}>
-            <Trash2Icon className="w-4 h-4 mr-2" /> Delete
-          </Button>
-        )}
+      <div className="flex flex-wrap items-center justify-between w-full gap-2 pt-2 border-t">
+        <div className="text-xs text-muted-foreground">{footerHint}</div>
+        <div className="flex flex-wrap gap-2">
+          {status?.status === "init" && (
+            <Button size="sm" variant="default" onClick={downloadJob}>
+              <DownloadIcon className="w-4 h-4 mr-2" /> Download
+            </Button>
+          )}
+          {isDownloading && (
+            <Button size="sm" variant="secondary" onClick={cancelJob}>
+              <Trash2Icon className="w-4 h-4 mr-2" /> Cancel
+            </Button>
+          )}
+          {["ready", "done", "saving"].includes(status?.status!) && (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={saveAsJob}
+              disabled={status?.status === "saving"}
+            >
+              <DownloadIcon className="w-4 h-4 mr-2" /> Save as
+            </Button>
+          )}
+          {["error"].includes(status?.status ?? "") && (
+            <Button size="sm" variant="default" onClick={downloadJob}>
+              <DownloadIcon className="w-4 h-4 mr-2" /> Retry download
+            </Button>
+          )}
+          {["ready", "done", "saving", "error"].includes(status?.status!) && (
+            <Button size="sm" variant="ghost" onClick={deleteJob}>
+              <Trash2Icon className="w-4 h-4 mr-2" /> Delete
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -156,7 +214,7 @@ const JobSavingView = ({ status }: { status: JobStatus }) => {
         >
           <path d="M21 12a9 9 0 1 1-6.219-8.56" />
         </svg>
-        {status.saveMessage || "Processing..."}
+        {status.saveMessage || "Saving..."}
       </div>
     </div>
   );
