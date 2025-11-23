@@ -72,7 +72,7 @@ describe("FetchLoader", () => {
       expect(error.status).toBe("fulfilled");
       if (error.status === "fulfilled") {
         expect(error.value).toBeInstanceOf(Error);
-        expect(error.value.message).toBe("Fetch error");
+        expect(error.value.message).toBe("Persistent failure");
       }
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
@@ -163,6 +163,28 @@ describe("FetchLoader", () => {
       await expect(
         fetchArrayBuffer("https://example.com/error.bin", 1)
       ).rejects.toThrow("HTTP 500");
+    });
+
+    it("throws last error when retries are exhausted", async () => {
+      vi.useFakeTimers();
+      const fetchMock = vi
+        .fn()
+        .mockRejectedValue(new Error("Buffer failure"));
+      globalThis.fetch = fetchMock;
+
+      const promise = fetchArrayBuffer("https://example.com/error.bin", 2);
+
+      const [, error] = await Promise.allSettled([
+        vi.runAllTimersAsync(),
+        promise.catch((e) => e),
+      ]);
+
+      expect(error.status).toBe("fulfilled");
+      if (error.status === "fulfilled") {
+        expect(error.value).toBeInstanceOf(Error);
+        expect(error.value.message).toBe("Buffer failure");
+      }
+      expect(fetchMock).toHaveBeenCalledTimes(2);
     });
   });
 });

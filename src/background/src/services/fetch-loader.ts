@@ -9,15 +9,24 @@ async function fetchWithRetry<Data>(
   }
   let countdown = attempts;
   let retryTime = 100;
+  let lastError: unknown;
   while (countdown--) {
     try {
       return await fetchFn();
     } catch (e) {
+      lastError = e;
+      const message = (e as Error)?.message ?? "";
+      if (message.startsWith("HTTP ")) {
+        throw e;
+      }
       if (countdown > 0) {
         await new Promise((resolve) => setTimeout(resolve, retryTime));
         retryTime *= 1.15;
       }
     }
+  }
+  if (lastError instanceof Error) {
+    throw lastError;
   }
   throw new Error("Fetch error");
 }
