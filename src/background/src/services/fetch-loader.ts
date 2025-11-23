@@ -23,13 +23,24 @@ async function fetchWithRetry<Data>(
 }
 
 export async function fetchText(url: string, attempts: number = 1) {
-  const fetchFn: FetchFn<string> = () => fetch(url).then((res) => res.text());
+  const fetchFn: FetchFn<string> = () =>
+    fetch(url).then((res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      return res.text();
+    });
   return fetchWithRetry(fetchFn, attempts);
 }
 
 export async function fetchArrayBuffer(url: string, attempts: number = 1) {
   const fetchFn: FetchFn<ArrayBuffer> = () =>
-    fetch(url).then((res) => res.arrayBuffer());
+    fetch(url).then((res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      return res.arrayBuffer();
+    });
   return fetchWithRetry(fetchFn, attempts);
 }
 export const FetchLoader = {

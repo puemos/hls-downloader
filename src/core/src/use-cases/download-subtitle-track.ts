@@ -2,6 +2,8 @@ import { Level, Playlist } from "../entities";
 import { IFS, ILoader, IParser } from "../services";
 import { getFragmentsDetailsFactory } from "./get-fragments-details";
 import { generateSubtitleFileName } from "./generate-subtitle-file-name";
+import { appendQueryParams } from "../utils/url";
+import { fetchWithFallback } from "../utils/fetch";
 
 export const downloadSubtitleTrackFactory = (
   loader: ILoader,
@@ -12,11 +14,16 @@ export const downloadSubtitleTrackFactory = (
     level: Level,
     playlist: Playlist,
     fetchAttempts: number,
-    dialog: boolean
+    dialog: boolean,
+    options: { baseUri?: string } = {}
   ): Promise<string> => {
+    const baseUri = options.baseUri ?? playlist.uri;
     const fragments = await getFragmentsDetailsFactory(loader, parser)(
       level,
-      fetchAttempts
+      fetchAttempts,
+      {
+        baseUri,
+      }
     );
 
     const hasFragments = fragments.length > 0;
@@ -24,14 +31,22 @@ export const downloadSubtitleTrackFactory = (
 
     if (hasFragments) {
       for (const fragment of fragments) {
-        const fragmentText = await loader.fetchText(
+        const { data: fragmentText } = await fetchWithFallback(
           fragment.uri,
-          fetchAttempts
+          fragment.fallbackUri,
+          fetchAttempts,
+          loader.fetchText
         );
         textParts.push(fragmentText.trim());
       }
     } else {
-      const subtitleText = await loader.fetchText(level.uri, fetchAttempts);
+      const levelUri = appendQueryParams(baseUri, level.uri);
+      const { data: subtitleText } = await fetchWithFallback(
+        levelUri,
+        level.uri,
+        fetchAttempts,
+        loader.fetchText
+      );
       textParts.push(subtitleText.trim());
     }
 

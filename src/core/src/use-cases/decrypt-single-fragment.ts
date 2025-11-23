@@ -1,5 +1,6 @@
 import { Key } from "../entities";
 import { IDecryptor, ILoader } from "../services";
+import { fetchWithFallback } from "../utils/fetch";
 
 export const decryptSingleFragmentFactory = (
   loader: ILoader,
@@ -13,9 +14,11 @@ export const decryptSingleFragmentFactory = (
     if (!key.uri || !key.iv) {
       return data;
     }
-    const keyArrayBuffer = await loader.fetchArrayBuffer(
+    const { data: keyArrayBuffer } = await fetchWithFallback(
       key.uri,
-      fetchAttempts
+      key.fallbackUri,
+      fetchAttempts,
+      loader.fetchArrayBuffer
     );
     const decryptedData = await decryptor.decrypt(data, keyArrayBuffer, key.iv);
     return decryptedData;

@@ -25,12 +25,16 @@ export const downloadSubtitleEpic: Epic<
           })
         );
       }
+      const baseUri = level.playlistID;
       return from(
         downloadSubtitleTrackFactory(loader, parser, fs)(
           level,
           playlist,
           store$.value.config.fetchAttempts,
-          store$.value.config.saveDialog
+          store$.value.config.saveDialog,
+          {
+            baseUri,
+          }
         )
       ).pipe(
         mergeMap((filename) =>
