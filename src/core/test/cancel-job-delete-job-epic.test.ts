@@ -7,7 +7,7 @@ describe("cancelJobdeleteJobEpic", () => {
   it("dispatches delete when job is canceled", async () => {
     const action$ = of(jobsSlice.actions.cancel({ jobId: "1" }));
     const result = await firstValueFrom(
-      cancelJobdeleteJobEpic(action$, {} as any, { fs: {} } as any),
+      cancelJobdeleteJobEpic(action$, {} as any, { fs: {} } as any)
     );
     expect(result).toEqual(jobsSlice.actions.delete({ jobId: "1" }));
   });

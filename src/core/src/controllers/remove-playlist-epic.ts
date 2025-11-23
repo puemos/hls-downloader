@@ -25,7 +25,7 @@ export const removePlaylistEpic: Epic<
         levelInspectionsSlice.actions.removePlaylistInspections({ playlistID }),
         playlistPreferencesSlice.actions.removePlaylistPreferences({
           playlistID,
-        }),
+        })
       );
-    }),
+    })
   );

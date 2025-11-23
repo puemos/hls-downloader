@@ -60,7 +60,8 @@ describe("persistState", () => {
       const result = await getState();
 
       expect(mockGet).toHaveBeenCalledWith(["state"]);
-      expect(result).toEqual({ config: { foo: "bar" } });
+      expect(result?.config?.foo).toBe("bar");
+      expect(result?.config?.maxActiveDownloads).toBeDefined();
     });
 
     it("returns undefined when no state exists", async () => {
@@ -94,7 +95,8 @@ describe("persistState", () => {
 
       const result = await getState();
 
-      expect(result).toEqual({ config: { setting1: "value1" } });
+      expect(result?.config?.setting1).toBe("value1");
+      expect(result?.config?.maxActiveDownloads).toBeDefined();
       expect(result).not.toHaveProperty("downloads");
       expect(result).not.toHaveProperty("ui");
     });

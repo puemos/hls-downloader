@@ -14,6 +14,8 @@ const SnifferModule = () => {
     directURI,
     setDirectURI,
     addDirectPlaylist,
+    expandedPlaylists,
+    toggleExpandedPlaylist,
   } = useSnifferController();
 
   return (
@@ -28,6 +30,8 @@ const SnifferModule = () => {
       directURI={directURI}
       setDirectURI={setDirectURI}
       addDirectPlaylist={addDirectPlaylist}
+      expandedPlaylists={expandedPlaylists}
+      toggleExpandedPlaylist={toggleExpandedPlaylist}
     ></SnifferView>
   );
 };

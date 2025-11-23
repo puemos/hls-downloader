@@ -12,8 +12,8 @@ describe("incDownloadStatusEpic", () => {
     const action$ = of(jobsSlice.actions.incDownloadStatus({ jobId: "1" }));
     const result = await firstValueFrom(
       incDownloadStatusEpic(action$, { value: state } as any, {} as any).pipe(
-        toArray(),
-      ),
+        toArray()
+      )
     );
     expect(result).toEqual([
       jobsSlice.actions.finishDownload({ jobId: "1" }),

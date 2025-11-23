@@ -14,6 +14,6 @@ export const cancelJobdeleteJobEpic: Epic<
   action$.pipe(
     filter(jobsSlice.actions.cancel.match),
     mergeMap(({ payload: { jobId } }) =>
-      of(jobsSlice.actions.delete({ jobId })),
-    ),
+      of(jobsSlice.actions.delete({ jobId }))
+    )
   );

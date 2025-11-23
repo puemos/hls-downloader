@@ -9,7 +9,7 @@ const createAudioLevel = (id: string, props: Partial<Level> = {}): Level =>
     playlistID: "p1",
     uri: `${id}.m3u8`,
     ...props,
-  }) as Level;
+  } as Level);
 
 describe("selectPreferredAudioLevel", () => {
   it("prefers languages in user priority list", () => {

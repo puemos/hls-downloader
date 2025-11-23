@@ -22,7 +22,7 @@ export const downloadSubtitleEpic: Epic<
           subtitlesSlice.actions.downloadFailed({
             levelID,
             message: "Subtitle track not found",
-          }),
+          })
         );
       }
       return from(
@@ -30,25 +30,25 @@ export const downloadSubtitleEpic: Epic<
           level,
           playlist,
           store$.value.config.fetchAttempts,
-          store$.value.config.saveDialog,
-        ),
+          store$.value.config.saveDialog
+        )
       ).pipe(
         mergeMap((filename) =>
           of(
             subtitlesSlice.actions.downloadSuccess({
               levelID,
               filename,
-            }),
-          ),
+            })
+          )
         ),
         catchError((error: unknown) =>
           of(
             subtitlesSlice.actions.downloadFailed({
               levelID,
               message: (error as Error)?.message ?? "Subtitle download failed",
-            }),
-          ),
-        ),
+            })
+          )
+        )
       );
-    }),
+    })
   );

@@ -180,7 +180,7 @@ describe("IndexedDBFS", () => {
       expect(mockDownload).toHaveBeenCalledWith(
         expect.objectContaining({
           filename: expect.not.stringMatching(/[<>:"/\\|?*]/),
-        }),
+        })
       );
     });
 
@@ -191,7 +191,7 @@ describe("IndexedDBFS", () => {
       await IndexedDBFS.saveAs(path, link, { dialog: false });
 
       expect(mockDownload).toHaveBeenCalledWith(
-        expect.objectContaining({ filename: "Caf\u00E9.mp4" }),
+        expect.objectContaining({ filename: "Caf\u00E9.mp4" })
       );
     });
   });
@@ -204,10 +204,10 @@ describe("IndexedDBFS", () => {
 
       // Initialize the buckets by writing some data
       const bucket1 = (await IndexedDBFS.getBucket(
-        "bucket1",
+        "bucket1"
       )) as IndexedDBBucket;
       const bucket2 = (await IndexedDBFS.getBucket(
-        "bucket2",
+        "bucket2"
       )) as IndexedDBBucket;
       await bucket1.write(0, new Uint8Array([1]).buffer);
       await bucket2.write(0, new Uint8Array([2]).buffer);

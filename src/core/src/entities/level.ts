@@ -19,6 +19,6 @@ export class Level {
     readonly autoSelect?: boolean,
     readonly forced?: boolean,
     readonly groupId?: string,
-    readonly audioGroupId?: string,
+    readonly audioGroupId?: string
   ) {}
 }

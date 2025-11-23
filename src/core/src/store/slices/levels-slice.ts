@@ -52,7 +52,7 @@ export const levelsSlice: Slice<ILevelsState, ILevelsReducers, "levels"> =
       },
       removePlaylistLevels(
         state,
-        action: PayloadAction<IRemovePlaylistLevelsPayload>,
+        action: PayloadAction<IRemovePlaylistLevelsPayload>
       ) {
         const { playlistID } = action.payload;
         for (const id in state.levels) {

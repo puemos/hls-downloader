@@ -2,6 +2,7 @@ export * from "./download-job-epic";
 export * from "./add-download-job-epic";
 export * from "./save-as-job-epic";
 export * from "./inc-download-status-epic";
+export * from "./download-queue-epic";
 export * from "./fetch-playlist-levels-epic";
 export * from "./add-playlist-epic";
 export * from "./delete-job-epic";

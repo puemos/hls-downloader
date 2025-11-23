@@ -8,7 +8,7 @@ describe("inspectLevelEncryptionFactory", () => {
     "stream",
     "level-1",
     "playlist-1",
-    "http://example.com/level.m3u8",
+    "http://example.com/level.m3u8"
   );
 
   it("marks AES-128 as supported", async () => {
@@ -31,7 +31,7 @@ describe("inspectLevelEncryptionFactory", () => {
 
     expect(loader.fetchText).toHaveBeenCalledWith(
       "http://example.com/level.m3u8",
-      2,
+      2
     );
     expect(parser.inspectLevelEncryption).toHaveBeenCalled();
     expect(result).toMatchObject({

@@ -35,21 +35,21 @@ export const addDownloadJobEpic: Epic<
         Promise.all([
           getFragmentsDetailsFactory(loader, parser)(
             videoLevel,
-            store$.value.config.fetchAttempts,
+            store$.value.config.fetchAttempts
           ),
           audioLevel
             ? getFragmentsDetailsFactory(loader, parser)(
                 audioLevel,
-                store$.value.config.fetchAttempts,
+                store$.value.config.fetchAttempts
               )
             : Promise.resolve([]),
           subtitleLevel
             ? getSubtitleTextFactory(loader, parser)(
                 subtitleLevel,
-                store$.value.config.fetchAttempts,
+                store$.value.config.fetchAttempts
               )
             : Promise.resolve(null),
-        ]),
+        ])
       ).pipe(
         map(([videoFragments, audioFragments, subtitleText]) => ({
           videoLevel,
@@ -58,8 +58,8 @@ export const addDownloadJobEpic: Epic<
           videoFragments,
           audioFragments,
           subtitleText,
-        })),
-      ),
+        }))
+      )
     ),
     map(
       ({
@@ -77,7 +77,7 @@ export const addDownloadJobEpic: Epic<
         videoFragments,
         audioFragments,
         playlist: store$.value.playlists.playlists[videoLevel.playlistID]!,
-      }),
+      })
     ),
     map(
       ({
@@ -100,7 +100,7 @@ export const addDownloadJobEpic: Epic<
           playlist,
           container,
         };
-      },
+      }
     ),
     mergeMap(
       ({
@@ -154,14 +154,14 @@ export const addDownloadJobEpic: Epic<
                 jobId,
                 subtitleLevel,
                 playlist,
-                subtitleText,
+                subtitleText
               );
             }
             return actions;
-          })(),
+          })()
         );
 
         return storeAndEmit$.pipe(mergeMap((acts) => of(...acts)));
-      },
-    ),
+      }
+    )
   );

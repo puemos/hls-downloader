@@ -78,21 +78,21 @@ export const playlistsSlice: Slice<
     },
     fetchPlaylistLevels(
       state,
-      action: PayloadAction<IFetchPlaylistLevelsPayload>,
+      action: PayloadAction<IFetchPlaylistLevelsPayload>
     ) {
       const { playlistID } = action.payload;
       state.playlistsStatus[playlistID]!.status = "fetching";
     },
     fetchPlaylistLevelsSuccess(
       state,
-      action: PayloadAction<IFetchPlaylistLevelsSuccessPayload>,
+      action: PayloadAction<IFetchPlaylistLevelsSuccessPayload>
     ) {
       const { playlistID } = action.payload;
       state.playlistsStatus[playlistID]!.status = "ready";
     },
     fetchPlaylistLevelsFailed(
       state,
-      action: PayloadAction<IFetchPlaylistLevelsFailedPayload>,
+      action: PayloadAction<IFetchPlaylistLevelsFailedPayload>
     ) {
       const { playlistID } = action.payload;
       state.playlistsStatus[playlistID]!.status = "error";

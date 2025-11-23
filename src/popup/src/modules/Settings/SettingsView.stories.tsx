@@ -13,10 +13,14 @@ export const Default: Story = {
   render: () => (
     <SettingsView
       concurrency={3}
+      maxActiveDownloads={2}
       fetchAttempts={5}
       saveDialog={true}
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
+      onActiveDownloadsIncrease={() => {}}
+      onActiveDownloadsDecrease={() => {}}
+      onActiveDownloadsUnlimited={() => {}}
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
@@ -30,10 +34,14 @@ export const Minimal: Story = {
   render: () => (
     <SettingsView
       concurrency={1}
+      maxActiveDownloads={0}
       fetchAttempts={1}
       saveDialog={false}
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
+      onActiveDownloadsIncrease={() => {}}
+      onActiveDownloadsDecrease={() => {}}
+      onActiveDownloadsUnlimited={() => {}}
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}

@@ -8,7 +8,7 @@ export const generateFileName = () => {
   const run = (
     playlist: Playlist,
     level: Level,
-    options?: GenerateFileNameOptions,
+    options?: GenerateFileNameOptions
   ): string => {
     const path = playlist.uri.split("?")[0];
     const chunks = path.split("/");

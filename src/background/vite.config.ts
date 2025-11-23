@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   const outDir = resolve(
     __dirname,
     "../../",
-    outDirName,
+    outDirName
   ); /* default shared dist */
 
   return {

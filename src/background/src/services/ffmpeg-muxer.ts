@@ -14,7 +14,7 @@ export type MuxResult = { blob: Blob; mime: string };
 
 async function writeSubtitles(
   ffmpeg: FFmpeg,
-  subtitleText: string | undefined,
+  subtitleText: string | undefined
 ) {
   if (subtitleText === undefined) {
     return;
@@ -75,7 +75,7 @@ export async function muxStreams({
       "-b:a",
       "192k",
       "-af",
-      "aresample=async=1:first_pts=0",
+      "aresample=async=1:first_pts=0"
     );
     if (includeSubtitles) {
       args.push("-map", "1:s:0");

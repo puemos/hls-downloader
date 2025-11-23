@@ -158,7 +158,7 @@ export const M3u8Parser: IParser = {
             groupId: key,
           };
         });
-      },
+      }
     );
 
     const subtitleResults = Object.entries(subtitlePlaylists).flatMap(
@@ -185,7 +185,7 @@ export const M3u8Parser: IParser = {
             };
           })
           .flatMap((entry) => (entry ? [entry] : []));
-      },
+      }
     );
 
     const closedCaptionResults = Object.entries(closedCaptions).flatMap(
@@ -210,7 +210,7 @@ export const M3u8Parser: IParser = {
             };
           })
           .flatMap((entry) => (entry ? [entry] : []));
-      },
+      }
     );
 
     return results
@@ -255,7 +255,7 @@ export const M3u8Parser: IParser = {
               : new Uint8Array(
                   key.iv.buffer,
                   key.iv.byteOffset,
-                  key.iv.byteLength,
+                  key.iv.byteLength
                 );
           iv = `0x${Array.from(view)
             .map((v) => v.toString(16).padStart(2, "0"))
@@ -275,7 +275,7 @@ export const M3u8Parser: IParser = {
     (Array.isArray(sessionKeys) ? sessionKeys : [sessionKeys]).forEach(
       (key: any) => {
         collectKey(key);
-      },
+      }
     );
 
     return {

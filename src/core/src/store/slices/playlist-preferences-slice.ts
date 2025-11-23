@@ -60,7 +60,7 @@ export const playlistPreferencesSlice: Slice<
     },
     setSubtitleSelection(
       state,
-      action: PayloadAction<ISetSubtitleSelectionPayload>,
+      action: PayloadAction<ISetSubtitleSelectionPayload>
     ) {
       const { playlistID, levelID } = action.payload;
       state.subtitleSelections[playlistID] = levelID;
@@ -71,7 +71,7 @@ export const playlistPreferencesSlice: Slice<
     },
     removePlaylistPreferences(
       state,
-      action: PayloadAction<IRemovePlaylistPreferencesPayload>,
+      action: PayloadAction<IRemovePlaylistPreferencesPayload>
     ) {
       const { playlistID } = action.payload;
       delete state.audioSelections[playlistID];

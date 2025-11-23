@@ -3,19 +3,19 @@ import { IDecryptor, ILoader } from "../services";
 
 export const decryptSingleFragmentFactory = (
   loader: ILoader,
-  decryptor: IDecryptor,
+  decryptor: IDecryptor
 ) => {
   const run = async (
     key: Key,
     data: ArrayBuffer,
-    fetchAttempts: number,
+    fetchAttempts: number
   ): Promise<ArrayBuffer> => {
     if (!key.uri || !key.iv) {
       return data;
     }
     const keyArrayBuffer = await loader.fetchArrayBuffer(
       key.uri,
-      fetchAttempts,
+      fetchAttempts
     );
     const decryptedData = await decryptor.decrypt(data, keyArrayBuffer, key.iv);
     return decryptedData;

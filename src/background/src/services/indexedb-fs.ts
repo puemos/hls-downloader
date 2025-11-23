@@ -151,7 +151,7 @@ export class IndexedDBBucket implements Bucket {
   constructor(
     readonly videoLength: number,
     readonly audioLength: number,
-    readonly id: string,
+    readonly id: string
   ) {
     const base = id.endsWith(".mp4") ? id.slice(0, -4) : id;
     this.fileName = (filenamify(base) ?? "file").normalize("NFC");
@@ -238,7 +238,7 @@ export class IndexedDBBucket implements Bucket {
               ["chunks"],
               "chunks",
               unknown
-            > | null,
+            > | null
           ) {
             if (!currentCursor) {
               controller.close();
@@ -254,12 +254,12 @@ export class IndexedDBBucket implements Bucket {
           }
         },
       },
-      {},
+      {}
     );
   }
 
   async getLink(
-    onProgress?: (progress: number, message: string) => void,
+    onProgress?: (progress: number, message: string) => void
   ): Promise<string> {
     await this.ensureDb();
 
@@ -270,7 +270,7 @@ export class IndexedDBBucket implements Bucket {
           videoLength: this.videoLength,
           audioLength: this.audioLength,
         },
-        onProgress,
+        onProgress
       );
     }
 
@@ -286,7 +286,7 @@ export class IndexedDBBucket implements Bucket {
   }
 
   private async streamToMp4Blob(
-    onProgress?: (progress: number, message: string) => void,
+    onProgress?: (progress: number, message: string) => void
   ) {
     await this.ensureDb();
 
@@ -320,13 +320,13 @@ export class IndexedDBBucket implements Bucket {
     } catch (error) {
       console.error(`Muxing failed for ${outputFileName}:`, error);
       throw new Error(
-        `Muxing failed (output file missing). Check audio/subtitle tracks and try again.`,
+        `Muxing failed (output file missing). Check audio/subtitle tracks and try again.`
       );
     }
   }
   // Helper function to read chunks by index to avoid transaction timeout
   private async readChunkByIndex(
-    chunkIndex: number,
+    chunkIndex: number
   ): Promise<Uint8Array | null> {
     const transaction = this.db!.transaction(this.objectStoreName, "readonly");
     const store = transaction.objectStore(this.objectStoreName);
@@ -344,7 +344,7 @@ export class IndexedDBBucket implements Bucket {
   // Helper function to concatenate chunks using streams
   private async concatenateChunks(
     startIndex: number,
-    length: number,
+    length: number
   ): Promise<Blob> {
     const chunks: Uint8Array[] = [];
 
@@ -383,7 +383,7 @@ const cleanup: IFS["cleanup"] = async function () {
 const createBucket: IFS["createBucket"] = async function (
   id: string,
   videoLength: number,
-  audioLength: number,
+  audioLength: number
 ) {
   await setBucketMeta(id, { videoLength, audioLength });
   buckets[id] = new IndexedDBBucket(videoLength, audioLength, id);
@@ -391,14 +391,31 @@ const createBucket: IFS["createBucket"] = async function (
 };
 
 const deleteBucket: IFS["deleteBucket"] = async function (id: string) {
-  const bucket = await getBucket(id);
-  if (bucket) {
-    await bucket.deleteDB();
+  try {
+    const bucket = await getBucket(id);
+    if (bucket) {
+      await bucket.deleteDB();
+    } else {
+      // Best-effort delete even if metadata is missing
+      try {
+        await deleteDB(id);
+      } catch (_error) {
+        // ignore
+      }
+    }
+  } finally {
+    delete buckets[id];
+    try {
+      await deleteBucketMeta(id);
+    } catch (_error) {
+      // ignore
+    }
+    try {
+      await deleteSubtitleText(id);
+    } catch (_error) {
+      // ignore
+    }
   }
-  delete buckets[id];
-  await deleteBucketMeta(id);
-  await deleteSubtitleText(id);
-  return Promise.resolve();
 };
 
 const getBucket: IFS["getBucket"] = async function (id: string) {
@@ -419,7 +436,7 @@ const getBucket: IFS["getBucket"] = async function (id: string) {
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
-  { dialog },
+  { dialog }
 ) {
   if (link === "") {
     return Promise.resolve();
@@ -454,7 +471,7 @@ function shouldUseOffscreen() {
   return Boolean(
     chromeApi?.offscreen &&
       typeof chromeApi.offscreen.createDocument === "function" &&
-      typeof document === "undefined",
+      typeof document === "undefined"
   );
 }
 
@@ -481,7 +498,7 @@ async function requestObjectUrlOffscreen(
     videoLength: number;
     audioLength: number;
   },
-  onProgress?: (progress: number, message: string) => void,
+  onProgress?: (progress: number, message: string) => void
 ) {
   await ensureOffscreenDocument();
 
@@ -523,7 +540,7 @@ async function requestObjectUrlOffscreen(
           return;
         }
         resolve(response.url);
-      },
+      }
     );
   });
 }
@@ -538,14 +555,14 @@ function getDownloadsApi() {
 
 async function setSubtitleText(
   id: string,
-  subtitle: { text: string; language?: string; name?: string },
+  subtitle: { text: string; language?: string; name?: string }
 ) {
   const db = await getSubtitlesDb();
   await db.put(SUBTITLE_STORE_NAME, { ...subtitle, id });
 }
 
 async function getSubtitleText(
-  id: string,
+  id: string
 ): Promise<{ text: string; language?: string; name?: string } | undefined> {
   const db = await getSubtitlesDb();
   const record = await db.get(SUBTITLE_STORE_NAME, id);

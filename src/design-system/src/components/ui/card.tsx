@@ -12,11 +12,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       className={cn(
         "flex flex-col gap-2 rounded-lg border bg-card p-3 text-card-foreground shadow-md",
         interactive && "cursor-pointer hover:bg-muted transition-colors",
-        className,
+        className
       )}
       {...props}
     />
-  ),
+  )
 );
 Card.displayName = "Card";
 

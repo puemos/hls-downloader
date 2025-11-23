@@ -22,18 +22,18 @@ export const inspectLevelEpic: Epic<
           levelInspectionsSlice.actions.inspectFailed({
             levelId,
             message: "Level not found",
-          }),
+          })
         );
       }
 
       return from(
         inspectLevelEncryptionFactory(loader, parser)(
           level,
-          state$.value.config.fetchAttempts,
-        ),
+          state$.value.config.fetchAttempts
+        )
       ).pipe(
         map((inspection) =>
-          levelInspectionsSlice.actions.inspectSuccess({ inspection }),
+          levelInspectionsSlice.actions.inspectSuccess({ inspection })
         ),
         catchError((error: unknown) =>
           of(
@@ -42,9 +42,9 @@ export const inspectLevelEpic: Epic<
               message:
                 (error as Error)?.message ||
                 "Unable to inspect encryption for level",
-            }),
-          ),
-        ),
+            })
+          )
+        )
       );
-    }),
+    })
   );

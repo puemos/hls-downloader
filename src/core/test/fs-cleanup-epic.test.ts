@@ -19,7 +19,7 @@ describe("fsCleanupOnInitEpic", () => {
         loader: {} as any,
         decryptor: {} as any,
         parser: {} as any,
-      }),
+      })
     );
     expect(fs.cleanup).toHaveBeenCalled();
     expect(result.type).toBe("init/done");

@@ -6,7 +6,7 @@ export const getSubtitleTextFactory = (loader: ILoader, parser: IParser) => {
   const run = async (level: Level, fetchAttempts: number): Promise<string> => {
     const fragments = await getFragmentsDetailsFactory(loader, parser)(
       level,
-      fetchAttempts,
+      fetchAttempts
     );
 
     const parts: string[] = [];
@@ -15,7 +15,7 @@ export const getSubtitleTextFactory = (loader: ILoader, parser: IParser) => {
       for (const fragment of fragments) {
         const fragmentText = await loader.fetchText(
           fragment.uri,
-          fetchAttempts,
+          fetchAttempts
         );
         parts.push(fragmentText.trim());
       }

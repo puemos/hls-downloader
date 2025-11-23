@@ -18,7 +18,7 @@ const videoLevel = new Level(
   1280,
   720,
   3000000,
-  30,
+  30
 );
 const audioLevel = new Level(
   "audio",
@@ -37,7 +37,7 @@ const audioLevel = new Level(
   true,
   true,
   undefined,
-  "audio",
+  "audio"
 );
 const subtitleLevel = new Level(
   "subtitle",
@@ -49,7 +49,7 @@ const subtitleLevel = new Level(
   undefined,
   undefined,
   "eng",
-  "English",
+  "English"
 );
 
 export const Ready: Story = {

@@ -1,14 +1,14 @@
 export async function decrypt(
   data: ArrayBuffer,
   keyData: ArrayBuffer,
-  iv: Uint8Array,
+  iv: Uint8Array
 ) {
   const rawKey = await crypto.subtle.importKey(
     "raw",
     keyData,
     "aes-cbc",
     false,
-    ["decrypt"],
+    ["decrypt"]
   );
   const decryptData = await crypto.subtle.decrypt(
     {
@@ -16,7 +16,7 @@ export async function decrypt(
       iv: iv,
     },
     rawKey,
-    data,
+    data
   );
   return decryptData;
 }

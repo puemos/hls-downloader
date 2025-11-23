@@ -18,7 +18,7 @@ interface ReturnType {
   downloadLevel: (
     videoId: string,
     audioLevelID?: string,
-    subtitleLevelID?: string,
+    subtitleLevelID?: string
   ) => void;
   inspections: ILevelInspectionsState;
   preferences: IPlaylistPreferencesState;
@@ -34,16 +34,16 @@ const usePlaylistController = ({ id }: { id: string }): ReturnType => {
   const dispatch = useDispatch();
 
   const status = useSelector<RootState, PlaylistStatus | null>(
-    (state) => state.playlists.playlistsStatus[id],
+    (state) => state.playlists.playlistsStatus[id]
   );
   const inspections = useSelector<RootState, ILevelInspectionsState>(
-    (state) => state.levelInspections,
+    (state) => state.levelInspections
   );
   const preferences = useSelector<RootState, IPlaylistPreferencesState>(
-    (state) => state.playlistPreferences,
+    (state) => state.playlistPreferences
   );
   const preferredAudioLanguage = useSelector<RootState, string | null>(
-    (state) => state.config.preferredAudioLanguage,
+    (state) => state.config.preferredAudioLanguage
   );
   const levels = useSelector<RootState, Level[]>((state) => {
     const list = Object.values(state.levels.levels)
@@ -62,11 +62,11 @@ const usePlaylistController = ({ id }: { id: string }): ReturnType => {
           levelID: levelId,
           audioLevelID,
           subtitleLevelID,
-        }),
+        })
       );
       setTab(TabOptions.DOWNLOADS);
     },
-    [dispatch, setTab],
+    [dispatch, setTab]
   );
   return {
     status,
@@ -81,10 +81,10 @@ const usePlaylistController = ({ id }: { id: string }): ReturnType => {
           playlistPreferencesSlice.actions.setAudioSelection({
             playlistID: id,
             levelID,
-          }),
+          })
         );
       },
-      [dispatch, id],
+      [dispatch, id]
     ),
     setSubtitlePreference: useCallback(
       (levelID: string) => {
@@ -92,20 +92,20 @@ const usePlaylistController = ({ id }: { id: string }): ReturnType => {
           playlistPreferencesSlice.actions.setSubtitleSelection({
             playlistID: id,
             levelID,
-          }),
+          })
         );
       },
-      [dispatch, id],
+      [dispatch, id]
     ),
     inspectLevel: useCallback(
       (levelID: string) => {
         dispatch(
           levelInspectionsSlice.actions.inspect({
             levelId: levelID,
-          }),
+          })
         );
       },
-      [dispatch],
+      [dispatch]
     ),
   };
 };

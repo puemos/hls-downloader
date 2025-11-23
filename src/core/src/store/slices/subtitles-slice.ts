@@ -68,14 +68,14 @@ export const subtitlesSlice: Slice<
     },
     downloadSuccess(
       state,
-      action: PayloadAction<IDownloadSubtitleSuccessPayload>,
+      action: PayloadAction<IDownloadSubtitleSuccessPayload>
     ) {
       const { levelID, filename } = action.payload;
       state.subtitles[levelID] = { status: "done", filename };
     },
     downloadFailed(
       state,
-      action: PayloadAction<IDownloadSubtitleFailedPayload>,
+      action: PayloadAction<IDownloadSubtitleFailedPayload>
     ) {
       const { levelID, message } = action.payload;
       state.subtitles[levelID] = { status: "error", message };

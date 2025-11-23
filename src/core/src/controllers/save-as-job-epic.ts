@@ -26,7 +26,7 @@ export const saveAsJobEpic: Epic<
                 text: job.subtitleText!,
                 language: job.subtitleLanguage,
                 name: job.subtitleName,
-              }),
+              })
             ).pipe(
               map(() => {
                 console.log("[subtitle] re-stored before save", {
@@ -35,7 +35,7 @@ export const saveAsJobEpic: Epic<
                   language: job.subtitleLanguage,
                 });
                 return null;
-              }),
+              })
             )
           : of(null);
 
@@ -47,15 +47,15 @@ export const saveAsJobEpic: Epic<
                 jobId,
                 progress,
                 message,
-              }),
-            ),
-          ),
+              })
+            )
+          )
         ),
         mergeMap((link) =>
           from(
             saveAsFactory(fs)(job.filename, link, {
               dialog,
-            }),
+            })
           ).pipe(
             map(() => jobsSlice.actions.saveAsSuccess({ jobId: job.id, link })),
             catchError((error: unknown) =>
@@ -65,10 +65,10 @@ export const saveAsJobEpic: Epic<
                   message:
                     (error as Error)?.message ||
                     "Failed to finalize download (mux or save)",
-                }),
-              ),
-            ),
-          ),
+                })
+              )
+            )
+          )
         ),
         catchError((error: unknown) =>
           of(
@@ -77,9 +77,9 @@ export const saveAsJobEpic: Epic<
               message:
                 (error as Error)?.message ||
                 "Failed to prepare download (mux or save)",
-            }),
-          ),
-        ),
+            })
+          )
+        )
       );
-    }),
+    })
   );

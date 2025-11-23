@@ -3,19 +3,19 @@ import { ILoader, IParser } from "../services";
 
 export const getFragmentsDetailsFactory = (
   loader: ILoader,
-  parser: IParser,
+  parser: IParser
 ) => {
   const run = async (
     playlist: Level,
-    fetchAttempts: number,
+    fetchAttempts: number
   ): Promise<Fragment[]> => {
     const levelPlaylistText = await loader.fetchText(
       playlist.uri,
-      fetchAttempts,
+      fetchAttempts
     );
     const fragments = parser.parseLevelPlaylist(
       levelPlaylistText,
-      playlist.uri,
+      playlist.uri
     );
     return fragments;
   };
