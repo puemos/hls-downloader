@@ -9,6 +9,8 @@ interface ReturnType {
   filter: string;
   setCurrentJobId: (jobId?: string) => void;
   setFilter: (filter: string) => void;
+  hasJobs: boolean;
+  showFilterInput: boolean;
 }
 
 const jobsFilter =
@@ -26,12 +28,12 @@ const jobsFilter =
 
 const useDownloadsController = (): ReturnType => {
   const [currentJobId, setCurrentJobId] = useState<string | undefined>(
-    undefined,
+    undefined
   );
   const [filter, setFilter] = useState("");
 
   const jobsRecord = useSelector<RootState, Record<string, Job | null>>(
-    (state) => state.jobs.jobs,
+    (state) => state.jobs.jobs
   );
 
   const jobs = Object.values(jobsRecord)
@@ -39,6 +41,7 @@ const useDownloadsController = (): ReturnType => {
     .filter(jobsFilter(filter));
 
   jobs.sort((a, b) => b!.createdAt - a!.createdAt);
+  const hasJobs = jobs.length > 0;
 
   return {
     jobs,
@@ -46,6 +49,8 @@ const useDownloadsController = (): ReturnType => {
     setCurrentJobId,
     filter,
     setFilter,
+    hasJobs,
+    showFilterInput: hasJobs,
   };
 };
 

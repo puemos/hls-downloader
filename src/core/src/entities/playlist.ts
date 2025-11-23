@@ -5,6 +5,6 @@ export class Playlist {
     readonly createdAt: number,
     readonly pageTitle?: string,
     readonly initiator?: string,
-    readonly tabId?: number,
+    readonly tabId?: number
   ) {}
 }

@@ -139,7 +139,7 @@ file0.ts
 `;
     const inspection = M3u8Parser.inspectLevelEncryption(
       encryptedPlaylist,
-      base,
+      base
     );
     expect(inspection.methods).toEqual(["AES-128"]);
     expect(inspection.keyUris).toEqual([`${base}enc.key`]);

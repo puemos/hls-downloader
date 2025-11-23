@@ -22,12 +22,12 @@ describe("CryptoDecryptor", () => {
       keyData,
       "aes-cbc",
       false,
-      ["encrypt"],
+      ["encrypt"]
     );
     const encrypted = await crypto.subtle.encrypt(
       { name: "aes-cbc", iv },
       cryptoKey,
-      plaintext,
+      plaintext
     );
 
     const decrypted = await decrypt(encrypted, keyData.buffer, iv);
@@ -41,7 +41,7 @@ describe("CryptoDecryptor", () => {
       .mockRejectedValue(new Error("import failure"));
 
     await expect(
-      decrypt(new ArrayBuffer(0), new ArrayBuffer(16), new Uint8Array(16)),
+      decrypt(new ArrayBuffer(0), new ArrayBuffer(16), new Uint8Array(16))
     ).rejects.toThrow("import failure");
 
     importSpy.mockRestore();
@@ -56,7 +56,7 @@ describe("CryptoDecryptor", () => {
       .mockRejectedValue(new Error("decrypt failure"));
 
     await expect(
-      decrypt(new ArrayBuffer(0), new ArrayBuffer(16), new Uint8Array(16)),
+      decrypt(new ArrayBuffer(0), new ArrayBuffer(16), new Uint8Array(16))
     ).rejects.toThrow("decrypt failure");
 
     importSpy.mockRestore();

@@ -6,7 +6,7 @@ export const storeSubtitleTextFactory = (fs: IFS) => {
     bucketId: string,
     level: Pick<Level, "language" | "name" | "id">,
     playlist: Pick<Playlist, "pageTitle" | "uri">,
-    text: string,
+    text: string
   ): Promise<void> => {
     console.log("[subtitle] store-subtitle-text", {
       bucketId,

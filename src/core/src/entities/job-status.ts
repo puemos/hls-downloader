@@ -4,7 +4,8 @@ type JobStatusType =
   | "ready"
   | "init"
   | "saving"
-  | "error";
+  | "error"
+  | "queued";
 
 export interface JobStatus {
   status: JobStatusType;

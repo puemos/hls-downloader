@@ -13,7 +13,7 @@ export function createRootEpic() {
   const rootEpic: Epic<any, any, RootState, Dependencies> = (
     action$,
     state$,
-    deps,
+    deps
   ) => epic$.pipe(mergeMap((epic) => epic(action$, state$, deps)));
   return rootEpic;
 }

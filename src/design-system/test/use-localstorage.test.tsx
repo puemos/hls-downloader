@@ -32,7 +32,7 @@ describe("useLocalStorage", () => {
     window.localStorage.setItem("settings", JSON.stringify({ theme: "dark" }));
 
     const { result } = renderHook(() =>
-      useLocalStorage("settings", { theme: "light" }),
+      useLocalStorage("settings", { theme: "light" })
     );
 
     expect(result.current[0]).toEqual({ theme: "dark" });
@@ -40,7 +40,7 @@ describe("useLocalStorage", () => {
 
   it("uses default value and updates storage", () => {
     const { result } = renderHook(() =>
-      useLocalStorage("prefs", { theme: "light" }),
+      useLocalStorage("prefs", { theme: "light" })
     );
 
     expect(result.current[0]).toEqual({ theme: "light" });
@@ -52,10 +52,10 @@ describe("useLocalStorage", () => {
     expect(result.current[0]).toEqual({ theme: "dark" });
     expect(window.localStorage.setItem).toHaveBeenCalledWith(
       "prefs",
-      JSON.stringify({ theme: "dark" }),
+      JSON.stringify({ theme: "dark" })
     );
     expect(window.localStorage.getItem("prefs")).toBe(
-      JSON.stringify({ theme: "dark" }),
+      JSON.stringify({ theme: "dark" })
     );
   });
 });

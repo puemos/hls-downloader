@@ -3,6 +3,8 @@ import React from "react";
 
 interface Props {
   concurrency: number;
+  maxActiveDownloads: number;
+  activeDownloadsUnlimited: boolean;
   fetchAttempts: number;
   saveDialog: boolean;
   onFetchAttemptsIncrease: () => void;
@@ -10,6 +12,9 @@ interface Props {
   onSaveDialogToggle: () => void;
   onConcurrencyIncrease: () => void;
   onConcurrencyDecrease: () => void;
+  onActiveDownloadsIncrease: () => void;
+  onActiveDownloadsDecrease: () => void;
+  onActiveDownloadsUnlimited: () => void;
   preferredAudioLanguage?: string | null;
   onSetPreferredAudioLanguage: (lang: string | null) => void;
 }
@@ -52,6 +57,11 @@ const SettingsView = ({
   saveDialog,
   onConcurrencyIncrease,
   onConcurrencyDecrease,
+  onActiveDownloadsIncrease,
+  onActiveDownloadsDecrease,
+  onActiveDownloadsUnlimited,
+  activeDownloadsUnlimited,
+  maxActiveDownloads,
   onFetchAttemptsIncrease,
   onFetchAttemptsDecrease,
   onSaveDialogToggle,
@@ -59,27 +69,81 @@ const SettingsView = ({
   onSetPreferredAudioLanguage,
 }: Props) => {
   return (
-    <div className="flex flex-col p-4 space-y-4">
+    <div className="flex flex-col px-4 pb-4 space-y-4">
       <h2 className="text-lg font-semibold">Settings</h2>
       <div className="space-y-3">
         <Card className="flex-row items-center justify-between gap-2">
-          <p className="text-sm font-medium">Concurrency</p>
+          <div className="flex flex-col">
+            <p className="text-sm font-medium">Active downloads</p>
+            <p className="text-[11px] text-muted-foreground">
+              Limit how many jobs run at once
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               size="sm"
+              variant={activeDownloadsUnlimited ? "default" : "outline"}
+              aria-label="set active downloads to unlimited"
+              onClick={onActiveDownloadsUnlimited}
+            >
+              Unlimited
+            </Button>
+            <Button
+              size="sm"
               variant="outline"
-              aria-label="decrease fetch attempts"
-              onClick={onConcurrencyDecrease}
+              aria-label="decrease active downloads"
+              onClick={onActiveDownloadsDecrease}
+              disabled={activeDownloadsUnlimited || maxActiveDownloads <= 1}
             >
               -
             </Button>
-            <div className="w-10 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm">
-              <div>{concurrency}</div>
+            <div className="w-16 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm px-2">
+              <div>
+                {activeDownloadsUnlimited ? (
+                  "∞"
+                ) : (
+                  <span className="inline-flex leading-tight min-w-[1ch] justify-center">
+                    {maxActiveDownloads}
+                  </span>
+                )}
+              </div>
             </div>
             <Button
               size="sm"
               variant="outline"
-              aria-label="increase fetch attempts"
+              aria-label="increase active downloads"
+              onClick={onActiveDownloadsIncrease}
+            >
+              +
+            </Button>
+          </div>
+        </Card>
+
+        <Card className="flex-row items-center justify-between gap-2">
+          <div className="flex flex-col">
+            <p className="text-sm font-medium">Fragment concurrency</p>
+            <p className="text-[11px] text-muted-foreground">
+              Number of fragments fetched in parallel
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              aria-label="decrease fragment concurrency"
+              onClick={onConcurrencyDecrease}
+            >
+              -
+            </Button>
+            <div className="w-16 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm">
+              <div className="inline-flex leading-tight min-w-[2ch] justify-center">
+                {concurrency}
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              aria-label="increase fragment concurrency"
               onClick={onConcurrencyIncrease}
             >
               +
@@ -88,7 +152,12 @@ const SettingsView = ({
         </Card>
 
         <Card className="flex-row items-center justify-between gap-2">
-          <p className="text-sm font-medium">Fetch Attempts</p>
+          <div className="flex flex-col">
+            <p className="text-sm font-medium">Fetch attempts</p>
+            <p className="text-[11px] text-muted-foreground">
+              Retry count per fragment request
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               size="sm"
@@ -98,8 +167,10 @@ const SettingsView = ({
             >
               -
             </Button>
-            <div className="w-10 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm">
-              <div>{fetchAttempts}</div>
+            <div className="w-16 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm">
+              <div className="inline-flex leading-tight min-w-[2ch] justify-center">
+                {fetchAttempts}
+              </div>
             </div>
             <Button
               size="sm"
@@ -113,7 +184,12 @@ const SettingsView = ({
         </Card>
 
         <Card className="flex-row items-center justify-between gap-2">
-          <p className="text-sm font-medium">Save Dialog</p>
+          <div className="flex flex-col">
+            <p className="text-sm font-medium">Save dialog</p>
+            <p className="text-[11px] text-muted-foreground">
+              Ask for a location before saving files
+            </p>
+          </div>
           <Switch
             aria-label="toggle save dialog"
             onClick={onSaveDialogToggle}

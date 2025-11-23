@@ -27,8 +27,16 @@ describe("downloadJobEpic", () => {
       fetchArrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(0)),
     };
     const decryptor = { decrypt: vi.fn() };
-    const action$ = of(jobsSlice.actions.add({ job }));
-    const state = { config: { concurrency: 1, fetchAttempts: 1 } };
+    const action$ = of(jobsSlice.actions.download({ jobId: "1" }));
+    const state = {
+      config: { concurrency: 1, fetchAttempts: 1 },
+      jobs: {
+        jobs: { "1": job },
+        jobsStatus: {
+          "1": { status: "queued", total: 1, done: 0 },
+        },
+      },
+    };
     const result = await firstValueFrom(
       downloadJobEpic(
         action$,
@@ -37,8 +45,8 @@ describe("downloadJobEpic", () => {
           fs,
           loader,
           decryptor,
-        } as any,
-      ),
+        } as any
+      )
     );
     expect(fs.createBucket).toHaveBeenCalledWith("1", 1, 0);
     expect(result).toEqual(jobsSlice.actions.incDownloadStatus({ jobId: "1" }));

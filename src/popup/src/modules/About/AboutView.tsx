@@ -1,5 +1,13 @@
 import { Button } from "@hls-downloader/design-system";
-import { Bug, Github, Lock, Scroll, Code2, Info } from "lucide-react";
+import {
+  Bug,
+  Github,
+  Lock,
+  Scroll,
+  Code2,
+  Info,
+  ExternalLink,
+} from "lucide-react";
 import React from "react";
 
 interface Props {
@@ -31,22 +39,25 @@ const AboutView = ({ version, name, description }: Props) => {
           {description}
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-3 text-sm">
-        <div className="flex items-center justify-between rounded-md border p-2">
+      <div className="grid grid-cols-2 text-sm border border-gray-300">
+        {/* Version */}
+        <div className="flex items-center justify-between p-2 border-b border-r border-gray-300">
           <div className="flex items-center gap-2 font-semibold">
             <Info className="h-4 w-4" />
             Version
           </div>
-          <div className="font-semibold">{version}</div>
+          <div className="p-2">{version}</div>
         </div>
 
-        <div className="flex items-center justify-between rounded-md border p-2">
+        {/* Report a bug */}
+        <div className="flex items-center justify-between p-2 border-b border-gray-300">
           <div className="flex items-center gap-2 font-semibold">
             <Bug className="h-4 w-4" />
             Report a bug
           </div>
           <Button
             size="sm"
+            className="underline decoration-wavy hover:decoration-purple-400"
             variant="link"
             onClick={() =>
               open("https://github.com/puemos/hls-downloader/issues")
@@ -56,13 +67,15 @@ const AboutView = ({ version, name, description }: Props) => {
           </Button>
         </div>
 
-        <div className="flex items-center justify-between rounded-md border p-2">
+        {/* Source code */}
+        <div className="flex items-center justify-between p-2 border-b border-r border-gray-300">
           <div className="flex items-center gap-2 font-semibold">
             <Code2 className="h-4 w-4" />
             Source code
           </div>
           <Button
             size="sm"
+            className="underline decoration-wavy hover:decoration-purple-400"
             variant="link"
             onClick={() => open("https://github.com/puemos/hls-downloader")}
           >
@@ -70,17 +83,19 @@ const AboutView = ({ version, name, description }: Props) => {
           </Button>
         </div>
 
-        <div className="flex items-center justify-between rounded-md border p-2">
+        {/* Privacy Policy */}
+        <div className="flex items-center justify-between p-2 border-b border-gray-300">
           <div className="flex items-center gap-2 font-semibold">
             <Lock className="h-4 w-4" />
             Privacy Policy
           </div>
           <Button
             size="sm"
+            className="underline decoration-wavy hover:decoration-purple-400"
             variant="link"
             onClick={() =>
               open(
-                "https://github.com/puemos/hls-downloader/blob/master/PRIVACY.md",
+                "https://github.com/puemos/hls-downloader/blob/master/PRIVACY.md"
               )
             }
           >
@@ -88,17 +103,19 @@ const AboutView = ({ version, name, description }: Props) => {
           </Button>
         </div>
 
-        <div className="flex items-center justify-between rounded-md border p-2">
+        {/* License */}
+        <div className="flex items-center justify-between p-2 border-r border-gray-300">
           <div className="flex items-center gap-2 font-semibold">
             <Scroll className="h-4 w-4" />
             License
           </div>
           <Button
             size="sm"
+            className="underline decoration-wavy hover:decoration-purple-400"
             variant="link"
             onClick={() =>
               open(
-                "https://github.com/puemos/hls-downloader/blob/master/LICENSE",
+                "https://github.com/puemos/hls-downloader/blob/master/LICENSE"
               )
             }
           >
@@ -106,13 +123,15 @@ const AboutView = ({ version, name, description }: Props) => {
           </Button>
         </div>
 
-        <div className="flex items-center justify-between rounded-md border p-2">
+        {/* Contribute */}
+        <div className="flex items-center justify-between p-2">
           <div className="flex items-center gap-2 font-semibold">
             <Github className="h-4 w-4" />
             Contribute
           </div>
           <Button
             size="sm"
+            className="underline decoration-wavy hover:decoration-purple-400"
             variant="link"
             onClick={() => open("https://github.com/puemos/hls-downloader")}
           >

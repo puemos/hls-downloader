@@ -29,7 +29,7 @@ describe("fetchPlaylistLevelsEpic", () => {
     loader = { fetchText: vi.fn().mockResolvedValue("") };
     parser = { parseMasterPlaylist: vi.fn().mockReturnValue([level]) };
     action$ = of(
-      playlistsSlice.actions.fetchPlaylistLevels({ playlistID: "1" }),
+      playlistsSlice.actions.fetchPlaylistLevels({ playlistID: "1" })
     ) as any;
     state = createMockState({
       playlists: { "1": playlist },
@@ -47,18 +47,18 @@ describe("fetchPlaylistLevelsEpic", () => {
           {
             loader,
             parser,
-          } as any,
-        ).pipe(toArray()),
+          } as any
+        ).pipe(toArray())
       );
 
       // Verify
       expect(loader.fetchText).toHaveBeenCalledWith(
         "http://example.com/master.m3u8",
-        1,
+        1
       );
       expect(parser.parseMasterPlaylist).toHaveBeenCalledWith(
         "",
-        "http://example.com/master.m3u8",
+        "http://example.com/master.m3u8"
       );
       expect(result).toEqual([
         playlistsSlice.actions.fetchPlaylistLevelsSuccess({ playlistID: "1" }),
@@ -78,14 +78,14 @@ describe("fetchPlaylistLevelsEpic", () => {
           {
             loader,
             parser,
-          } as any,
-        ).pipe(toArray()),
+          } as any
+        ).pipe(toArray())
       );
 
       // Verify fetch attempts was passed correctly
       expect(loader.fetchText).toHaveBeenCalledWith(
         "http://example.com/master.m3u8",
-        5,
+        5
       );
     });
   });
@@ -103,8 +103,8 @@ describe("fetchPlaylistLevelsEpic", () => {
           {
             loader,
             parser,
-          } as any,
-        ).pipe(toArray()),
+          } as any
+        ).pipe(toArray())
       );
 
       // Verify - should emit failure action
@@ -126,8 +126,8 @@ describe("fetchPlaylistLevelsEpic", () => {
         fetchPlaylistLevelsEpic(
           action$,
           { value: state } as any,
-          epicDependencies as any,
-        ).pipe(toArray()),
+          epicDependencies as any
+        ).pipe(toArray())
       );
 
       // Verify - should emit failure action

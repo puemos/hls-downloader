@@ -19,7 +19,7 @@ export const addPlaylistEpic: Epic<
       of(
         playlistsSlice.actions.fetchPlaylistLevels({
           playlistID: id,
-        }),
-      ),
-    ),
+        })
+      )
+    )
   );

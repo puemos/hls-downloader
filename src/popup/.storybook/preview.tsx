@@ -27,7 +27,7 @@ const videoLevel = new Level(
   1920,
   1080,
   4_500_000,
-  30,
+  30
 );
 const audioLevel = new Level(
   "audio",
@@ -39,7 +39,7 @@ const audioLevel = new Level(
   192_000,
   undefined,
   "en",
-  "English",
+  "English"
 );
 const subtitleLevel = new Level(
   "subtitle",
@@ -52,7 +52,7 @@ const subtitleLevel = new Level(
   undefined,
   "en",
   "English",
-  "cc",
+  "cc"
 );
 
 const jobOne = new Job(
@@ -63,7 +63,7 @@ const jobOne = new Job(
   Date.now(),
   1920,
   1080,
-  4_500_000,
+  4_500_000
 );
 const jobTwo = new Job(
   "2",
@@ -73,7 +73,7 @@ const jobTwo = new Job(
   Date.now(),
   1280,
   720,
-  2_000_000,
+  2_000_000
 );
 
 // Seed Storybook with a lightweight Redux store so hooks using `useSelector` and `useDispatch` work out of the box.
@@ -88,14 +88,14 @@ const preloadedState: RootState = {
         "https://example.com/master.m3u8",
         Date.now(),
         "Storybook playlist",
-        "storybook",
+        "storybook"
       ),
       [otherPlaylistId]: new Playlist(
         otherPlaylistId,
         "https://example.com/other.m3u8",
         Date.now(),
         "Another playlist",
-        "storybook",
+        "storybook"
       ),
     },
     playlistsStatus: {

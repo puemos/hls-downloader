@@ -87,7 +87,7 @@ export const levelInspectionsSlice: Slice<
     },
     removePlaylistInspections(
       state,
-      action: PayloadAction<IRemovePlaylistInspectionsPayload>,
+      action: PayloadAction<IRemovePlaylistInspectionsPayload>
     ) {
       const { playlistID } = action.payload;
       for (const id in state.inspections) {

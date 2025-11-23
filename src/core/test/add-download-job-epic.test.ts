@@ -59,7 +59,7 @@ describe("addDownloadJobEpic", () => {
     mockParser.parseLevelPlaylist = vi
       .fn()
       .mockImplementation((_text, uri) =>
-        uri === "video" ? [videoFragment] : [audioFragment],
+        uri === "video" ? [videoFragment] : [audioFragment]
       );
 
     // Create mock state
@@ -73,13 +73,13 @@ describe("addDownloadJobEpic", () => {
   it("creates a download job for video and audio levels", async () => {
     // Setup
     const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" }),
+      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
 
     // Execute
     const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any),
+      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
 
     // Verify
@@ -110,13 +110,13 @@ describe("addDownloadJobEpic", () => {
   it("creates a download job for video only when no audio level is provided", async () => {
     // Setup
     const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v" }),
+      levelsSlice.actions.download({ levelID: "v" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
 
     // Execute
     const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any),
+      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
 
     // Verify
@@ -137,12 +137,12 @@ describe("addDownloadJobEpic", () => {
     // Setup - configure fetch attempts
     mockState.config.fetchAttempts = 3;
     const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" }),
+      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
     // Execute
     await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any),
+      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
     // Verify that loader uses the configured fetch attempts
     expect(mockLoader.fetchText).toHaveBeenCalledWith("video", 3);
@@ -153,18 +153,18 @@ describe("addDownloadJobEpic", () => {
     // Setup - different playlist title
     playlist.pageTitle = "My Custom Title";
     const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v" }),
+      levelsSlice.actions.download({ levelID: "v" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
     // Execute
     const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any),
+      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
 
     // Verify filename contains the custom title
     expect(result.type).toBe(jobsSlice.actions.add.type);
     expect((result as any).payload.job.filename).toBe(
-      "My Custom Title-master.mp4",
+      "My Custom Title-master.mp4"
     );
   });
 
@@ -175,12 +175,12 @@ describe("addDownloadJobEpic", () => {
       .mockRejectedValue(new Error("Network error"));
 
     const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v" }),
+      levelsSlice.actions.download({ levelID: "v" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
     // Verify that the epic completes without throwing
     const promise = firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any),
+      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
     // The epic should complete with an empty result or an error action
     await expect(promise).rejects.toThrow();

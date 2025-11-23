@@ -82,7 +82,7 @@ describe("use-cases", () => {
       "1",
       "https://a/b/c.m3u8",
       Date.now(),
-      "page",
+      "page"
     );
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
@@ -94,7 +94,7 @@ describe("use-cases", () => {
       "1",
       "https://a/b/c.m3u8",
       Date.now(),
-      "Cafe\u0301",
+      "Cafe\u0301"
     );
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
@@ -162,17 +162,17 @@ describe("use-cases", () => {
       "stream",
       "l1",
       "p1",
-      "http://example.com/level.m3u8",
+      "http://example.com/level.m3u8"
     );
     const run = getFragmentsDetailsFactory(loader, parser);
     const result = await run(level, 7);
     expect(loader.fetchText).toHaveBeenCalledWith(
       "http://example.com/level.m3u8",
-      7,
+      7
     );
     expect(parser.parseLevelPlaylist).toHaveBeenCalledWith(
       "playlist",
-      "http://example.com/level.m3u8",
+      "http://example.com/level.m3u8"
     );
     expect(result).toEqual(fragments);
   });
@@ -194,11 +194,11 @@ describe("use-cases", () => {
     const result = await run("http://example.com/master.m3u8", 9);
     expect(loader.fetchText).toHaveBeenCalledWith(
       "http://example.com/master.m3u8",
-      9,
+      9
     );
     expect(parser.parseMasterPlaylist).toHaveBeenCalledWith(
       "master",
-      "http://example.com/master.m3u8",
+      "http://example.com/master.m3u8"
     );
     expect(result).toEqual(levels);
   });

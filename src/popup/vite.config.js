@@ -6,7 +6,7 @@ const outDirName = process.env.DIST_DIR ?? "dist";
 const outDir = resolve(
   __dirname,
   "../../",
-  outDirName,
+  outDirName
 ); /* default shared dist */
 
 export default defineConfig({

@@ -25,14 +25,14 @@ describe("jobs slice", () => {
 
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.add({ job }),
+        jobsSlice.actions.add({ job })
       );
 
       expect(nextState.jobs["job1"]).toEqual(job);
       expect(nextState.jobsStatus["job1"]).toBeDefined();
-      expect(nextState.jobsStatus["job1"]?.status).toBe("downloading");
+      expect(nextState.jobsStatus["job1"]?.status).toBe("queued");
       expect(nextState.jobsStatus["job1"]?.total).toBe(
-        job.videoFragments.length + job.audioFragments.length,
+        job.videoFragments.length + job.audioFragments.length
       );
       expect(nextState.jobsStatus["job1"]?.done).toBe(0);
     });
@@ -58,10 +58,68 @@ describe("jobs slice", () => {
 
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.add({ job }),
+        jobsSlice.actions.add({ job })
       );
 
       expect(nextState.jobsStatus["job1"]?.total).toBe(5); // 2 video + 3 audio
+    });
+  });
+
+  describe("queue action", () => {
+    it("should move a job to queued and reset progress", () => {
+      const job = createTestJob({ id: "job1" });
+      let state = {
+        jobs: { job1: job },
+        jobsStatus: {
+          job1: {
+            status: "error" as const,
+            total: 5,
+            done: 3,
+            saveProgress: 0.5,
+            saveMessage: "message",
+            errorMessage: "failed",
+          },
+        },
+      };
+
+      state = jobsSlice.reducer(
+        state,
+        jobsSlice.actions.queue({ jobId: "job1" })
+      );
+
+      expect(state.jobsStatus["job1"]?.status).toBe("queued");
+      expect(state.jobsStatus["job1"]?.done).toBe(0);
+      expect(state.jobsStatus["job1"]?.saveProgress).toBe(0);
+      expect(state.jobsStatus["job1"]?.errorMessage).toBeUndefined();
+    });
+  });
+
+  describe("download action", () => {
+    it("should set a queued job to downloading and reset counters", () => {
+      const job = createTestJob({ id: "job1" });
+      let state = {
+        jobs: { job1: job },
+        jobsStatus: {
+          job1: {
+            status: "queued" as const,
+            total: 5,
+            done: 2,
+            saveProgress: 0.4,
+          },
+        },
+      };
+
+      state = jobsSlice.reducer(
+        state,
+        jobsSlice.actions.download({ jobId: "job1" })
+      );
+
+      expect(state.jobsStatus["job1"]?.status).toBe("downloading");
+      expect(state.jobsStatus["job1"]?.done).toBe(0);
+      expect(state.jobsStatus["job1"]?.saveProgress).toBe(0);
+      expect(state.jobsStatus["job1"]?.total).toBe(
+        job.videoFragments.length + job.audioFragments.length
+      );
     });
   });
 
@@ -82,7 +140,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.incDownloadStatus({ jobId: "job1" }),
+        jobsSlice.actions.incDownloadStatus({ jobId: "job1" })
       );
 
       expect(state.jobsStatus["job1"]?.done).toBe(3);
@@ -106,7 +164,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.finishDownload({ jobId: "job1" }),
+        jobsSlice.actions.finishDownload({ jobId: "job1" })
       );
 
       expect(state.jobsStatus["job1"]?.status).toBe("ready");
@@ -131,7 +189,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.saveAs({ jobId: "job1" }),
+        jobsSlice.actions.saveAs({ jobId: "job1" })
       );
 
       expect(state.jobsStatus["job1"]?.status).toBe("saving");
@@ -158,7 +216,7 @@ describe("jobs slice", () => {
         jobsSlice.actions.saveAsSuccess({
           jobId: "job1",
           link: "file://test.mp4",
-        }),
+        })
       );
 
       expect(state.jobs["job1"]?.link).toBe("file://test.mp4");
@@ -180,7 +238,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.saveAsSuccess({ jobId: "job1" }),
+        jobsSlice.actions.saveAsSuccess({ jobId: "job1" })
       );
 
       expect(state.jobs["job1"]?.link).toBeUndefined();
@@ -209,7 +267,7 @@ describe("jobs slice", () => {
           jobId: "job1",
           progress: 75,
           message: "Preparing file",
-        }),
+        })
       );
 
       expect(state.jobsStatus["job1"]?.saveProgress).toBe(75);
@@ -230,7 +288,7 @@ describe("jobs slice", () => {
           jobId: "job1",
           progress: 75,
           message: "Preparing file",
-        }),
+        })
       );
 
       expect(state.jobsStatus["job1"]).toBeUndefined();
@@ -262,7 +320,7 @@ describe("jobs slice", () => {
 
       state = jobsSlice.reducer(
         state,
-        jobsSlice.actions.deleteSuccess({ jobId: "job1" }),
+        jobsSlice.actions.deleteSuccess({ jobId: "job1" })
       );
 
       expect(state.jobs["job1"]).toBeUndefined();
@@ -307,7 +365,7 @@ describe("jobs slice", () => {
       const initialState = { jobs: {}, jobsStatus: {} };
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.download({ jobId: "job1" }),
+        jobsSlice.actions.download({ jobId: "job1" })
       );
       expect(nextState).toEqual(initialState);
     });
@@ -316,7 +374,7 @@ describe("jobs slice", () => {
       const initialState = { jobs: {}, jobsStatus: {} };
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.cancel({ jobId: "job1" }),
+        jobsSlice.actions.cancel({ jobId: "job1" })
       );
       expect(nextState).toEqual(initialState);
     });
@@ -325,7 +383,7 @@ describe("jobs slice", () => {
       const initialState = { jobs: {}, jobsStatus: {} };
       const nextState = jobsSlice.reducer(
         initialState,
-        jobsSlice.actions.delete({ jobId: "job1" }),
+        jobsSlice.actions.delete({ jobId: "job1" })
       );
       expect(nextState).toEqual(initialState);
     });

@@ -23,7 +23,7 @@ const config: StorybookConfig = {
         alias: {
           "@hls-downloader/design-system": resolve(
             __dirname,
-            "../../design-system/src",
+            "../../design-system/src"
           ),
           "@hls-downloader/core/lib": resolve(__dirname, "../../core/src"),
           "@hls-downloader/core": resolve(__dirname, "../../core/src"),

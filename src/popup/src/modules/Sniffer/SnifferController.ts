@@ -18,6 +18,8 @@ interface ReturnType {
   directURI: string;
   setDirectURI: (uri: string) => void;
   addDirectPlaylist: () => void;
+  expandedPlaylists: string[];
+  toggleExpandedPlaylist: (id: string) => void;
 }
 
 const playlistFilter =
@@ -49,6 +51,7 @@ const useSnifferController = (): ReturnType => {
   >(undefined);
   const [filter, setFilter] = useState("");
   const [directURI, setDirectURI] = useState("");
+  const [expandedPlaylists, setExpandedPlaylists] = useState<string[]>([]);
   const dispatch = useDispatch();
   const playlistsRecord = useSelector<
     RootState,
@@ -72,7 +75,7 @@ const useSnifferController = (): ReturnType => {
         uri: directURI,
         createdAt: Date.now(),
         initiator: "Direct",
-      }),
+      })
     );
     setCurrentPlaylistId(directURI);
   }
@@ -82,11 +85,17 @@ const useSnifferController = (): ReturnType => {
     .filter(
       (playlist) =>
         playlistsStatusRecord[playlist.id]?.status === "ready" ||
-        playlist.initiator === "Direct",
+        playlist.initiator === "Direct"
     )
     .filter(playlistFilter(filter));
 
   playlists.sort((a, b) => b.createdAt - a.createdAt);
+
+  function toggleExpandedPlaylist(id: string) {
+    setExpandedPlaylists((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    );
+  }
 
   function copyPlaylistsToClipboard() {
     const playlistUris = playlists.map((p) => p.uri).join("\n");
@@ -104,6 +113,8 @@ const useSnifferController = (): ReturnType => {
     directURI,
     setDirectURI,
     addDirectPlaylist,
+    expandedPlaylists,
+    toggleExpandedPlaylist,
   };
 };
 

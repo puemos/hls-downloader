@@ -2,7 +2,7 @@ type FetchFn<Data> = () => Promise<Data>;
 
 async function fetchWithRetry<Data>(
   fetchFn: FetchFn<Data>,
-  attempts: number = 1,
+  attempts: number = 1
 ): Promise<Data> {
   if (attempts < 1) {
     throw new Error("Attempts less then 1");

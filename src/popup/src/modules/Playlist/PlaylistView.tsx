@@ -46,7 +46,7 @@ const PlaylistView = ({
   encryptionBlocked,
 }: Props) => {
   const [copied, setCopied] = useState<"video" | "audio" | "subtitle" | null>(
-    null,
+    null
   );
   const copyTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -80,7 +80,7 @@ const PlaylistView = ({
     const selectedVideo = videoLevels.find((v) => v.id === selectedVideoId);
     const selectedAudio = audioLevels.find((a) => a.id === selectedAudioId);
     const selectedSubtitle = subtitleLevels.find(
-      (s) => s.id === selectedSubtitleId,
+      (s) => s.id === selectedSubtitleId
     );
 
     function handleSelectVideo(id: string) {
@@ -177,7 +177,7 @@ const PlaylistView = ({
                     setCopied("video");
                     copyTimeout.current = setTimeout(
                       () => setCopied(null),
-                      1200,
+                      1200
                     );
                   }}
                   aria-label="Copy video URL"
@@ -230,7 +230,7 @@ const PlaylistView = ({
                     setCopied("audio");
                     copyTimeout.current = setTimeout(
                       () => setCopied(null),
-                      1200,
+                      1200
                     );
                   }}
                   aria-label="Copy audio URL"
@@ -281,7 +281,7 @@ const PlaylistView = ({
                     setCopied("subtitle");
                     copyTimeout.current = setTimeout(
                       () => setCopied(null),
-                      1200,
+                      1200
                     );
                   }}
                   aria-label="Copy subtitles URL"

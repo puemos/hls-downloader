@@ -6,17 +6,17 @@ import { generateSubtitleFileName } from "./generate-subtitle-file-name";
 export const downloadSubtitleTrackFactory = (
   loader: ILoader,
   parser: IParser,
-  fs: IFS,
+  fs: IFS
 ) => {
   const run = async (
     level: Level,
     playlist: Playlist,
     fetchAttempts: number,
-    dialog: boolean,
+    dialog: boolean
   ): Promise<string> => {
     const fragments = await getFragmentsDetailsFactory(loader, parser)(
       level,
-      fetchAttempts,
+      fetchAttempts
     );
 
     const hasFragments = fragments.length > 0;
@@ -26,7 +26,7 @@ export const downloadSubtitleTrackFactory = (
       for (const fragment of fragments) {
         const fragmentText = await loader.fetchText(
           fragment.uri,
-          fetchAttempts,
+          fetchAttempts
         );
         textParts.push(fragmentText.trim());
       }
@@ -37,7 +37,7 @@ export const downloadSubtitleTrackFactory = (
 
     const fileName = generateSubtitleFileName()(playlist, level);
     const link = URL.createObjectURL(
-      new Blob([textParts.join("\n\n")], { type: "text/vtt" }),
+      new Blob([textParts.join("\n\n")], { type: "text/vtt" })
     );
 
     try {

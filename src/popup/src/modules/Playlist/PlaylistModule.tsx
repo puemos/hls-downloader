@@ -5,7 +5,7 @@ import { Level } from "@hls-downloader/core/lib/entities";
 
 export function selectPreferredAudioLevel(
   audioLevels: Level[] = [],
-  preferredLanguage?: string | null,
+  preferredLanguage?: string | null
 ): string | undefined {
   if (!audioLevels || audioLevels.length === 0) {
     return;
@@ -58,20 +58,20 @@ const PlaylistModule = ({ id }: { id: string }) => {
 
   const videoLevels = useMemo(
     () => levels.filter((l) => l.type === "stream"),
-    [levels],
+    [levels]
   );
   const audioLevels = useMemo(
     () => levels.filter((l) => l.type === "audio"),
-    [levels],
+    [levels]
   );
   const subtitleLevels = useMemo(
     () => levels.filter((l) => l.type === "subtitle"),
-    [levels],
+    [levels]
   );
 
   const selectedVideo = useMemo(
     () => videoLevels.find((v) => v.id === videoId),
-    [videoLevels, videoId],
+    [videoLevels, videoId]
   );
 
   const filteredAudioLevels = useMemo(() => {
@@ -83,7 +83,7 @@ const PlaylistModule = ({ id }: { id: string }) => {
 
   const selectedAudio = useMemo(
     () => filteredAudioLevels.find((a) => a.id === audioId),
-    [filteredAudioLevels, audioId],
+    [filteredAudioLevels, audioId]
   );
 
   const storedAudioId = preferences.audioSelections[id];
@@ -223,7 +223,7 @@ const PlaylistModule = ({ id }: { id: string }) => {
   ].flatMap((entry) => (entry ? [entry] : []));
 
   const encryptionBlocked = encryptionSummaries.some(
-    (summary) => summary.supported === false,
+    (summary) => summary.supported === false
   );
 
   const canDownload =
@@ -240,7 +240,7 @@ const PlaylistModule = ({ id }: { id: string }) => {
     downloadLevel(
       primaryId,
       requiresAudio ? audioId : undefined,
-      subtitleId || undefined,
+      subtitleId || undefined
     );
   }
 

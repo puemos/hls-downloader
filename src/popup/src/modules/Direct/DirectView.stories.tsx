@@ -16,14 +16,14 @@ const samplePlaylists = [
     "https://example.com/playlist1.m3u8",
     Date.now(),
     "Video 1",
-    "script",
+    "script"
   ),
   new Playlist(
     "2",
     "https://example.com/playlist2.m3u8",
     Date.now(),
     "Video 2",
-    "script",
+    "script"
   ),
 ];
 

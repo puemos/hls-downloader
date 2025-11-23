@@ -44,6 +44,7 @@ Coverage reports are generated in the `coverage/` directory and include HTML, JS
 The `test-utils.ts` file provides a set of utility functions to make testing easier:
 
 - **Mock Factories**:
+
   - `createMockLoader()`: Creates a mock loader for network operations
   - `createMockParser()`: Creates a mock parser for HLS manifest parsing
   - `createMockFS()`: Creates a mock filesystem
@@ -51,6 +52,7 @@ The `test-utils.ts` file provides a set of utility functions to make testing eas
   - `createMockDependencies()`: Creates all dependencies with mocks
 
 - **Test Data Factories**:
+
   - `createTestFragment()`: Creates a test Fragment instance
   - `createTestLevel()`: Creates a test Level instance
   - `createTestPlaylist()`: Creates a test Playlist instance
@@ -78,7 +80,7 @@ it("should add a job to the state", () => {
 
   const nextState = jobsSlice.reducer(
     initialState,
-    jobsSlice.actions.add({ job }),
+    jobsSlice.actions.add({ job })
   );
 
   expect(nextState.jobs["job1"]).toEqual(job);
@@ -101,13 +103,13 @@ Example:
 it("creates a download job for video and audio levels", async () => {
   // Setup
   const action$ = toObservable(
-    levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" }),
+    levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
   );
   const deps = { loader: mockLoader, parser: mockParser };
 
   // Execute
   const result = await firstValueFrom(
-    addDownloadJobEpic(action$, { value: mockState } as any, deps as any),
+    addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
   );
 
   // Verify
