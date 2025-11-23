@@ -1,6 +1,26 @@
 # HLS Downloader Changelog
 
-# HLS Downloader Changelog
+## 5.2.0
+
+### Features
+- Subtitle downloads end-to-end: fetch VTT tracks, generate language-aware filenames, and mux into MKV when subtitles are present (`src/core/src/use-cases/download-subtitle-track.ts`, `src/background/src/services/ffmpeg-muxer.ts`).
+- Richer audio and subtitle selection: parse default/autoselect/forced flags and group IDs, honor a preferred audio language, and persist per-playlist audio/subtitle choices while blocking downloads on unsupported encryption (`src/background/src/services/m3u8-parser.ts`, `src/core/src/store/slices/playlist-preferences-slice.ts`, `src/popup/src/modules/Playlist/PlaylistModule.tsx`).
+- Sniffer gains direct URL entry and streamlined navigation (Direct tab removed); playlist UI shows metadata badges and quick copy buttons for track URLs (`src/popup/src/modules/Sniffer/SnifferView.tsx`, `src/popup/src/modules/Navbar/RouterView.tsx`, `src/popup/src/components/Metadata.tsx`).
+- Job cards and About/Settings views refreshed with clearer status, hover/copy affordances, and Storybook scenarios seeded with realistic store state (`src/popup/src/modules/Job/JobView.tsx`, `src/popup/.storybook/preview.tsx`).
+
+### Fixes
+- More robust muxing pipeline with offscreen document fallback for MV3 and safer bucket cleanup when generating download blobs (`src/background/src/services/indexedb-fs.ts`, `src/background/src/offscreen.ts`).
+
+### Chores
+- Vite/tooling upgrade (`vite@6.4.1`, `pnpm@10.11.0`) and Storybook now runs from the popup package (`package.json`, `src/popup/.storybook/main.ts`).
+- CI/release workflow tweaks: fixed permissions for publishing/coverage, added coverage badge workflow, removed CodeQL (`.github/workflows`).
+- Added feature overview doc and pruned planning docs (`FUNCTIONALITIES.md`, `plans/roadmap.md`).
+
+### Known issues
+- Audio-only playlists are currently blocked from downloading because the playlist module requires a video level to mark media as available (`src/popup/src/modules/Playlist/PlaylistModule.tsx:174-177`).
+
+### Testing
+- `pnpm test`
 
 ## 5.1.0
 
