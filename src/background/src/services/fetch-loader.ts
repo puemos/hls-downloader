@@ -1,5 +1,16 @@
 type FetchFn<Data> = () => Promise<Data>;
 
+class HttpError extends Error {
+  constructor(readonly status: number) {
+    super(`HTTP ${status}`);
+    this.name = "HttpError";
+  }
+}
+
+function isHttpError(error: unknown): error is HttpError {
+  return typeof (error as any)?.status === "number";
+}
+
 async function fetchWithRetry<Data>(
   fetchFn: FetchFn<Data>,
   attempts: number = 1
@@ -15,8 +26,7 @@ async function fetchWithRetry<Data>(
       return await fetchFn();
     } catch (e) {
       lastError = e;
-      const message = (e as Error)?.message ?? "";
-      if (message.startsWith("HTTP ")) {
+      if (isHttpError(e)) {
         throw e;
       }
       if (countdown > 0) {
@@ -35,7 +45,7 @@ export async function fetchText(url: string, attempts: number = 1) {
   const fetchFn: FetchFn<string> = () =>
     fetch(url).then((res) => {
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        throw new HttpError(res.status);
       }
       return res.text();
     });
@@ -46,7 +56,7 @@ export async function fetchArrayBuffer(url: string, attempts: number = 1) {
   const fetchFn: FetchFn<ArrayBuffer> = () =>
     fetch(url).then((res) => {
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        throw new HttpError(res.status);
       }
       return res.arrayBuffer();
     });

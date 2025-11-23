@@ -113,6 +113,18 @@ describe("FetchLoader", () => {
       );
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
+
+    it("does not retry HTTP errors", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: false, status: 404, text: vi.fn() });
+      globalThis.fetch = fetchMock;
+
+      await expect(fetchText("https://example.com/404", 3)).rejects.toThrow(
+        "HTTP 404"
+      );
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("fetchArrayBuffer", () => {
@@ -185,6 +197,18 @@ describe("FetchLoader", () => {
         expect(error.value.message).toBe("Buffer failure");
       }
       expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("does not retry HTTP errors for array buffers", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: false, status: 401, arrayBuffer: vi.fn() });
+      globalThis.fetch = fetchMock;
+
+      await expect(
+        fetchArrayBuffer("https://example.com/protected.bin", 3)
+      ).rejects.toThrow("HTTP 401");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
   });
 });
