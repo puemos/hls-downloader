@@ -14,6 +14,7 @@ export const Default: Story = {
     <SettingsView
       concurrency={3}
       maxActiveDownloads={2}
+      activeDownloadsUnlimited={false}
       fetchAttempts={5}
       saveDialog={true}
       onConcurrencyIncrease={() => {}}
@@ -35,6 +36,7 @@ export const Minimal: Story = {
     <SettingsView
       concurrency={1}
       maxActiveDownloads={0}
+      activeDownloadsUnlimited={true}
       fetchAttempts={1}
       saveDialog={false}
       onConcurrencyIncrease={() => {}}

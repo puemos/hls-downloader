@@ -29,7 +29,10 @@ export const inspectLevelEpic: Epic<
       return from(
         inspectLevelEncryptionFactory(loader, parser)(
           level,
-          state$.value.config.fetchAttempts
+          state$.value.config.fetchAttempts,
+          {
+            baseUri: level.playlistID,
+          }
         )
       ).pipe(
         map((inspection) =>

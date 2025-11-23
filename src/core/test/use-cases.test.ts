@@ -141,10 +141,40 @@ describe("use-cases", () => {
       fetchArrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(3)),
     };
     const run = downloadSingleFactory(loader);
-    const fragment = new Fragment(new Key(null, null), "https://frag", 1);
+    const fragment = new Fragment(new Key(null, null), "https://frag", 1, null);
     const data = await run(fragment, 5);
     expect(loader.fetchArrayBuffer).toHaveBeenCalledWith("https://frag", 5);
     expect(data.byteLength).toBe(3);
+  });
+
+  it("falls back to fragment without params on fetch failure", async () => {
+    const loader: ILoader = {
+      fetchText: vi.fn(),
+      fetchArrayBuffer: vi
+        .fn()
+        .mockRejectedValueOnce(new Error("fail"))
+        .mockResolvedValueOnce(new ArrayBuffer(1)),
+    };
+    const run = downloadSingleFactory(loader);
+    const fragment = new Fragment(
+      new Key(null, null),
+      "https://example.com/frag.ts?token=abc",
+      0,
+      "https://example.com/frag.ts"
+    );
+    const data = await run(fragment, 2);
+
+    expect(loader.fetchArrayBuffer).toHaveBeenNthCalledWith(
+      1,
+      "https://example.com/frag.ts?token=abc",
+      2
+    );
+    expect(loader.fetchArrayBuffer).toHaveBeenNthCalledWith(
+      2,
+      "https://example.com/frag.ts",
+      2
+    );
+    expect(data.byteLength).toBe(1);
   });
 
   it("gets fragments details", async () => {
@@ -152,7 +182,9 @@ describe("use-cases", () => {
       fetchText: vi.fn().mockResolvedValue("playlist"),
       fetchArrayBuffer: vi.fn(),
     };
-    const fragments = [new Fragment(new Key(null, null), "f1.ts", 0)];
+    const fragments = [
+      new Fragment(new Key(null, null), "http://example.com/f1.ts", 0),
+    ];
     const parser: IParser = {
       parseMasterPlaylist: vi.fn(),
       parseLevelPlaylist: vi.fn().mockReturnValue(fragments),
@@ -161,7 +193,7 @@ describe("use-cases", () => {
     const level = new Level(
       "stream",
       "l1",
-      "p1",
+      "http://example.com/master.m3u8",
       "http://example.com/level.m3u8"
     );
     const run = getFragmentsDetailsFactory(loader, parser);
@@ -174,7 +206,50 @@ describe("use-cases", () => {
       "playlist",
       "http://example.com/level.m3u8"
     );
-    expect(result).toEqual(fragments);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.uri).toBe("http://example.com/f1.ts");
+    expect(result[0]!.fallbackUri).toBeNull();
+  });
+
+  it("appends query params to fragments and keys and falls back on original", async () => {
+    const loader: ILoader = {
+      fetchText: vi
+        .fn()
+        .mockResolvedValueOnce("playlist")
+        .mockResolvedValueOnce("playlist"),
+      fetchArrayBuffer: vi.fn(),
+    };
+    const fragments = [
+      new Fragment(
+        new Key("http://example.com/key", new Uint8Array([1])),
+        "http://example.com/video.ts",
+        0
+      ),
+    ];
+    const parser: IParser = {
+      parseMasterPlaylist: vi.fn(),
+      parseLevelPlaylist: vi.fn().mockReturnValue(fragments),
+      inspectLevelEncryption: vi.fn(),
+    };
+    const level = new Level(
+      "stream",
+      "l1",
+      "http://example.com/master.m3u8?session=abc",
+      "http://example.com/level.m3u8"
+    );
+    const run = getFragmentsDetailsFactory(loader, parser);
+    const result = await run(level, 3, {
+      baseUri: level.playlistID,
+    });
+
+    expect(loader.fetchText).toHaveBeenCalledWith(
+      "http://example.com/level.m3u8?session=abc",
+      3
+    );
+    expect(result[0]!.uri).toBe("http://example.com/video.ts?session=abc");
+    expect(result[0]!.fallbackUri).toBe("http://example.com/video.ts");
+    expect(result[0]!.key.uri).toBe("http://example.com/key?session=abc");
+    expect(result[0]!.key.fallbackUri).toBe("http://example.com/key");
   });
 
   it("gets levels", async () => {
@@ -201,6 +276,24 @@ describe("use-cases", () => {
       "http://example.com/master.m3u8"
     );
     expect(result).toEqual(levels);
+  });
+
+  it("appends query params from master playlist to level URIs when enabled", async () => {
+    const loader: ILoader = {
+      fetchText: vi.fn().mockResolvedValue("master"),
+      fetchArrayBuffer: vi.fn(),
+    };
+    const levels = [
+      new Level("stream", "l1", "p1", "http://example.com/level.m3u8"),
+    ];
+    const parser: IParser = {
+      parseMasterPlaylist: vi.fn().mockReturnValue(levels),
+      parseLevelPlaylist: vi.fn(),
+      inspectLevelEncryption: vi.fn(),
+    };
+    const run = getLevelsFactory(loader, parser);
+    const result = await run("http://example.com/master.m3u8?token=abc", 1);
+    expect(result[0]!.uri).toBe("http://example.com/level.m3u8");
   });
 
   it("throws when master playlist fetch fails", async () => {

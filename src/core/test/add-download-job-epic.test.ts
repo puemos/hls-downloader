@@ -178,11 +178,15 @@ describe("addDownloadJobEpic", () => {
       levelsSlice.actions.download({ levelID: "v" })
     );
     const deps = { loader: mockLoader, parser: mockParser };
-    // Verify that the epic completes without throwing
-    const promise = firstValueFrom(
+    const result = await firstValueFrom(
       addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
     );
-    // The epic should complete with an empty result or an error action
-    await expect(promise).rejects.toThrow();
+
+    expect(result).toMatchObject({
+      type: jobsSlice.actions.downloadFailed.type,
+      payload: {
+        message: "Network error",
+      },
+    });
   });
 });

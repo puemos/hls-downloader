@@ -172,6 +172,8 @@ export function createTestFragment(
     uri?: string;
     keyUri?: string | null;
     keyIv?: Uint8Array | null;
+    fallbackUri?: string | null;
+    keyFallbackUri?: string | null;
   } = {}
 ): Fragment {
   const {
@@ -179,10 +181,12 @@ export function createTestFragment(
     uri = `fragment-${index}.ts`,
     keyUri = null,
     keyIv = null,
+    fallbackUri = null,
+    keyFallbackUri = null,
   } = options;
 
-  const key = new Key(keyUri, keyIv);
-  return new Fragment(key, uri, index);
+  const key = new Key(keyUri, keyIv, keyFallbackUri);
+  return new Fragment(key, uri, index, fallbackUri);
 }
 
 /**
@@ -323,6 +327,7 @@ export function createMockState(
     saveDialog?: boolean;
     tabId?: number;
     maxActiveDownloads?: number;
+    preferredAudioLanguage?: string | null;
   } = {}
 ): any {
   const {
@@ -336,6 +341,7 @@ export function createMockState(
     saveDialog = false,
     tabId = 1,
     maxActiveDownloads = 0,
+    preferredAudioLanguage = null,
   } = options;
 
   return {
@@ -355,6 +361,7 @@ export function createMockState(
       fetchAttempts,
       saveDialog,
       maxActiveDownloads,
+      preferredAudioLanguage,
     },
     tabs: {
       current: {

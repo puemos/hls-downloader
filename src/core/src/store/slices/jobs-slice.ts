@@ -153,11 +153,16 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
     },
     downloadFailed(state, action: PayloadAction<IDownloadJobFailedPayload>) {
       const { jobId, message } = action.payload;
-      const jobStatus = state.jobsStatus[jobId];
-      if (jobStatus) {
-        jobStatus.status = "error";
-        jobStatus.errorMessage = message;
-      }
+      const jobStatus =
+        state.jobsStatus[jobId] ||
+        (state.jobsStatus[jobId] = {
+          status: "error",
+          total: 0,
+          done: 0,
+          saveProgress: 0,
+        });
+      jobStatus.status = "error";
+      jobStatus.errorMessage = message;
     },
     incDownloadStatus(
       state,

@@ -12,7 +12,11 @@ afterEach(() => {
 describe("FetchLoader", () => {
   describe("fetchText", () => {
     it("successfully fetches text on first attempt", async () => {
-      const mockResponse = { text: () => Promise.resolve("success") };
+      const mockResponse = {
+        text: () => Promise.resolve("success"),
+        ok: true,
+        status: 200,
+      };
       const fetchMock = vi.fn().mockResolvedValue(mockResponse);
       globalThis.fetch = fetchMock;
 
@@ -30,7 +34,11 @@ describe("FetchLoader", () => {
         .fn()
         .mockRejectedValueOnce(new Error("Network error"))
         .mockRejectedValueOnce(new Error("Server error"))
-        .mockResolvedValueOnce({ text: () => Promise.resolve("success") });
+        .mockResolvedValueOnce({
+          text: () => Promise.resolve("success"),
+          ok: true,
+          status: 200,
+        });
       globalThis.fetch = fetchMock;
 
       const promise = fetchText("https://example.com", 3);
@@ -64,7 +72,7 @@ describe("FetchLoader", () => {
       expect(error.status).toBe("fulfilled");
       if (error.status === "fulfilled") {
         expect(error.value).toBeInstanceOf(Error);
-        expect(error.value.message).toBe("Fetch error");
+        expect(error.value.message).toBe("Persistent failure");
       }
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
@@ -80,7 +88,11 @@ describe("FetchLoader", () => {
     });
 
     it("uses default attempt count of 1 when not specified", async () => {
-      const mockResponse = { text: () => Promise.resolve("default") };
+      const mockResponse = {
+        text: () => Promise.resolve("default"),
+        ok: true,
+        status: 200,
+      };
       const fetchMock = vi.fn().mockResolvedValue(mockResponse);
       globalThis.fetch = fetchMock;
 
@@ -89,12 +101,40 @@ describe("FetchLoader", () => {
       expect(result).toBe("default");
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
+
+    it("fails when response status is not ok", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: false, status: 403, text: vi.fn() });
+      globalThis.fetch = fetchMock;
+
+      await expect(fetchText("https://example.com/forbidden")).rejects.toThrow(
+        "HTTP 403"
+      );
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not retry HTTP errors", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: false, status: 404, text: vi.fn() });
+      globalThis.fetch = fetchMock;
+
+      await expect(fetchText("https://example.com/404", 3)).rejects.toThrow(
+        "HTTP 404"
+      );
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("fetchArrayBuffer", () => {
     it("successfully fetches array buffer", async () => {
       const mockBuffer = new ArrayBuffer(8);
-      const mockResponse = { arrayBuffer: () => Promise.resolve(mockBuffer) };
+      const mockResponse = {
+        arrayBuffer: () => Promise.resolve(mockBuffer),
+        ok: true,
+        status: 200,
+      };
       const fetchMock = vi.fn().mockResolvedValue(mockResponse);
       globalThis.fetch = fetchMock;
 
@@ -113,6 +153,8 @@ describe("FetchLoader", () => {
         .mockRejectedValueOnce(new Error("Network error"))
         .mockResolvedValueOnce({
           arrayBuffer: () => Promise.resolve(mockBuffer),
+          ok: true,
+          status: 200,
         });
       globalThis.fetch = fetchMock;
 
@@ -122,6 +164,51 @@ describe("FetchLoader", () => {
 
       expect(result).toBe(mockBuffer);
       expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("throws when array buffer response is not ok", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: false, status: 500, arrayBuffer: vi.fn() });
+      globalThis.fetch = fetchMock;
+
+      await expect(
+        fetchArrayBuffer("https://example.com/error.bin", 1)
+      ).rejects.toThrow("HTTP 500");
+    });
+
+    it("throws last error when retries are exhausted", async () => {
+      vi.useFakeTimers();
+      const fetchMock = vi
+        .fn()
+        .mockRejectedValue(new Error("Buffer failure"));
+      globalThis.fetch = fetchMock;
+
+      const promise = fetchArrayBuffer("https://example.com/error.bin", 2);
+
+      const [, error] = await Promise.allSettled([
+        vi.runAllTimersAsync(),
+        promise.catch((e) => e),
+      ]);
+
+      expect(error.status).toBe("fulfilled");
+      if (error.status === "fulfilled") {
+        expect(error.value).toBeInstanceOf(Error);
+        expect(error.value.message).toBe("Buffer failure");
+      }
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("does not retry HTTP errors for array buffers", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue({ ok: false, status: 401, arrayBuffer: vi.fn() });
+      globalThis.fetch = fetchMock;
+
+      await expect(
+        fetchArrayBuffer("https://example.com/protected.bin", 3)
+      ).rejects.toThrow("HTTP 401");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
   });
 });
