@@ -18,6 +18,7 @@
     "unlimitedStorage",
     "storage",
     "downloads",
+    "notifications",
     "tabs",
     "http://*/*",
     "https://*/*"

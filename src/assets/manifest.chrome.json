@@ -16,6 +16,7 @@
   "permissions": [
     "downloads",
     "offscreen",
+    "notifications",
     "storage",
     "unlimitedStorage",
     "tabs",
