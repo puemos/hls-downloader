@@ -20,7 +20,7 @@
     "dev:background": "pnpm --filter ./src/background run dev",
     "dev:popup": "pnpm --filter ./src/popup run dev",
     "predev": "pnpm run clean && pnpm run copy-assets",
-    "dev": "run-p dev:*",
+    "dev": "DIST_DIR=dist/mv3 MV_TARGET=mv3 run-p dev:*",
     "test": "run-p test:core test:background test:design-system test:popup",
     "test:core": "pnpm --filter ./src/core run test",
     "test:background": "pnpm --filter ./src/background run test",

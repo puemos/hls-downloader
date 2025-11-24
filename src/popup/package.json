@@ -6,6 +6,7 @@
     "@hls-downloader/core": "workspace:*",
     "@hls-downloader/design-system": "workspace:*",
     "gsap": "^3.13.0",
+    "hls.js": "^1.6.15",
     "lucide-react": "^0.137.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
