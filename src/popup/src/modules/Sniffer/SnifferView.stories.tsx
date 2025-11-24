@@ -88,6 +88,8 @@ export const Selected: Story = {
     <SnifferView
       playlists={samplePlaylists}
       currentPlaylistId="1"
+      currentPlaylist={samplePlaylists[0]}
+      currentPlaylistStatus={{ status: "ready" }}
       filter=""
       clearPlaylists={() => {}}
       setFilter={() => {}}
@@ -150,6 +152,8 @@ export const TransitionDemo: Story = {
     const [directURI, setDirectURI] = useState("");
 
     const playlists = samplePlaylists;
+    const currentPlaylist =
+      playlists.find((p) => p.id === currentPlaylistId) ?? null;
     const toggleExpandedPlaylist = (id: string) => {
       setExpandedPlaylists((prev) =>
         prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
@@ -160,6 +164,10 @@ export const TransitionDemo: Story = {
       <SnifferView
         playlists={playlists}
         currentPlaylistId={currentPlaylistId}
+        currentPlaylist={currentPlaylist}
+        currentPlaylistStatus={
+          currentPlaylistId ? { status: "ready" } : undefined
+        }
         filter={filter}
         clearPlaylists={() => {
           setCurrentPlaylistId(undefined);
