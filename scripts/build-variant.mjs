@@ -9,11 +9,17 @@ const { values } = parseArgs({
   options: {
     mv: { type: "string", default: "mv2" },
     blocklist: { type: "boolean", default: true },
+    "no-blocklist": { type: "boolean" },
   },
 });
 
 const mvVersion = values.mv; // 'mv2' or 'mv3'
-const hasBlocklist = values.blocklist;
+const hasBlocklist =
+  values.blocklist !== undefined
+    ? values.blocklist
+    : values["no-blocklist"] === true
+      ? false
+      : true;
 
 // Determine output directory and zip basename
 const blocklistSuffix = hasBlocklist ? "" : "-no-blocklist";
