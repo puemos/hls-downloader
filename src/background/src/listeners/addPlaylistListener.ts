@@ -6,11 +6,17 @@ import {
   browserAction as actiobV2,
   action as actiobV3,
 } from "webextension-polyfill";
+import { isBlocked } from "../blocklist";
 
 export function addPlaylistListener(store: ReturnType<typeof createStore>) {
   webRequest.onCompleted.addListener(
     async (details) => {
       if (details.tabId < 0) {
+        return;
+      }
+
+      // Check if the request initiator is blocked
+      if (details.initiator && isBlocked(details.initiator)) {
         return;
       }
 

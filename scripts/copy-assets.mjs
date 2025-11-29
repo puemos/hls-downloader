@@ -23,10 +23,25 @@ async function run() {
   });
 
   // Copy manifest for the selected target
-  await copyFile(
-    path.join(assetsDir, manifestFile),
-    path.join(distDir, "manifest.json")
-  );
+  if (process.env.NO_BLOCKLIST === "true") {
+    const manifestContent = await import(path.join(assetsDir, manifestFile), {
+      assert: { type: "json" },
+    });
+    const manifest = manifestContent.default;
+    manifest.name = "experimental unstable nightly beta alpha hls-downloader";
+
+    // We need to write the modified manifest
+    const fs = await import("fs/promises");
+    await fs.writeFile(
+      path.join(distDir, "manifest.json"),
+      JSON.stringify(manifest, null, 2)
+    );
+  } else {
+    await copyFile(
+      path.join(assetsDir, manifestFile),
+      path.join(distDir, "manifest.json")
+    );
+  }
 
   if (target === "mv3") {
     await copyFile(

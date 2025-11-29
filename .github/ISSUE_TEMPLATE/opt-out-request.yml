@@ -1,0 +1,26 @@
+name: Opt-Out Request
+description: Request to add your domain to the blocklist
+title: "[Opt-Out Request] "
+labels: ["opt-out"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We respect the intellectual property rights and legitimate interests of all websites and their operators.
+        If you do not permit this tool to operate on your website, please submit this request.
+  - type: input
+    id: domain
+    attributes:
+      label: Website Domain
+      description: The domain you want to block (e.g., example.com)
+      placeholder: example.com
+    validations:
+      required: true
+  - type: input
+    id: email
+    attributes:
+      label: Contact Email
+      description: For identity verification when necessary.
+      placeholder: email@example.com
+    validations:
+      required: true
