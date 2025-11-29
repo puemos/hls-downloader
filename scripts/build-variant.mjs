@@ -2,7 +2,10 @@
 import { execSync } from "child_process";
 import { parseArgs } from "util";
 
+const args = process.argv.slice(2).filter((arg) => arg !== "--");
+
 const { values } = parseArgs({
+  args,
   options: {
     mv: { type: "string", default: "mv2" },
     blocklist: { type: "boolean", default: true },
