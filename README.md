@@ -208,6 +208,55 @@ This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md).
 
 ---
 
+## 🚧 Build Variants
+
+HLS Downloader is available in multiple build variants to accommodate different distribution requirements:
+
+### Store Builds (Firefox Add-ons / Edge Add-ons)
+Official store releases include a blocklist that respects copyright holder opt-out requests. This version complies with distribution platform policies and content owner preferences.
+
+### Independent Builds  
+Alternative builds are available for advanced users who prefer complete local control. These "experimental" variants contain no blocklist and allow unrestricted operation:
+
+```bash
+# MV2 without blocklist (Firefox/Edge manual install)
+pnpm run build:mv2:no-blocklist
+
+# MV3 without blocklist (Chrome/Brave/Arc manual install)
+pnpm run build:mv3:no-blocklist
+
+# Build all variants at once
+pnpm run build:all-variants
+```
+
+Non-blocklist builds are named "experimental unstable nightly beta alpha hls-downloader" and are intended for personal use only—not for redistribution on official stores.
+
+---
+
+## 🤚 Disclaimer
+
+This extension is designed for downloading video content that you own or have authorization to access. **It is prohibited to use this tool for downloading copyrighted content without permission.** Users are solely responsible for their actions, and the developer assumes no liability for user behavior. This tool is provided "as-is" without warranty of any kind.
+
+---
+
+## 🚫 Copyright Protection and Opt-Out Policy
+
+We respect the intellectual property rights and legitimate interests of all websites and content operators.
+
+If you do not wish this tool to operate on your website, you may submit an opt-out request. We will add verified domains to the project's blocklist in subsequent releases.
+
+### How to Submit an Opt-Out Request
+
+1. Create a new **[Issue](https://github.com/puemos/hls-downloader/issues/new?template=opt-out-request.yml)** using the "Opt-Out Request" template  
+2. Use the title format: `[Opt-Out Request] YourDomain.com`  
+3. Provide the following information for verification:
+   - **Website Domain** (e.g., `example.com`)  
+   - **Contact Email** (for identity verification if necessary)
+
+We commit to honoring legitimate requests and will include verified domains in the blocklist for store-distributed versions. Please note that as an open-source project, update cycles may vary. Thank you for your understanding and cooperation.
+
+---
+
 ## 📝 License
 
 <details>
