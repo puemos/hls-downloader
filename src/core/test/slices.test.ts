@@ -35,7 +35,7 @@ describe("store slices", () => {
 
   it("jobs slice reducers", () => {
     const fragment = new Fragment(new Key(null, null), "u", 0);
-    const job = new Job("1", [fragment], [], "f", Date.now());
+    const job = new Job("1", "p1", [fragment], [], "f", Date.now());
     let state = jobsSlice.reducer(undefined, { type: "init" } as any);
     state = jobsSlice.reducer(state, jobsSlice.actions.add({ job }));
     expect(state.jobs["1"]).toBe(job);

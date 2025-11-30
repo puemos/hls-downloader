@@ -12,8 +12,8 @@ export default meta;
 type Story = StoryObj<typeof DownloadsView>;
 
 const sampleJobs = [
-  new Job("1", [], [], "video1.mp4", Date.now()),
-  new Job("2", [], [], "video2.mp4", Date.now()),
+  new Job("1", undefined, [], [], "video1.mp4", Date.now()),
+  new Job("2", undefined, [], [], "video2.mp4", Date.now()),
 ];
 
 export const Empty: Story = {

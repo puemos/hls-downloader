@@ -151,6 +151,27 @@ describe("IndexedDBFS", () => {
     });
   });
 
+  describe("storage stats", () => {
+    it("reports stored bytes and fragments per bucket", async () => {
+      const id = "stats-bucket";
+      await IndexedDBFS.createBucket(id, 2, 0);
+      const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
+
+      await bucket.write(0, new Uint8Array([1, 2, 3]).buffer);
+      await bucket.write(1, new Uint8Array([4, 5]).buffer);
+
+      const stats = await IndexedDBFS.getStorageStats();
+      expect(stats.buckets).toHaveLength(1);
+      expect(stats.buckets[0]).toMatchObject({
+        id,
+        storedBytes: 5,
+        storedChunks: 2,
+        videoLength: 2,
+        audioLength: 0,
+      });
+    });
+  });
+
   describe("saveAs functionality", () => {
     it("calls download API with correct parameters", async () => {
       const path = "test-video.mp4";

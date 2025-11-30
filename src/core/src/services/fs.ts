@@ -21,6 +21,7 @@ export interface IFS {
       dialog: boolean;
     }
   ): Promise<void>;
+  getStorageStats(): Promise<StorageSnapshot>;
 }
 
 export interface Bucket {
@@ -29,3 +30,25 @@ export interface Bucket {
     onProgress?: (progress: number, message: string) => void
   ): Promise<string>;
 }
+
+export type StorageBucketInfo = {
+  id: string;
+  videoLength: number;
+  audioLength: number;
+  storedBytes: number;
+  storedChunks: number;
+  updatedAt?: number;
+};
+
+export type StorageEstimate = {
+  usage?: number;
+  quota?: number;
+  available?: number;
+  source: "navigator" | "fallback" | "unknown";
+};
+
+export type StorageSnapshot = {
+  buckets: StorageBucketInfo[];
+  subtitlesBytes?: number;
+  estimate?: StorageEstimate;
+};

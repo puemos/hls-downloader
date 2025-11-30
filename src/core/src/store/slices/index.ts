@@ -6,3 +6,4 @@ export * from "./jobs-slice";
 export * from "./subtitles-slice";
 export * from "./level-inspections-slice";
 export * from "./playlist-preferences-slice";
+export * from "./storage-slice";

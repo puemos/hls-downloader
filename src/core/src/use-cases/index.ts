@@ -14,3 +14,5 @@ export * from "./download-subtitle-track";
 export * from "./get-subtitle-text";
 export * from "./store-subtitle-text";
 export * from "./inspect-level-encryption";
+export * from "./get-storage-stats";
+export * from "./get-playlist-duration";

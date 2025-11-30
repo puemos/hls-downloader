@@ -1,4 +1,4 @@
-import { Playlist, PlaylistStatus } from "@hls-downloader/core/lib/entities";
+import { Playlist } from "@hls-downloader/core/lib/entities";
 import {
   Button,
   Input,
@@ -17,13 +17,10 @@ import {
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import PlaylistModule from "../Playlist/PlaylistModule";
-import PlaylistPreview from "./PlaylistPreview";
 
 interface Props {
   playlists: Playlist[];
   currentPlaylistId: string | undefined;
-  currentPlaylist?: Playlist | null;
-  currentPlaylistStatus?: PlaylistStatus | null;
   filter: string;
   clearPlaylists: () => void;
   copyPlaylistsToClipboard: () => void;
@@ -43,8 +40,6 @@ const SnifferView = ({
   filter,
   playlists,
   currentPlaylistId,
-  currentPlaylist,
-  currentPlaylistStatus,
   setCurrentPlaylistId,
   directURI,
   setDirectURI,
@@ -128,21 +123,11 @@ const SnifferView = ({
     <div className="flex flex-col px-4 pb-4 space-y-4">
       <div ref={detailRef} className="space-y-3" aria-hidden={!visibleDetailId}>
         {visibleDetailId && (
-          <Button
-            onClick={() => setCurrentPlaylistId()}
-            size="sm"
-            variant="secondary"
-          >
-            Back
-          </Button>
-        )}
-        {visibleDetailId && currentPlaylist && (
-          <PlaylistPreview
-            playlist={currentPlaylist}
-            status={currentPlaylistStatus}
+          <PlaylistModule
+            id={visibleDetailId}
+            onBack={() => setCurrentPlaylistId()}
           />
         )}
-        {visibleDetailId && <PlaylistModule id={visibleDetailId} />}
       </div>
 
       <div ref={listRef} className="space-y-4" aria-hidden={!!visibleDetailId}>

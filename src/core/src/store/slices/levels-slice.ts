@@ -8,12 +8,17 @@ import { Level } from "../../entities";
 
 export interface ILevelsState {
   levels: Record<string, Level | null>;
+  durations: Record<string, number | null | undefined>;
 }
 export interface IRemovePlaylistLevelsPayload {
   playlistID: string;
 }
 export interface IAddLevelsPayload {
   levels: Level[];
+}
+export interface ISetLevelDurationPayload {
+  levelId: string;
+  durationSec: number | null;
 }
 export interface IDownloadLevelPayload {
   levelID: string;
@@ -29,11 +34,16 @@ interface ILevelsReducers {
     ILevelsState,
     PayloadAction<IRemovePlaylistLevelsPayload>
   >;
+  setDuration: CaseReducer<
+    ILevelsState,
+    PayloadAction<ISetLevelDurationPayload>
+  >;
   [key: string]: CaseReducer<ILevelsState, PayloadAction<any>>;
 }
 
 const initialLevelsState: ILevelsState = {
   levels: {},
+  durations: {},
 };
 export const levelsSlice: Slice<ILevelsState, ILevelsReducers, "levels"> =
   createSlice({
@@ -49,6 +59,7 @@ export const levelsSlice: Slice<ILevelsState, ILevelsReducers, "levels"> =
       },
       clear(state) {
         state.levels = initialLevelsState.levels;
+        state.durations = initialLevelsState.durations;
       },
       removePlaylistLevels(
         state,
@@ -60,9 +71,13 @@ export const levelsSlice: Slice<ILevelsState, ILevelsReducers, "levels"> =
             const level = state.levels[id];
             if (level?.playlistID === playlistID) {
               delete state.levels[id];
+              delete state.durations[id];
             }
           }
         }
+      },
+      setDuration(state, action: PayloadAction<ISetLevelDurationPayload>) {
+        state.durations[action.payload.levelId] = action.payload.durationSec;
       },
     },
   });
