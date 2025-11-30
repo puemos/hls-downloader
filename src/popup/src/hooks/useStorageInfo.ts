@@ -20,10 +20,10 @@ export function useStorageInfo() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!storage.lastUpdated && !storage.loading) {
+    if (!storage.lastUpdated && !storage.loading && !storage.error) {
       refreshStorage();
     }
-  }, [storage.lastUpdated, storage.loading, refreshStorage]);
+  }, [storage.lastUpdated, storage.loading, storage.error, refreshStorage]);
 
   useEffect(() => {
     if (storage.cleanupStatus === "success") {
