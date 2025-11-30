@@ -34,7 +34,10 @@ interface ILevelsReducers {
     ILevelsState,
     PayloadAction<IRemovePlaylistLevelsPayload>
   >;
-  setDuration: CaseReducer<ILevelsState, PayloadAction<ISetLevelDurationPayload>>;
+  setDuration: CaseReducer<
+    ILevelsState,
+    PayloadAction<ISetLevelDurationPayload>
+  >;
   [key: string]: CaseReducer<ILevelsState, PayloadAction<any>>;
 }
 

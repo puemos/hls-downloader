@@ -10,10 +10,7 @@ import {
 import { RootAction, RootState } from "../store/root-reducer";
 import { storageSlice, jobsSlice } from "../store/slices";
 import { Dependencies } from "../services";
-import {
-  fsCleanupFactory,
-  getStorageStatsFactory,
-} from "../use-cases";
+import { fsCleanupFactory, getStorageStatsFactory } from "../use-cases";
 
 export const fetchStorageStatsEpic: Epic<
   RootAction,
