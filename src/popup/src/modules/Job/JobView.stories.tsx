@@ -11,7 +11,7 @@ const meta: Meta<typeof JobView> = {
 export default meta;
 type Story = StoryObj<typeof JobView>;
 
-const sampleJob = new Job("1", [], [], "video.mp4", Date.now());
+const sampleJob = new Job("1", undefined, [], [], "video.mp4", Date.now());
 const derive = (status: any) => buildJobViewDerived(status);
 
 export const Init: Story = {

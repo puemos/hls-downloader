@@ -11,6 +11,7 @@ describe("fsCleanupOnInitEpic", () => {
       createBucket: vi.fn(),
       deleteBucket: vi.fn(),
       saveAs: vi.fn(),
+      getStorageStats: vi.fn(),
     };
     const action$ = of({ type: "init/start" as const, payload: undefined });
     const result = await firstValueFrom(

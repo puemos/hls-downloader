@@ -1,5 +1,7 @@
 import { Button, Switch, Input, Card } from "@hls-downloader/design-system";
 import React from "react";
+import StorageSummary from "../Storage/StorageSummary";
+import { StorageState } from "@hls-downloader/core/lib/store/slices/storage-slice";
 
 interface Props {
   concurrency: number;
@@ -17,6 +19,9 @@ interface Props {
   onActiveDownloadsUnlimited: () => void;
   preferredAudioLanguage?: string | null;
   onSetPreferredAudioLanguage: (lang: string | null) => void;
+  storage: StorageState;
+  onCleanupStorage: () => void;
+  onRefreshStorage: () => void;
 }
 
 const LANG_OPTIONS = [
@@ -67,10 +72,26 @@ const SettingsView = ({
   onSaveDialogToggle,
   preferredAudioLanguage = "",
   onSetPreferredAudioLanguage,
+  storage,
+  onCleanupStorage,
+  onRefreshStorage,
 }: Props) => {
   return (
     <div className="flex flex-col px-4 pb-4 space-y-4">
       <h2 className="text-lg font-semibold">Settings</h2>
+      <StorageSummary
+        compact
+        usedBytes={storage.totalUsedBytes}
+        availableBytes={storage.availableBytes}
+        quotaBytes={storage.quotaBytes}
+        estimateSource={storage.estimateSource}
+        nearQuota={storage.nearQuota}
+        loading={storage.loading}
+        subtitlesBytes={storage.subtitlesBytes}
+        cleanupStatus={storage.cleanupStatus}
+        onCleanup={onCleanupStorage}
+        onRefresh={onRefreshStorage}
+      />
       <div className="space-y-3">
         <Card className="flex-row items-center justify-between gap-2">
           <div className="flex flex-col">

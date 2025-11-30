@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import PlaylistView from "./PlaylistView";
 import usePlaylistController from "./PlaylistController";
-import { Level } from "@hls-downloader/core/lib/entities";
+import { Level, Playlist } from "@hls-downloader/core/lib/entities";
+import { useSelector } from "react-redux";
+import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
 
 export function selectPreferredAudioLevel(
   audioLevels: Level[] = [],
@@ -37,7 +39,7 @@ export function selectPreferredAudioLevel(
   })[0]?.id;
 }
 
-const PlaylistModule = ({ id }: { id: string }) => {
+const PlaylistModule = ({ id, onBack }: { id: string; onBack?: () => void }) => {
   const {
     levels,
     status,
@@ -52,9 +54,15 @@ const PlaylistModule = ({ id }: { id: string }) => {
     id,
   });
 
+  const playlist = useSelector<RootState, Playlist | null>(
+    (state) => state.playlists.playlists[id] ?? null
+  );
   const [videoId, setVideoId] = useState<string>();
   const [audioId, setAudioId] = useState<string>();
   const [subtitleId, setSubtitleId] = useState<string>("");
+  const levelDurations = useSelector(
+    (state: RootState) => state.levels.durations
+  );
 
   const videoLevels = useMemo(
     () => levels.filter((l) => l.type === "stream"),
@@ -176,6 +184,34 @@ const PlaylistModule = ({ id }: { id: string }) => {
     selectedVideo?.audioGroupId && filteredAudioLevels.length > 0;
   const hasMedia = requiresVideo || requiresAudio;
 
+  const estimate = useMemo(() => {
+    const storedDuration = videoId ? levelDurations[videoId] ?? null : null;
+    const duration = storedDuration ?? null;
+    if (!duration || !selectedVideo) {
+      return undefined;
+    }
+    const videoBitrate = selectedVideo.bitrate ?? 0;
+    const audioBitrate =
+      (selectedAudio?.bitrate ?? 0) ||
+      (filteredAudioLevels.length > 0 ? 128_000 : 0);
+    const totalBitrate = videoBitrate + audioBitrate;
+    if (totalBitrate === 0) {
+      return undefined;
+    }
+    const expectedBytes = (totalBitrate / 8) * duration;
+    return {
+      expectedBytes,
+      storedBytes: undefined,
+      totalFragments: undefined,
+    };
+  }, [
+    levelDurations,
+    videoId,
+    selectedVideo,
+    selectedAudio,
+    filteredAudioLevels.length,
+  ]);
+
   const selectedInspections = {
     video: videoId ? inspections.inspections[videoId] : null,
     audio: audioId ? inspections.inspections[audioId] : null,
@@ -256,6 +292,8 @@ const PlaylistModule = ({ id }: { id: string }) => {
 
   return (
     <PlaylistView
+      onBack={onBack}
+      playlist={playlist}
       videoLevels={videoLevels}
       audioLevels={filteredAudioLevels}
       subtitleLevels={subtitleLevels}
@@ -271,6 +309,7 @@ const PlaylistModule = ({ id }: { id: string }) => {
       encryptionSummaries={encryptionSummaries}
       inspectionPending={inspectionPending}
       encryptionBlocked={encryptionBlocked}
+      estimate={estimate}
     ></PlaylistView>
   );
 };

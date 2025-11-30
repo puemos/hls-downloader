@@ -1,6 +1,7 @@
 import React from "react";
 import SettingsView from "./SettingsView";
 import useSettingsController from "./SettingsController";
+import { useStorageInfo } from "../../hooks/useStorageInfo";
 
 const SettingsModule = () => {
   const {
@@ -20,6 +21,7 @@ const SettingsModule = () => {
     onActiveDownloadsIncrease,
     onActiveDownloadsUnlimited,
   } = useSettingsController();
+  const { storage, startCleanup, refreshStorage } = useStorageInfo();
 
   return (
     <SettingsView
@@ -38,6 +40,9 @@ const SettingsModule = () => {
       onActiveDownloadsDecrease={onActiveDownloadsDecrease}
       onActiveDownloadsIncrease={onActiveDownloadsIncrease}
       onActiveDownloadsUnlimited={onActiveDownloadsUnlimited}
+      storage={storage}
+      onCleanupStorage={startCleanup}
+      onRefreshStorage={refreshStorage}
     ></SettingsView>
   );
 };

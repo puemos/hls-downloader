@@ -22,6 +22,7 @@ import {
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { Metadata } from "../../components/Metadata";
+import { formatBytes } from "../../utils/format-bytes";
 
 interface Props {
   job: Job | null;
@@ -151,6 +152,11 @@ const JobView = ({
             </span>
             %
           </span>
+          <span className="text-[11px] text-right truncate max-w-[140px]">
+            {derived.size.expectedBytes
+              ? `~${formatBytes(derived.size.expectedBytes)}`
+              : "Estimating size"}
+          </span>
         </div>
       </button>
 
@@ -198,6 +204,40 @@ const JobView = ({
               height: job.height,
             }}
           />
+        </div>
+
+        <div className="rounded-md border bg-muted/40 p-3 text-[12px] leading-tight space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-semibold">Storage</span>
+            <span className="text-muted-foreground">
+              {derived.size.storedBytes !== undefined
+                ? `${formatBytes(derived.size.storedBytes)} stored`
+                : "Not stored yet"}
+            </span>
+            {derived.progress.total > 0 && (
+              <span className="text-muted-foreground">
+                • {derived.progress.done}/{derived.progress.total} fragments
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-muted-foreground">
+              Expected:{" "}
+              {derived.size.expectedBytes !== undefined
+                ? `~${formatBytes(derived.size.expectedBytes)}`
+                : "Estimating"}
+            </span>
+            {derived.size.remainingBytes !== undefined && (
+              <span className="text-muted-foreground">
+                • {formatBytes(derived.size.remainingBytes)} remaining
+              </span>
+            )}
+            {derived.size.availableBytes !== undefined && (
+              <span className="text-muted-foreground">
+                • Free {formatBytes(derived.size.availableBytes)}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="w-full space-y-2">

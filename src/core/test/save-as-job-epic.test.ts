@@ -6,7 +6,7 @@ import { Job } from "../src/entities/index.ts";
 
 describe("saveAsJobEpic", () => {
   it("saves job to file and emits success", async () => {
-    const job = new Job("1", [], [], "file.mp4", Date.now());
+    const job = new Job("1", "p1", [], [], "file.mp4", Date.now());
     const fs = {
       getBucket: vi.fn().mockResolvedValue({
         getLink: vi.fn().mockResolvedValue("link"),
