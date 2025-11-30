@@ -1,6 +1,7 @@
 import React from "react";
 import DownloadsView from "./DownloadsView";
 import useDownloadsController from "./DownloadsController";
+import { useStorageInfo } from "../../hooks/useStorageInfo";
 
 const DownloadsModule = () => {
   const {
@@ -12,6 +13,7 @@ const DownloadsModule = () => {
     hasJobs,
     showFilterInput,
   } = useDownloadsController();
+  const { storage, startCleanup, refreshStorage } = useStorageInfo();
 
   return (
     <DownloadsView
@@ -22,6 +24,9 @@ const DownloadsModule = () => {
       jobs={jobs}
       hasJobs={hasJobs}
       showFilterInput={showFilterInput}
+      storage={storage}
+      onCleanup={startCleanup}
+      onRefreshStorage={refreshStorage}
     ></DownloadsView>
   );
 };

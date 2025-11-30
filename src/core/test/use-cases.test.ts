@@ -11,6 +11,8 @@ import {
   downloadSingleFactory,
   getFragmentsDetailsFactory,
   getLevelsFactory,
+  getStorageStatsFactory,
+  getPlaylistDurationFactory,
 } from "../src/use-cases/index.ts";
 import { Playlist, Level, Key, Fragment } from "../src/entities/index.ts";
 import type {
@@ -33,6 +35,10 @@ const createFsMock = () => {
     deleteBucket: vi.fn().mockResolvedValue(undefined),
     getBucket: vi.fn().mockResolvedValue(bucket),
     saveAs: vi.fn().mockResolvedValue(undefined),
+    getStorageStats: vi.fn().mockResolvedValue({
+      buckets: [],
+      estimate: { source: "fallback" },
+    }),
   };
   return { fs, bucket };
 };
@@ -308,5 +314,53 @@ describe("use-cases", () => {
     };
     const run = getLevelsFactory(loader, parser);
     await expect(run("uri", 1)).rejects.toThrow("LevelManifest");
+  });
+
+  it("calculates storage stats with expected size", async () => {
+    const snapshot = {
+      buckets: [
+        {
+          id: "job-1",
+          videoLength: 2,
+          audioLength: 1,
+          storedBytes: 3_000,
+          storedChunks: 1,
+        },
+      ],
+      subtitlesBytes: 500,
+      estimate: {
+        usage: 4_000,
+        quota: 10_000,
+        available: 6_000,
+        source: "navigator" as const,
+      },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const run = getStorageStatsFactory(fs as any);
+    const stats = await run();
+
+    expect(stats.buckets[0]?.expectedBytes).toBeCloseTo(9_000);
+    expect(stats.totalUsedBytes).toBe(3_500);
+    expect(stats.availableBytes).toBe(6_000);
+    expect(stats.estimateSource).toBe("navigator");
+  });
+
+  it("calculates playlist duration from EXTINF", async () => {
+    const loader: ILoader = {
+      fetchText: vi
+        .fn()
+        .mockResolvedValue(
+          "#EXTM3U\n#EXTINF:3.0,\na.ts\n#EXTINF:4.5,\nb.ts\n"
+        ),
+      fetchArrayBuffer: vi.fn(),
+    };
+    const run = getPlaylistDurationFactory(loader);
+    const duration = await run("http://example.com/l.m3u8", null, 2);
+    expect(loader.fetchText).toHaveBeenCalledWith(
+      "http://example.com/l.m3u8",
+      2
+    );
+    expect(duration).toBeCloseTo(7.5);
   });
 });

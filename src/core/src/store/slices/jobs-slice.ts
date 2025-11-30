@@ -46,7 +46,7 @@ export interface ISetSaveProgressPayload {
 
 interface IJobsReducers {
   download: CaseReducer<IJobsState, PayloadAction<IDownloadJobPayload>>;
-  clear: CaseReducer<IJobsState, PayloadAction<any>>;
+  clear: CaseReducer<IJobsState>;
   add: CaseReducer<IJobsState, PayloadAction<IAddJobPayload>>;
   queue: CaseReducer<IJobsState, PayloadAction<IDownloadJobPayload>>;
   cancel: CaseReducer<IJobsState, PayloadAction<IDeleteJobPayload>>;

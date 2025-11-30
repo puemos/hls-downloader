@@ -10,8 +10,6 @@ import { useDispatch, useSelector } from "react-redux";
 interface ReturnType {
   playlists: Playlist[];
   currentPlaylistId: string | undefined;
-  currentPlaylist: Playlist | null;
-  currentPlaylistStatus: PlaylistStatus | null;
   filter: string;
   clearPlaylists: () => void;
   setFilter: (filter: string) => void;
@@ -105,12 +103,6 @@ const useSnifferController = (): ReturnType => {
   }
 
   return {
-    currentPlaylist: currentPlaylistId
-      ? playlistsRecord[currentPlaylistId] ?? null
-      : null,
-    currentPlaylistStatus: currentPlaylistId
-      ? playlistsStatusRecord[currentPlaylistId] ?? null
-      : null,
     filter,
     clearPlaylists,
     setFilter,

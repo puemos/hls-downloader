@@ -6,7 +6,11 @@ import {
   IDBPCursorWithValue,
 } from "idb";
 
-import { Bucket, IFS } from "@hls-downloader/core/lib/services";
+import {
+  Bucket,
+  IFS,
+  StorageSnapshot,
+} from "@hls-downloader/core/lib/services";
 import browser from "webextension-polyfill";
 import filenamify from "filenamify";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
@@ -18,10 +22,14 @@ const browserApi = (browser as any) ?? (globalThis as any).browser ?? chromeApi;
 const BUCKET_META_KEY = "bucketMeta";
 const SUBTITLE_DB_NAME = "subtitles";
 const SUBTITLE_STORE_NAME = "subtitles";
+const CHUNKS_STORE_NAME = "chunks";
 
 type BucketMeta = {
   videoLength: number;
   audioLength: number;
+  bytesWritten?: number;
+  storedChunks?: number;
+  updatedAt?: number;
 };
 
 let bucketMetaCache: Record<string, BucketMeta> | null = null;
@@ -56,6 +64,22 @@ async function deleteBucketMeta(id: string) {
   if (storageArea) {
     await storageArea.set({ [BUCKET_META_KEY]: cache });
   }
+}
+
+async function trackBucketUsage(id: string, bytesWritten: number) {
+  const cache = await loadBucketMetaCache();
+  const current = cache[id];
+  if (!current) {
+    return;
+  }
+
+  const next: BucketMeta = {
+    ...current,
+    bytesWritten: (current.bytesWritten ?? 0) + bytesWritten,
+    storedChunks: (current.storedChunks ?? 0) + 1,
+    updatedAt: Date.now(),
+  };
+  await setBucketMeta(id, next);
 }
 
 async function getBucketMeta(id: string): Promise<BucketMeta | undefined> {
@@ -115,6 +139,92 @@ async function deleteSubtitlesDb() {
   await deleteDB(SUBTITLE_DB_NAME);
 }
 
+async function measureBucketUsage(
+  id: string
+): Promise<{ storedBytes: number; storedChunks: number }> {
+  try {
+    const db = await openDB<ChunksDB>(id, 1);
+    const tx = db.transaction(CHUNKS_STORE_NAME, "readonly");
+    const store = tx.objectStore(CHUNKS_STORE_NAME);
+    let cursor = await store.openCursor();
+    let storedBytes = 0;
+    let storedChunks = 0;
+
+    while (cursor) {
+      const value = cursor.value;
+      if (value?.data) {
+        storedBytes += value.data.byteLength;
+      }
+      storedChunks++;
+      cursor = await cursor.continue();
+    }
+
+    await (tx as any)?.done?.();
+    db.close();
+    return { storedBytes, storedChunks };
+  } catch (error) {
+    console.warn(`[storage] Failed to measure bucket ${id}`, error);
+    return { storedBytes: 0, storedChunks: 0 };
+  }
+}
+
+async function estimateSubtitlesBytes(): Promise<number> {
+  try {
+    const db = await getSubtitlesDb();
+    const tx = db.transaction(SUBTITLE_STORE_NAME, "readonly");
+    const store = tx.objectStore(SUBTITLE_STORE_NAME);
+    const encoder = new TextEncoder();
+    let total = 0;
+    let cursor = await store.openCursor();
+
+    while (cursor) {
+      const record = cursor.value;
+      total += encoder.encode(record.text ?? "").byteLength;
+      if (record.language) {
+        total += encoder.encode(record.language).byteLength;
+      }
+      if (record.name) {
+        total += encoder.encode(record.name).byteLength;
+      }
+      cursor = await cursor.continue();
+    }
+
+    await (tx as any)?.done?.();
+    return total;
+  } catch (_error) {
+    return 0;
+  }
+}
+
+async function getStorageEstimate() {
+  const nav = (globalThis as any)?.navigator;
+  if (nav?.storage?.estimate) {
+    try {
+      const estimate = await nav.storage.estimate();
+      const usage =
+        typeof estimate.usage === "number" ? estimate.usage : undefined;
+      const quota =
+        typeof estimate.quota === "number" ? estimate.quota : undefined;
+      const available =
+        quota !== undefined && usage !== undefined
+          ? Math.max(0, quota - usage)
+          : undefined;
+      return {
+        usage,
+        quota,
+        available,
+        source: "navigator" as const,
+      };
+    } catch (error) {
+      console.warn("[storage] navigator.storage.estimate failed", error);
+    }
+  }
+
+  return {
+    source: "fallback" as const,
+  };
+}
+
 // Singleton FFmpeg instance
 class FFmpegSingleton {
   private static instance: FFmpeg | null = null;
@@ -144,7 +254,7 @@ class FFmpegSingleton {
 export class IndexedDBBucket implements Bucket {
   // make output name unique per bucket
   readonly fileName: string;
-  readonly objectStoreName = "chunks";
+  readonly objectStoreName = CHUNKS_STORE_NAME;
   private db?: IDBPDatabase<ChunksDB>;
   private isDeleted = false;
 
@@ -211,12 +321,14 @@ export class IndexedDBBucket implements Bucket {
 
   async write(index: number, data: ArrayBuffer): Promise<void> {
     const typedArray = new Uint8Array(data);
+    const byteLength = typedArray.byteLength;
 
     await this.ensureDb();
     await this.db!.add(this.objectStoreName, {
       data: typedArray,
       index,
     });
+    await trackBucketUsage(this.id, byteLength);
     return Promise.resolve();
   }
 
@@ -360,6 +472,14 @@ export class IndexedDBBucket implements Bucket {
 }
 
 const cleanup: IFS["cleanup"] = async function () {
+  for (const bucket of Object.values(buckets)) {
+    try {
+      await bucket.deleteDB();
+    } catch (_error) {
+      // ignore best-effort
+    }
+  }
+
   const meta = await loadBucketMetaCache();
   const dbNames = Object.keys(meta);
 
@@ -385,7 +505,13 @@ const createBucket: IFS["createBucket"] = async function (
   videoLength: number,
   audioLength: number
 ) {
-  await setBucketMeta(id, { videoLength, audioLength });
+  await setBucketMeta(id, {
+    videoLength,
+    audioLength,
+    bytesWritten: 0,
+    storedChunks: 0,
+    updatedAt: Date.now(),
+  });
   buckets[id] = new IndexedDBBucket(videoLength, audioLength, id);
   return Promise.resolve();
 };
@@ -433,6 +559,53 @@ const getBucket: IFS["getBucket"] = async function (id: string) {
   return bucket;
 };
 
+const getStorageStats: IFS["getStorageStats"] = async function () {
+  const meta = await loadBucketMetaCache();
+  const buckets: StorageSnapshot["buckets"] = [];
+
+  for (const [id, bucketMeta] of Object.entries(meta)) {
+    if (!bucketMeta) {
+      continue;
+    }
+
+    let storedBytes = bucketMeta.bytesWritten ?? 0;
+    let storedChunks = bucketMeta.storedChunks ?? 0;
+    const needsMeasurement =
+      bucketMeta.bytesWritten === undefined ||
+      bucketMeta.storedChunks === undefined;
+
+    if (needsMeasurement) {
+      const measured = await measureBucketUsage(id);
+      storedBytes = measured.storedBytes;
+      storedChunks = measured.storedChunks;
+      await setBucketMeta(id, {
+        ...bucketMeta,
+        bytesWritten: storedBytes,
+        storedChunks,
+        updatedAt: Date.now(),
+      });
+    }
+
+    buckets.push({
+      id,
+      videoLength: bucketMeta.videoLength,
+      audioLength: bucketMeta.audioLength,
+      storedBytes,
+      storedChunks,
+      updatedAt: bucketMeta.updatedAt,
+    });
+  }
+
+  const subtitlesBytes = await estimateSubtitlesBytes();
+  const estimate = await getStorageEstimate();
+
+  return {
+    buckets,
+    subtitlesBytes,
+    estimate,
+  };
+};
+
 const saveAs: IFS["saveAs"] = async function (
   path: string,
   link: string,
@@ -461,6 +634,7 @@ export const IndexedDBFS: IFS = {
   getBucket,
   createBucket,
   deleteBucket,
+  getStorageStats,
   saveAs,
   cleanup,
   setSubtitleText,

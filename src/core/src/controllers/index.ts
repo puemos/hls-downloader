@@ -11,3 +11,5 @@ export * from "./cancel-job-delete-job-epic";
 export * from "./download-subtitle-epic";
 export * from "./inspect-level-epic";
 export * from "./remove-playlist-epic";
+export * from "./storage-epics";
+export * from "./fetch-level-duration-epic";

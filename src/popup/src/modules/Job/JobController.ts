@@ -1,6 +1,7 @@
 import { Job, JobStatus } from "@hls-downloader/core/lib/entities";
 import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
 import { jobsSlice } from "@hls-downloader/core/lib/store/slices";
+import { StorageBucketStats } from "@hls-downloader/core/lib/use-cases/get-storage-stats";
 import { useDispatch, useSelector } from "react-redux";
 
 export type JobViewDerived = {
@@ -22,12 +23,21 @@ export type JobViewDerived = {
     percent: number;
     message: string;
   };
+  size: {
+    expectedBytes?: number;
+    storedBytes?: number;
+    remainingBytes?: number;
+    averageChunkBytes?: number;
+    totalFragments?: number;
+    availableBytes?: number;
+  };
 };
 
 interface ReturnType {
   status: JobStatus | null;
   job: Job | null;
   derived: JobViewDerived;
+  bucket?: StorageBucketStats;
   downloadJob: () => void;
   deleteJob: () => void;
   cancelJob: () => void;
@@ -42,7 +52,13 @@ const useJobController = ({ id }: { id: string }): ReturnType => {
   const job = useSelector<RootState, Job | null>(
     (state) => state.jobs.jobs[id]
   );
-  const derived = buildJobViewDerived(status);
+  const bucket = useSelector<RootState, StorageBucketStats | undefined>(
+    (state) => state.storage.buckets[id]
+  );
+  const availableBytes = useSelector<RootState, number | undefined>(
+    (state) => state.storage.availableBytes
+  );
+  const derived = buildJobViewDerived(status, bucket, availableBytes);
 
   function downloadJob() {
     dispatch(jobsSlice.actions.queue({ jobId: id }));
@@ -60,6 +76,7 @@ const useJobController = ({ id }: { id: string }): ReturnType => {
     status,
     job,
     derived,
+    bucket,
     downloadJob,
     deleteJob,
     cancelJob,
@@ -69,7 +86,11 @@ const useJobController = ({ id }: { id: string }): ReturnType => {
 
 export default useJobController;
 
-export function buildJobViewDerived(status: JobStatus | null): JobViewDerived {
+export function buildJobViewDerived(
+  status: JobStatus | null,
+  bucket?: StorageBucketStats,
+  availableBytes?: number
+): JobViewDerived {
   const isError = status?.status === "error";
   const isQueued = status?.status === "queued";
   const isDownloading = status?.status === "downloading";
@@ -126,6 +147,13 @@ export function buildJobViewDerived(status: JobStatus | null): JobViewDerived {
     ? "active"
     : "idle";
 
+  const expectedBytes = bucket?.expectedBytes;
+  const storedBytes = bucket?.storedBytes;
+  const remainingBytes =
+    expectedBytes !== undefined && storedBytes !== undefined
+      ? Math.max(0, expectedBytes - storedBytes)
+      : undefined;
+
   return {
     percent,
     headerStatusLabel,
@@ -144,6 +172,14 @@ export function buildJobViewDerived(status: JobStatus | null): JobViewDerived {
     saving: {
       percent: savingPercent,
       message: savingMessage,
+    },
+    size: {
+      expectedBytes,
+      storedBytes,
+      remainingBytes,
+      averageChunkBytes: bucket?.averageChunkBytes,
+      totalFragments: bucket?.totalFragments,
+      availableBytes,
     },
   };
 }
