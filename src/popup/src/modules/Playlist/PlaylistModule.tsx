@@ -39,7 +39,13 @@ export function selectPreferredAudioLevel(
   })[0]?.id;
 }
 
-const PlaylistModule = ({ id, onBack }: { id: string; onBack?: () => void }) => {
+const PlaylistModule = ({
+  id,
+  onBack,
+}: {
+  id: string;
+  onBack?: () => void;
+}) => {
   const {
     levels,
     status,

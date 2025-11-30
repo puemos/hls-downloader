@@ -179,9 +179,7 @@ describe("FetchLoader", () => {
 
     it("throws last error when retries are exhausted", async () => {
       vi.useFakeTimers();
-      const fetchMock = vi
-        .fn()
-        .mockRejectedValue(new Error("Buffer failure"));
+      const fetchMock = vi.fn().mockRejectedValue(new Error("Buffer failure"));
       globalThis.fetch = fetchMock;
 
       const promise = fetchArrayBuffer("https://example.com/error.bin", 2);

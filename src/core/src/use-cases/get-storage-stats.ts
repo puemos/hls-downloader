@@ -1,8 +1,4 @@
-import {
-  IFS,
-  StorageEstimate,
-  StorageSnapshot,
-} from "../services";
+import { IFS, StorageEstimate, StorageSnapshot } from "../services";
 
 export const STORAGE_WARNING_RATIO = 0.9;
 export const STORAGE_WARNING_MIN_AVAILABLE_BYTES = 200 * 1024 * 1024;
@@ -82,8 +78,7 @@ export const getStorageStatsFactory = (
         ? Math.max(0, quotaBytes - usageForAvailable)
         : undefined);
 
-    const warningRatio =
-      options?.warningRatio ?? STORAGE_WARNING_RATIO;
+    const warningRatio = options?.warningRatio ?? STORAGE_WARNING_RATIO;
     const minAvailableBytes =
       options?.minAvailableBytes ?? STORAGE_WARNING_MIN_AVAILABLE_BYTES;
 
@@ -92,8 +87,7 @@ export const getStorageStatsFactory = (
         usageForAvailable !== undefined &&
         quotaBytes > 0 &&
         usageForAvailable / quotaBytes >= warningRatio) ||
-      (availableBytes !== undefined &&
-        availableBytes <= minAvailableBytes);
+      (availableBytes !== undefined && availableBytes <= minAvailableBytes);
 
     return {
       buckets,

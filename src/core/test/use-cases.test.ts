@@ -350,9 +350,7 @@ describe("use-cases", () => {
     const loader: ILoader = {
       fetchText: vi
         .fn()
-        .mockResolvedValue(
-          "#EXTM3U\n#EXTINF:3.0,\na.ts\n#EXTINF:4.5,\nb.ts\n"
-        ),
+        .mockResolvedValue("#EXTM3U\n#EXTINF:3.0,\na.ts\n#EXTINF:4.5,\nb.ts\n"),
       fetchArrayBuffer: vi.fn(),
     };
     const run = getPlaylistDurationFactory(loader);

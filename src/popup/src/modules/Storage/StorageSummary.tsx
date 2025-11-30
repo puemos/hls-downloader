@@ -79,7 +79,10 @@ const StorageSummary = ({
             </p>
           )}
           <p className="text-[11px] text-muted-foreground leading-tight">
-            Source: {estimateSource === "navigator" ? "browser estimate" : "saved metadata"}
+            Source:{" "}
+            {estimateSource === "navigator"
+              ? "browser estimate"
+              : "saved metadata"}
             {loading && " • updating..."}
           </p>
         </div>

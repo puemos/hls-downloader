@@ -39,16 +39,10 @@ export const initialStorageState: StorageState = {
 interface StorageReducers {
   refresh: CaseReducer<StorageState, PayloadAction<void>>;
   refreshSuccess: CaseReducer<StorageState, PayloadAction<StorageStats>>;
-  refreshFailure: CaseReducer<
-    StorageState,
-    PayloadAction<{ error: string }>
-  >;
+  refreshFailure: CaseReducer<StorageState, PayloadAction<{ error: string }>>;
   startCleanup: CaseReducer<StorageState, PayloadAction<void>>;
   cleanupSuccess: CaseReducer<StorageState, PayloadAction<void>>;
-  cleanupFailure: CaseReducer<
-    StorageState,
-    PayloadAction<{ error: string }>
-  >;
+  cleanupFailure: CaseReducer<StorageState, PayloadAction<{ error: string }>>;
   resetCleanupState: CaseReducer<StorageState, PayloadAction<void>>;
   [key: string]: CaseReducer<StorageState, PayloadAction<any>>;
 }
@@ -72,13 +66,10 @@ export const storageSlice: Slice<StorageState, StorageReducers, "storage"> =
         state.nearQuota = action.payload.nearQuota;
         state.totalUsedBytes = action.payload.totalUsedBytes;
         state.subtitlesBytes = action.payload.subtitlesBytes;
-        state.buckets = action.payload.buckets.reduce(
-          (acc, bucket) => {
-            acc[bucket.id] = bucket;
-            return acc;
-          },
-          {} as Record<string, StorageBucketStats>
-        );
+        state.buckets = action.payload.buckets.reduce((acc, bucket) => {
+          acc[bucket.id] = bucket;
+          return acc;
+        }, {} as Record<string, StorageBucketStats>);
       },
       refreshFailure(state, action: PayloadAction<{ error: string }>) {
         state.loading = false;
