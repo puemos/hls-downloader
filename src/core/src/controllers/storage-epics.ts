@@ -55,7 +55,7 @@ export const autoRefreshStorageStatsEpic: Epic<
 > = (action$) =>
   action$.pipe(
     filter((action) => STORAGE_TRIGGER_ACTIONS.some((match) => match(action))),
-    throttleTime(800, undefined, { leading: true, trailing: true }),
+    throttleTime(700, undefined, { leading: true, trailing: true }),
     map(() => storageSlice.actions.refresh())
   );
 
