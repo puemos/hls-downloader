@@ -66,20 +66,24 @@ async function deleteBucketMeta(id: string) {
   }
 }
 
-async function trackBucketUsage(id: string, bytesWritten: number) {
-  const cache = await loadBucketMetaCache();
-  const current = cache[id];
-  if (!current) {
-    return;
-  }
+const metaUpdateQueues: Record<string, Promise<void>> = {};
 
-  const next: BucketMeta = {
-    ...current,
-    bytesWritten: (current.bytesWritten ?? 0) + bytesWritten,
-    storedChunks: (current.storedChunks ?? 0) + 1,
-    updatedAt: Date.now(),
-  };
-  await setBucketMeta(id, next);
+async function trackBucketUsage(id: string, bytesWritten: number) {
+  const prev = metaUpdateQueues[id] ?? Promise.resolve();
+  metaUpdateQueues[id] = prev
+    .then(async () => {
+      const cache = await loadBucketMetaCache();
+      const current = cache[id];
+      if (!current) return;
+      await setBucketMeta(id, {
+        ...current,
+        bytesWritten: (current.bytesWritten ?? 0) + bytesWritten,
+        storedChunks: (current.storedChunks ?? 0) + 1,
+        updatedAt: Date.now(),
+      });
+    })
+    .catch(() => {}); // best-effort tracking, don't block writes
+  await metaUpdateQueues[id];
 }
 
 async function getBucketMeta(id: string): Promise<BucketMeta | undefined> {
@@ -142,8 +146,9 @@ async function deleteSubtitlesDb() {
 async function measureBucketUsage(
   id: string
 ): Promise<{ storedBytes: number; storedChunks: number }> {
+  let db: IDBPDatabase<ChunksDB> | undefined;
   try {
-    const db = await openDB<ChunksDB>(id, 1);
+    db = await openDB<ChunksDB>(id, 1);
     const tx = db.transaction(CHUNKS_STORE_NAME, "readonly");
     const store = tx.objectStore(CHUNKS_STORE_NAME);
     let cursor = await store.openCursor();
@@ -159,12 +164,13 @@ async function measureBucketUsage(
       cursor = await cursor.continue();
     }
 
-    await (tx as any)?.done?.();
-    db.close();
+    await tx.done;
     return { storedBytes, storedChunks };
   } catch (error) {
     console.warn(`[storage] Failed to measure bucket ${id}`, error);
     return { storedBytes: 0, storedChunks: 0 };
+  } finally {
+    db?.close();
   }
 }
 
@@ -189,7 +195,7 @@ async function estimateSubtitlesBytes(): Promise<number> {
       cursor = await cursor.continue();
     }
 
-    await (tx as any)?.done?.();
+    await tx.done;
     return total;
   } catch (_error) {
     return 0;
@@ -283,7 +289,7 @@ export class IndexedDBBucket implements Bucket {
       await this.openDB();
     }
     if (!this.db) {
-      throw Error();
+      throw Error("Cannot delete: DB not initialized");
     }
     this.db.close();
     this.db = undefined;
@@ -294,7 +300,7 @@ export class IndexedDBBucket implements Bucket {
 
   async openDB() {
     if (this.isDeleted) {
-      throw Error();
+      throw Error("Cannot open: bucket was deleted");
     }
     const objectStoreName = this.objectStoreName;
     const db = await openDB<ChunksDB>(this.id, 1, {
@@ -312,7 +318,7 @@ export class IndexedDBBucket implements Bucket {
 
   private async ensureDb() {
     if (this.isDeleted) {
-      throw Error();
+      throw Error("Cannot access: bucket was deleted");
     }
     if (!this.db) {
       await this.openDB();
@@ -484,9 +490,13 @@ const cleanup: IFS["cleanup"] = async function () {
   const dbNames = Object.keys(meta);
 
   for (const dbName of dbNames) {
-    const db = await openDB(dbName, 1);
-    db.close();
-    await deleteDB(dbName);
+    try {
+      const db = await openDB(dbName, 1);
+      db.close();
+      await deleteDB(dbName);
+    } catch (_error) {
+      // best-effort per-DB cleanup
+    }
   }
 
   bucketMetaCache = {};
@@ -529,8 +539,8 @@ const deleteBucket: IFS["deleteBucket"] = async function (id: string) {
         // ignore
       }
     }
-  } finally {
     delete buckets[id];
+  } finally {
     try {
       await deleteBucketMeta(id);
     } catch (_error) {

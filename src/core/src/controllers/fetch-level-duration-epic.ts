@@ -28,25 +28,27 @@ export const fetchLevelDurationEpic: Epic<
       }
       const run = getPlaylistDurationFactory(loader);
       return from(toFetch).pipe(
-        mergeMap((level) =>
-          from(run(level.uri, null, fetchAttempts)).pipe(
-            mergeMap((durationSec) =>
-              of(
-                levelsSlice.actions.setDuration({
-                  levelId: level.id,
-                  durationSec,
-                })
+        mergeMap(
+          (level) =>
+            from(run(level.uri, null, fetchAttempts)).pipe(
+              mergeMap((durationSec) =>
+                of(
+                  levelsSlice.actions.setDuration({
+                    levelId: level.id,
+                    durationSec,
+                  })
+                )
+              ),
+              catchError(() =>
+                of(
+                  levelsSlice.actions.setDuration({
+                    levelId: level.id,
+                    durationSec: null,
+                  })
+                )
               )
             ),
-            catchError(() =>
-              of(
-                levelsSlice.actions.setDuration({
-                  levelId: level.id,
-                  durationSec: null,
-                })
-              )
-            )
-          )
+          4
         )
       );
     })

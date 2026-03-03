@@ -85,7 +85,7 @@ export const storageSlice: Slice<StorageState, StorageReducers, "storage"> =
         state.loading = false;
         state.lastUpdated = Date.now();
         state.totalUsedBytes = 0;
-        state.availableBytes = state.quotaBytes ?? state.availableBytes;
+        state.availableBytes = undefined;
         state.nearQuota = false;
         state.buckets = {};
       },

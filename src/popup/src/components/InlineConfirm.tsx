@@ -32,7 +32,6 @@ const InlineConfirm = ({
 
   function handleConfirm() {
     onConfirm();
-    setConfirming(false);
   }
 
   function handleCancel() {
