@@ -84,6 +84,7 @@ export const addDownloadJobEpic: Epic<
             jobsSlice.actions.add({
               job: {
                 id: jobId,
+                playlistId: playlist.id,
                 videoFragments,
                 audioFragments,
                 filename: generateFileName()(playlist, videoLevel, {

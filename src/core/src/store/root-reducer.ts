@@ -11,6 +11,7 @@ import {
 import { levelInspectionsSlice } from "./slices/level-inspections-slice";
 import { playlistPreferencesSlice } from "./slices/playlist-preferences-slice";
 import { subtitlesSlice } from "./slices/subtitles-slice";
+import { storageSlice } from "./slices/storage-slice";
 
 export const rootReducer = combineReducers({
   playlists: playlistsSlice.reducer,
@@ -21,6 +22,7 @@ export const rootReducer = combineReducers({
   subtitles: subtitlesSlice.reducer,
   levelInspections: levelInspectionsSlice.reducer,
   playlistPreferences: playlistPreferencesSlice.reducer,
+  storage: storageSlice.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -34,4 +36,5 @@ export type RootAction =
   | ActionType<typeof playlistsSlice.actions>
   | ActionType<typeof subtitlesSlice.actions>
   | ActionType<typeof levelInspectionsSlice.actions>
-  | ActionType<typeof playlistPreferencesSlice.actions>;
+  | ActionType<typeof playlistPreferencesSlice.actions>
+  | ActionType<typeof storageSlice.actions>;

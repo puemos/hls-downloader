@@ -11,6 +11,8 @@ import {
   downloadSingleFactory,
   getFragmentsDetailsFactory,
   getLevelsFactory,
+  getStorageStatsFactory,
+  getPlaylistDurationFactory,
 } from "../src/use-cases/index.ts";
 import { Playlist, Level, Key, Fragment } from "../src/entities/index.ts";
 import type {
@@ -33,6 +35,10 @@ const createFsMock = () => {
     deleteBucket: vi.fn().mockResolvedValue(undefined),
     getBucket: vi.fn().mockResolvedValue(bucket),
     saveAs: vi.fn().mockResolvedValue(undefined),
+    getStorageStats: vi.fn().mockResolvedValue({
+      buckets: [],
+      estimate: { source: "fallback" },
+    }),
   };
   return { fs, bucket };
 };
@@ -308,5 +314,157 @@ describe("use-cases", () => {
     };
     const run = getLevelsFactory(loader, parser);
     await expect(run("uri", 1)).rejects.toThrow("LevelManifest");
+  });
+
+  it("calculates storage stats with expected size", async () => {
+    const snapshot = {
+      buckets: [
+        {
+          id: "job-1",
+          videoLength: 2,
+          audioLength: 1,
+          storedBytes: 3_000,
+          storedChunks: 1,
+        },
+      ],
+      subtitlesBytes: 500,
+      estimate: {
+        usage: 4_000,
+        quota: 10_000,
+        available: 6_000,
+        source: "navigator" as const,
+      },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const run = getStorageStatsFactory(fs as any);
+    const stats = await run();
+
+    expect(stats.buckets[0]?.expectedBytes).toBeCloseTo(9_000);
+    expect(stats.totalUsedBytes).toBe(3_500);
+    expect(stats.availableBytes).toBe(6_000);
+    expect(stats.estimateSource).toBe("navigator");
+  });
+
+  it("nearQuota = true when usage/quota ratio >= 0.9", async () => {
+    const snapshot = {
+      buckets: [
+        {
+          id: "job-1",
+          videoLength: 5,
+          audioLength: 5,
+          storedBytes: 9_000,
+          storedChunks: 10,
+        },
+      ],
+      subtitlesBytes: 0,
+      estimate: {
+        usage: 9_000,
+        quota: 10_000,
+        available: 1_000,
+        source: "navigator" as const,
+      },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const stats = await getStorageStatsFactory(fs as any)();
+    expect(stats.nearQuota).toBe(true);
+  });
+
+  it("nearQuota = true when available bytes <= 200MB", async () => {
+    const snapshot = {
+      buckets: [],
+      subtitlesBytes: 0,
+      estimate: {
+        usage: 100,
+        quota: 200 * 1024 * 1024 + 100,
+        available: 200 * 1024 * 1024,
+        source: "navigator" as const,
+      },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const stats = await getStorageStatsFactory(fs as any)();
+    expect(stats.nearQuota).toBe(true);
+  });
+
+  it("nearQuota = false for normal usage", async () => {
+    const snapshot = {
+      buckets: [],
+      subtitlesBytes: 0,
+      estimate: {
+        usage: 1_000,
+        quota: 1_000_000_000,
+        available: 999_999_000,
+        source: "navigator" as const,
+      },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const stats = await getStorageStatsFactory(fs as any)();
+    expect(stats.nearQuota).toBe(false);
+  });
+
+  it("handles empty buckets array", async () => {
+    const snapshot = {
+      buckets: [],
+      subtitlesBytes: 0,
+      estimate: { source: "fallback" as const },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const stats = await getStorageStatsFactory(fs as any)();
+    expect(stats.buckets).toEqual([]);
+    expect(stats.totalUsedBytes).toBe(0);
+  });
+
+  it("uses fallback source when estimate missing", async () => {
+    const snapshot = {
+      buckets: [],
+      subtitlesBytes: 0,
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const stats = await getStorageStatsFactory(fs as any)();
+    expect(stats.estimateSource).toBe("unknown");
+    expect(stats.availableBytes).toBeUndefined();
+    expect(stats.quotaBytes).toBeUndefined();
+  });
+
+  it("expectedBytes is undefined when storedChunks = 0", async () => {
+    const snapshot = {
+      buckets: [
+        {
+          id: "job-1",
+          videoLength: 5,
+          audioLength: 3,
+          storedBytes: 0,
+          storedChunks: 0,
+        },
+      ],
+      subtitlesBytes: 0,
+      estimate: { source: "fallback" as const },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+    const stats = await getStorageStatsFactory(fs as any)();
+    expect(stats.buckets[0]?.expectedBytes).toBeUndefined();
+    expect(stats.buckets[0]?.averageChunkBytes).toBeUndefined();
+  });
+
+  it("calculates playlist duration from EXTINF", async () => {
+    const loader: ILoader = {
+      fetchText: vi
+        .fn()
+        .mockResolvedValue("#EXTM3U\n#EXTINF:3.0,\na.ts\n#EXTINF:4.5,\nb.ts\n"),
+      fetchArrayBuffer: vi.fn(),
+    };
+    const run = getPlaylistDurationFactory(loader);
+    const duration = await run("http://example.com/l.m3u8", null, 2);
+    expect(loader.fetchText).toHaveBeenCalledWith(
+      "http://example.com/l.m3u8",
+      2
+    );
+    expect(duration).toBeCloseTo(7.5);
   });
 });

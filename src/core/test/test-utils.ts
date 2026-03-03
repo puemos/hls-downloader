@@ -124,9 +124,17 @@ export function createMockBucket(
 export function createMockFS(
   options: {
     bucket?: Bucket;
+    storageSnapshot?: any;
   } = {}
 ): IFS {
-  const { bucket = createMockBucket() } = options;
+  const {
+    bucket = createMockBucket(),
+    storageSnapshot = {
+      buckets: [],
+      estimate: { source: "fallback" },
+      subtitlesBytes: 0,
+    },
+  } = options;
 
   return {
     cleanup: vi.fn().mockResolvedValue(undefined),
@@ -134,6 +142,7 @@ export function createMockFS(
     createBucket: vi.fn().mockResolvedValue(undefined),
     deleteBucket: vi.fn().mockResolvedValue(undefined),
     saveAs: vi.fn().mockResolvedValue(undefined),
+    getStorageStats: vi.fn().mockResolvedValue(storageSnapshot),
   };
 }
 
@@ -247,6 +256,7 @@ export function createTestPlaylist(
 export function createTestJob(
   options: {
     id?: string;
+    playlistId?: string;
     videoFragments?: Fragment[];
     audioFragments?: Fragment[];
     filename?: string;
@@ -258,6 +268,7 @@ export function createTestJob(
 ): Job {
   const {
     id = `job-${Math.random().toString(36).substring(2, 9)}`,
+    playlistId = "playlist-1",
     videoFragments = [
       createTestFragment({ index: 0 }),
       createTestFragment({ index: 1 }),
@@ -272,6 +283,7 @@ export function createTestJob(
 
   return new Job(
     id,
+    playlistId,
     videoFragments,
     audioFragments,
     filename,
@@ -320,6 +332,7 @@ export function createMockState(
     playlists?: Record<string, Playlist | null>;
     playlistsStatus?: Record<string, any>;
     levels?: Record<string, Level | null>;
+    levelDurations?: Record<string, number | null | undefined>;
     jobs?: Record<string, Job | null>;
     jobsStatus?: Record<string, JobStatus | null>;
     concurrency?: number;
@@ -334,6 +347,7 @@ export function createMockState(
     playlists = {},
     playlistsStatus = {},
     levels = {},
+    levelDurations = {},
     jobs = {},
     jobsStatus = {},
     concurrency = 2,
@@ -351,6 +365,7 @@ export function createMockState(
     },
     levels: {
       levels,
+      durations: levelDurations,
     },
     jobs: {
       jobs,

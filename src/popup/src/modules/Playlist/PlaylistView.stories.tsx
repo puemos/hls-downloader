@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Level } from "@hls-downloader/core/lib/entities";
+import { Level, Playlist } from "@hls-downloader/core/lib/entities";
 import PlaylistView from "./PlaylistView";
 
 const meta: Meta<typeof PlaylistView> = {
@@ -51,11 +51,19 @@ const subtitleLevel = new Level(
   "eng",
   "English"
 );
+const samplePlaylist = new Playlist(
+  "p1",
+  "https://example.com/master.m3u8",
+  Date.now(),
+  "Sample playlist",
+  "storybook"
+);
 
 export const Ready: Story = {
   render: () => (
     <PlaylistView
       status={{ status: "ready" }}
+      playlist={samplePlaylist}
       videoLevels={[videoLevel]}
       audioLevels={[audioLevel]}
       subtitleLevels={[subtitleLevel]}
@@ -105,6 +113,7 @@ export const DisabledDownload: Story = {
   render: () => (
     <PlaylistView
       status={{ status: "ready" }}
+      playlist={samplePlaylist}
       videoLevels={[videoLevel]}
       audioLevels={[audioLevel]}
       subtitleLevels={[subtitleLevel]}

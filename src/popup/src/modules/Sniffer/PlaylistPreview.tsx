@@ -9,9 +9,10 @@ type PreviewState = "idle" | "loading" | "ready" | "error";
 interface Props {
   playlist: Playlist;
   status?: PlaylistStatus | null;
+  onDuration?: (seconds: number | null) => void;
 }
 
-const PlaylistPreview = ({ playlist, status }: Props) => {
+const PlaylistPreview = ({ playlist, status, onDuration }: Props) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [state, setState] = useState<PreviewState>("idle");
@@ -32,6 +33,7 @@ const PlaylistPreview = ({ playlist, status }: Props) => {
       video.pause();
       video.removeAttribute("src");
       video.load();
+      onDuration?.(null);
     };
 
     teardown();
@@ -48,6 +50,9 @@ const PlaylistPreview = ({ playlist, status }: Props) => {
     const onReady = () => {
       if (cancelled) return;
       setState("ready");
+      if (video.duration && isFinite(video.duration)) {
+        onDuration?.(video.duration);
+      }
     };
     const onVideoError = () => {
       if (cancelled) return;
@@ -68,6 +73,12 @@ const PlaylistPreview = ({ playlist, status }: Props) => {
       });
       hlsRef.current = hls;
       hls.on(Hls.Events.MANIFEST_PARSED, onReady);
+      hls.on(Hls.Events.LEVEL_LOADED, (_event, data) => {
+        if (cancelled) return;
+        if (typeof data?.details?.totalduration === "number") {
+          onDuration?.(data.details.totalduration);
+        }
+      });
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (cancelled) return;
         if (data?.fatal) {
@@ -112,22 +123,21 @@ const PlaylistPreview = ({ playlist, status }: Props) => {
     status?.status === "fetching"
       ? "Sniffing playlist..."
       : status?.status === "error"
-        ? "Playlist may not be playable yet."
-        : null;
+      ? "Playlist may not be playable yet."
+      : null;
 
   const statusLabel =
     state === "loading"
       ? "Loading preview..."
       : state === "ready"
-        ? "Preview ready"
-        : state === "error"
-          ? "Preview unavailable"
-          : "Preview";
+      ? "Preview ready"
+      : state === "error"
+      ? "Preview unavailable"
+      : "Preview";
 
   return (
-    <Card className="p-3 space-y-3">
+    <div className="p-3 space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <div className="text-sm font-semibold">Preview</div>
         <div className="text-[11px] text-muted-foreground">{statusLabel}</div>
         <Button
           size="icon"
@@ -175,7 +185,7 @@ const PlaylistPreview = ({ playlist, status }: Props) => {
       {statusHint && (
         <div className="text-[11px] text-muted-foreground">{statusHint}</div>
       )}
-    </Card>
+    </div>
   );
 };
 
