@@ -17,6 +17,7 @@ export const Default: Story = {
       activeDownloadsUnlimited={false}
       fetchAttempts={5}
       saveDialog={true}
+      autoDeleteAfterSave={false}
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
       onActiveDownloadsIncrease={() => {}}
@@ -25,6 +26,7 @@ export const Default: Story = {
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
+      onAutoDeleteAfterSaveToggle={() => {}}
       preferredAudioLanguage={"eng"}
       onSetPreferredAudioLanguage={() => {}}
     />
@@ -39,6 +41,7 @@ export const Minimal: Story = {
       activeDownloadsUnlimited={true}
       fetchAttempts={1}
       saveDialog={false}
+      autoDeleteAfterSave={true}
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
       onActiveDownloadsIncrease={() => {}}
@@ -47,6 +50,7 @@ export const Minimal: Story = {
       onFetchAttemptsIncrease={() => {}}
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
+      onAutoDeleteAfterSaveToggle={() => {}}
       preferredAudioLanguage={null}
       onSetPreferredAudioLanguage={() => {}}
     />

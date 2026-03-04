@@ -24,12 +24,17 @@ export interface ISetMaxActiveDownloadsPayload {
   maxActiveDownloads: number;
 }
 
+export interface ISetAutoDeleteAfterSavePayload {
+  autoDeleteAfterSave: boolean;
+}
+
 export interface IConfigState {
   concurrency: number;
   saveDialog: boolean;
   fetchAttempts: number;
   preferredAudioLanguage: string | null;
   maxActiveDownloads: number;
+  autoDeleteAfterSave: boolean;
 }
 
 interface IConfigReducers {
@@ -53,6 +58,10 @@ interface IConfigReducers {
     IConfigState,
     PayloadAction<ISetMaxActiveDownloadsPayload>
   >;
+  setAutoDeleteAfterSave: CaseReducer<
+    IConfigState,
+    PayloadAction<ISetAutoDeleteAfterSavePayload>
+  >;
   [key: string]: CaseReducer<IConfigState, PayloadAction<any>>;
 }
 
@@ -62,6 +71,7 @@ export const initialConfigState: IConfigState = {
   fetchAttempts: 100,
   preferredAudioLanguage: null,
   maxActiveDownloads: 0,
+  autoDeleteAfterSave: false,
 };
 
 export const configSlice: Slice<IConfigState, IConfigReducers, "config"> =
@@ -89,6 +99,12 @@ export const configSlice: Slice<IConfigState, IConfigReducers, "config"> =
         action: PayloadAction<ISetMaxActiveDownloadsPayload>
       ) {
         state.maxActiveDownloads = action.payload.maxActiveDownloads;
+      },
+      setAutoDeleteAfterSave(
+        state,
+        action: PayloadAction<ISetAutoDeleteAfterSavePayload>
+      ) {
+        state.autoDeleteAfterSave = action.payload.autoDeleteAfterSave;
       },
     },
   });
