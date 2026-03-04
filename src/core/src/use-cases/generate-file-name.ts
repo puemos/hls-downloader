@@ -1,4 +1,5 @@
 import { Playlist, Level } from "../entities";
+import { sanitizeFilename } from "./sanitize-filename";
 
 type GenerateFileNameOptions = {
   container?: "mp4" | "mkv";
@@ -17,7 +18,7 @@ export const generateFileName = () => {
     const container = options?.container ?? "mp4";
 
     const filename = playlist.pageTitle
-      ? `${playlist.pageTitle}-${playlistFilenameWithoutExt}.${container}`
+      ? `${sanitizeFilename(playlist.pageTitle)}-${playlistFilenameWithoutExt}.${container}`
       : `${playlistFilenameWithoutExt}.${container}`;
 
     return filename.normalize("NFC");
