@@ -11,7 +11,9 @@ const SettingsModule = () => {
     onFetchAttemptsIncrease,
     fetchAttempts,
     onSaveDialogToggle,
+    onAutoDeleteAfterSaveToggle,
     saveDialog,
+    autoDeleteAfterSave,
     concurrency,
     preferredAudioLanguage,
     onSetPreferredAudioLanguage,
@@ -29,7 +31,9 @@ const SettingsModule = () => {
       onFetchAttemptsDecrease={onFetchAttemptsDecrease}
       onFetchAttemptsIncrease={onFetchAttemptsIncrease}
       onSaveDialogToggle={onSaveDialogToggle}
+      onAutoDeleteAfterSaveToggle={onAutoDeleteAfterSaveToggle}
       saveDialog={saveDialog}
+      autoDeleteAfterSave={autoDeleteAfterSave}
       onConcurrencyDecrease={onConcurrencyDecrease}
       onConcurrencyIncrease={onConcurrencyIncrease}
       concurrency={concurrency}

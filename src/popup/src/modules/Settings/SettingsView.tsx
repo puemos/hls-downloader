@@ -9,9 +9,11 @@ interface Props {
   activeDownloadsUnlimited: boolean;
   fetchAttempts: number;
   saveDialog: boolean;
+  autoDeleteAfterSave: boolean;
   onFetchAttemptsIncrease: () => void;
   onFetchAttemptsDecrease: () => void;
   onSaveDialogToggle: () => void;
+  onAutoDeleteAfterSaveToggle: () => void;
   onConcurrencyIncrease: () => void;
   onConcurrencyDecrease: () => void;
   onActiveDownloadsIncrease: () => void;
@@ -60,6 +62,7 @@ const SettingsView = ({
   concurrency,
   fetchAttempts,
   saveDialog,
+  autoDeleteAfterSave,
   onConcurrencyIncrease,
   onConcurrencyDecrease,
   onActiveDownloadsIncrease,
@@ -70,6 +73,7 @@ const SettingsView = ({
   onFetchAttemptsIncrease,
   onFetchAttemptsDecrease,
   onSaveDialogToggle,
+  onAutoDeleteAfterSaveToggle,
   preferredAudioLanguage = "",
   onSetPreferredAudioLanguage,
   storage,
@@ -215,6 +219,20 @@ const SettingsView = ({
             aria-label="toggle save dialog"
             onClick={onSaveDialogToggle}
             checked={saveDialog}
+          ></Switch>
+        </Card>
+
+        <Card className="flex-row items-center justify-between gap-2">
+          <div className="flex flex-col">
+            <p className="text-sm font-medium">Auto delete after save</p>
+            <p className="text-[11px] text-muted-foreground">
+              Remove downloaded data after saving
+            </p>
+          </div>
+          <Switch
+            aria-label="toggle auto delete after save"
+            onClick={onAutoDeleteAfterSaveToggle}
+            checked={autoDeleteAfterSave}
           ></Switch>
         </Card>
 

@@ -7,9 +7,11 @@ interface ReturnType {
   maxActiveDownloads: number;
   fetchAttempts: number;
   saveDialog: boolean;
+  autoDeleteAfterSave: boolean;
   onFetchAttemptsIncrease: () => void;
   onFetchAttemptsDecrease: () => void;
   onSaveDialogToggle: () => void;
+  onAutoDeleteAfterSaveToggle: () => void;
   onConcurrencyIncrease: () => void;
   onConcurrencyDecrease: () => void;
   onActiveDownloadsIncrease: () => void;
@@ -36,6 +38,9 @@ const useSettingsController = (): ReturnType => {
   );
   const preferredAudioLanguage = useSelector<RootState, string | null>(
     (state) => state.config.preferredAudioLanguage
+  );
+  const autoDeleteAfterSave = useSelector<RootState, boolean>(
+    (state) => state.config.autoDeleteAfterSave
   );
   const activeDownloadsUnlimited = maxActiveDownloads === 0;
 
@@ -97,6 +102,13 @@ const useSettingsController = (): ReturnType => {
       })
     );
   }
+  function onAutoDeleteAfterSaveToggle() {
+    dispatch(
+      configSlice.actions.setAutoDeleteAfterSave({
+        autoDeleteAfterSave: !autoDeleteAfterSave,
+      })
+    );
+  }
   function onSetPreferredAudioLanguage(lang: string | null) {
     const normalized = (lang ?? "").trim();
     dispatch(
@@ -116,9 +128,11 @@ const useSettingsController = (): ReturnType => {
     onActiveDownloadsUnlimited,
     fetchAttempts,
     saveDialog,
+    autoDeleteAfterSave,
     onFetchAttemptsIncrease,
     onFetchAttemptsDecrease,
     onSaveDialogToggle,
+    onAutoDeleteAfterSaveToggle,
     preferredAudioLanguage,
     onSetPreferredAudioLanguage,
   };
