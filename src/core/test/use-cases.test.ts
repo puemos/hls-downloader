@@ -7,6 +7,7 @@ import {
   fsCleanupFactory,
   getLinkBucketFactory,
   generateFileName,
+  generateSubtitleFileName,
   decryptSingleFragmentFactory,
   downloadSingleFactory,
   getFragmentsDetailsFactory,
@@ -93,6 +94,30 @@ describe("use-cases", () => {
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
     expect(run(playlist, level)).toBe("page-c.mp4");
+  });
+
+  it("sanitizes illegal characters in page title", () => {
+    const playlist = new Playlist(
+      "1",
+      "https://a/b/stream.m3u8",
+      Date.now(),
+      'Video "Test" <2024>'
+    );
+    const level = new Level("stream", "l", "1", "uri");
+    const run = generateFileName();
+    expect(run(playlist, level)).toBe("Video _Test_ _2024_-stream.mp4");
+  });
+
+  it("sanitizes illegal characters in subtitle page title", () => {
+    const playlist = new Playlist(
+      "1",
+      "https://a/b/stream.m3u8",
+      Date.now(),
+      'Video "Test" <2024>'
+    );
+    const level = new Level("subtitle", "English", "1", "uri", undefined, undefined, undefined, undefined, "en");
+    const run = generateSubtitleFileName();
+    expect(run(playlist, level)).toBe("Video _Test_ _2024_-en.vtt");
   });
 
   it("normalizes non-ASCII page title", () => {
