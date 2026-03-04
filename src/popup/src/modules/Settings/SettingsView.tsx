@@ -227,7 +227,7 @@ const SettingsView = ({
           </div>
           <div className="flex-1 min-w-[240px] border rounded-md">
             <select
-              className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+              className="w-full p-2 text-sm bg-background text-foreground border-r-8 border-r-transparent"
               value={preferredAudioLanguage ?? ""}
               onChange={(e) =>
                 onSetPreferredAudioLanguage(e.target.value || null)
