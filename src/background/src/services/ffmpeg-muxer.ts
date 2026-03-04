@@ -1,16 +1,32 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile } from "@ffmpeg/util";
 
 export type MuxRequest = {
   ffmpeg: FFmpeg;
   outputFileName: string;
-  videoBlob?: Blob;
-  audioBlob?: Blob;
+  videoData?: Uint8Array;
+  audioData?: Uint8Array;
+  subtitleText?: string;
+  subtitleLanguage?: string;
+};
+
+export type MuxExecRequest = {
+  ffmpeg: FFmpeg;
+  outputFileName: string;
+  hasVideo: boolean;
+  hasAudio: boolean;
   subtitleText?: string;
   subtitleLanguage?: string;
 };
 
 export type MuxResult = { blob: Blob; mime: string };
+
+export async function writeMediaToFFmpegFS(
+  ffmpeg: FFmpeg,
+  filename: string,
+  data: Uint8Array
+): Promise<void> {
+  await ffmpeg.writeFile(filename, data);
+}
 
 async function writeSubtitles(
   ffmpeg: FFmpeg,
@@ -19,28 +35,23 @@ async function writeSubtitles(
   if (subtitleText === undefined) {
     return;
   }
-  const blob = new Blob([subtitleText], { type: "text/vtt" });
-  await ffmpeg.writeFile("subtitles.vtt", await fetchFile(blob));
+  await ffmpeg.writeFile("subtitles.vtt", new TextEncoder().encode(subtitleText));
 }
 
-export async function muxStreams({
+export async function muxExec({
   ffmpeg,
   outputFileName,
-  videoBlob,
-  audioBlob,
+  hasVideo,
+  hasAudio,
   subtitleText,
   subtitleLanguage,
-}: MuxRequest): Promise<MuxResult> {
+}: MuxExecRequest): Promise<MuxResult> {
   const includeSubtitles = subtitleText !== undefined;
-  const hasVideo = Boolean(videoBlob);
-  const hasAudio = Boolean(audioBlob);
 
-  if (hasVideo) {
-    await ffmpeg.writeFile("video.ts", await fetchFile(videoBlob!));
+  if (!hasVideo && !hasAudio) {
+    throw new Error("No media to mux");
   }
-  if (hasAudio) {
-    await ffmpeg.writeFile("audio.ts", await fetchFile(audioBlob!));
-  }
+
   await writeSubtitles(ffmpeg, subtitleText);
 
   const args: string[] = ["-y"];
@@ -81,8 +92,6 @@ export async function muxStreams({
     if (includeSubtitles) {
       args.push("-map", "1:s:0");
     }
-  } else {
-    throw new Error("No media to mux");
   }
 
   if (includeSubtitles) {
@@ -106,4 +115,29 @@ export async function muxStreams({
       // best effort cleanup
     }
   }
+}
+
+export async function muxStreams({
+  ffmpeg,
+  outputFileName,
+  videoData,
+  audioData,
+  subtitleText,
+  subtitleLanguage,
+}: MuxRequest): Promise<MuxResult> {
+  if (videoData) {
+    await writeMediaToFFmpegFS(ffmpeg, "video.ts", videoData);
+  }
+  if (audioData) {
+    await writeMediaToFFmpegFS(ffmpeg, "audio.ts", audioData);
+  }
+
+  return muxExec({
+    ffmpeg,
+    outputFileName,
+    hasVideo: Boolean(videoData),
+    hasAudio: Boolean(audioData),
+    subtitleText,
+    subtitleLanguage,
+  });
 }

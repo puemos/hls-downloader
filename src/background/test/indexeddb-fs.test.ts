@@ -3,7 +3,18 @@ import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 // Mock webextension-polyfill
 vi.mock("webextension-polyfill", () => {
-  const downloads = { download: vi.fn() };
+  const onChangedListeners: Function[] = [];
+  const downloads = {
+    download: vi.fn().mockResolvedValue(42),
+    onChanged: {
+      addListener: vi.fn((fn: Function) => onChangedListeners.push(fn)),
+      removeListener: vi.fn((fn: Function) => {
+        const idx = onChangedListeners.indexOf(fn);
+        if (idx >= 0) onChangedListeners.splice(idx, 1);
+      }),
+      _listeners: onChangedListeners,
+    },
+  };
   const storage = {
     local: {
       get: vi.fn().mockResolvedValue({}),
@@ -18,20 +29,21 @@ vi.mock("webextension-polyfill", () => {
   };
 });
 
+let mockWriteFile: ReturnType<typeof vi.fn>;
+
 // Mock FFmpeg since we can't load it in tests
 vi.mock("@ffmpeg/ffmpeg", () => ({
-  FFmpeg: vi.fn().mockImplementation(() => ({
-    load: vi.fn().mockResolvedValue(undefined),
-    on: vi.fn(),
-    writeFile: vi.fn().mockResolvedValue(undefined),
-    readFile: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3, 4])),
-    exec: vi.fn().mockResolvedValue(undefined),
-    deleteFile: vi.fn().mockResolvedValue(undefined),
-  })),
-}));
-
-vi.mock("@ffmpeg/util", () => ({
-  fetchFile: vi.fn().mockImplementation((data) => Promise.resolve(data)),
+  FFmpeg: vi.fn().mockImplementation(() => {
+    mockWriteFile = vi.fn().mockResolvedValue(undefined);
+    return {
+      load: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
+      writeFile: mockWriteFile,
+      readFile: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3, 4])),
+      exec: vi.fn().mockResolvedValue(undefined),
+      deleteFile: vi.fn().mockResolvedValue(undefined),
+    };
+  }),
 }));
 
 // Mock window object for browser environment
@@ -65,16 +77,19 @@ const streamToArray = async (stream: ReadableStream<Uint8Array>) => {
 
 describe("IndexedDBFS", () => {
   let mockDownload: ReturnType<typeof vi.fn>;
+  let mockOnChanged: { addListener: ReturnType<typeof vi.fn>; removeListener: ReturnType<typeof vi.fn>; _listeners: Function[] };
 
   beforeEach(async () => {
     // Get mock reference
     const { downloads } = (await vi.importMock("webextension-polyfill")) as any;
     mockDownload = downloads.download;
+    mockOnChanged = downloads.onChanged;
   });
 
   afterEach(async () => {
     await IndexedDBFS.cleanup();
     vi.clearAllMocks();
+    mockOnChanged._listeners.length = 0;
   });
 
   describe("bucket lifecycle", () => {
@@ -151,6 +166,55 @@ describe("IndexedDBFS", () => {
     });
   });
 
+  describe("sequential processing", () => {
+    it("video+audio bucket produces valid link", async () => {
+      const id = "va-sequential-bucket";
+      await IndexedDBFS.createBucket(id, 2, 1);
+      const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
+
+      await bucket.write(0, new Uint8Array([1, 2]).buffer);
+      await bucket.write(1, new Uint8Array([3, 4]).buffer);
+      await bucket.write(2, new Uint8Array([5, 6]).buffer); // audio chunk
+
+      const link = await bucket.getLink();
+      expect(link).toBeDefined();
+      expect(link.startsWith("blob:")).toBe(true);
+
+      await IndexedDBFS.deleteBucket(id);
+    });
+
+    it("audio-only bucket produces valid link", async () => {
+      const id = "audio-sequential-bucket";
+      await IndexedDBFS.createBucket(id, 0, 1);
+      const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
+
+      await bucket.write(0, new Uint8Array([10, 20]).buffer);
+
+      const link = await bucket.getLink();
+      expect(link).toBeDefined();
+      expect(link.startsWith("blob:")).toBe(true);
+
+      await IndexedDBFS.deleteBucket(id);
+    });
+
+    it("ffmpeg.writeFile receives Uint8Array (not Blob)", async () => {
+      const id = "uint8-check-bucket";
+      await IndexedDBFS.createBucket(id, 1, 0);
+      const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
+
+      await bucket.write(0, new Uint8Array([1, 2, 3]).buffer);
+      await bucket.getLink();
+
+      // Check that writeFile was called with Uint8Array, not Blob
+      for (const call of mockWriteFile.mock.calls) {
+        const [, data] = call;
+        expect(data).toBeInstanceOf(Uint8Array);
+      }
+
+      await IndexedDBFS.deleteBucket(id);
+    });
+  });
+
   describe("storage stats", () => {
     it("reports stored bytes and fragments per bucket", async () => {
       const id = "stats-bucket";
@@ -214,6 +278,118 @@ describe("IndexedDBFS", () => {
       expect(mockDownload).toHaveBeenCalledWith(
         expect.objectContaining({ filename: "Caf\u00E9.mp4" })
       );
+    });
+  });
+
+  describe("blob URL revocation", () => {
+    it("onChanged listener registered after downloads.download for blob URLs", async () => {
+      await IndexedDBFS.saveAs("test.mp4", "blob:test-link", { dialog: false });
+
+      expect(mockOnChanged.addListener).toHaveBeenCalledTimes(1);
+    });
+
+    it("blob URL revoked on download complete state", async () => {
+      const revokeObjectURL = vi.spyOn(URL, "revokeObjectURL");
+      mockDownload.mockResolvedValueOnce(99);
+
+      await IndexedDBFS.saveAs("test.mp4", "blob:my-blob", { dialog: false });
+
+      // Simulate download complete
+      const listener = mockOnChanged._listeners[0];
+      listener({ id: 99, state: { current: "complete" } });
+
+      expect(revokeObjectURL).toHaveBeenCalledWith("blob:my-blob");
+      revokeObjectURL.mockRestore();
+    });
+
+    it("blob URL revoked on download interrupted state", async () => {
+      const revokeObjectURL = vi.spyOn(URL, "revokeObjectURL");
+      mockDownload.mockResolvedValueOnce(101);
+
+      await IndexedDBFS.saveAs("test.mp4", "blob:my-blob2", { dialog: false });
+
+      const listener = mockOnChanged._listeners[0];
+      listener({ id: 101, state: { current: "interrupted" } });
+
+      expect(revokeObjectURL).toHaveBeenCalledWith("blob:my-blob2");
+      revokeObjectURL.mockRestore();
+    });
+
+    it("ignores events for other download IDs", async () => {
+      const revokeObjectURL = vi.spyOn(URL, "revokeObjectURL");
+      mockDownload.mockResolvedValueOnce(50);
+
+      await IndexedDBFS.saveAs("test.mp4", "blob:my-blob3", { dialog: false });
+
+      const listener = mockOnChanged._listeners[0];
+      listener({ id: 999, state: { current: "complete" } });
+
+      expect(revokeObjectURL).not.toHaveBeenCalled();
+      revokeObjectURL.mockRestore();
+    });
+
+    it("ignores events without state change", async () => {
+      const revokeObjectURL = vi.spyOn(URL, "revokeObjectURL");
+      mockDownload.mockResolvedValueOnce(60);
+
+      await IndexedDBFS.saveAs("test.mp4", "blob:my-blob4", { dialog: false });
+
+      const listener = mockOnChanged._listeners[0];
+      listener({ id: 60 }); // no state field
+
+      expect(revokeObjectURL).not.toHaveBeenCalled();
+      revokeObjectURL.mockRestore();
+    });
+
+    it("ignores in_progress state (no premature revocation)", async () => {
+      const revokeObjectURL = vi.spyOn(URL, "revokeObjectURL");
+      mockDownload.mockResolvedValueOnce(70);
+
+      await IndexedDBFS.saveAs("test.mp4", "blob:my-blob5", { dialog: false });
+
+      const listener = mockOnChanged._listeners[0];
+      listener({ id: 70, state: { current: "in_progress" } });
+
+      expect(revokeObjectURL).not.toHaveBeenCalled();
+      revokeObjectURL.mockRestore();
+    });
+
+    it("no listener registered for non-blob URLs", async () => {
+      await IndexedDBFS.saveAs("test.mp4", "https://example.com/file.mp4", {
+        dialog: false,
+      });
+
+      expect(mockOnChanged.addListener).not.toHaveBeenCalled();
+    });
+
+    it("no crash when onChanged is unavailable", async () => {
+      const { downloads } = (await vi.importMock("webextension-polyfill")) as any;
+      const original = downloads.onChanged;
+      downloads.onChanged = undefined;
+
+      await expect(
+        IndexedDBFS.saveAs("test.mp4", "blob:test-link", { dialog: false })
+      ).resolves.not.toThrow();
+
+      downloads.onChanged = original;
+    });
+  });
+
+  describe("edge cases", () => {
+    it("sparse writes (missing chunks) still produce a link", async () => {
+      const id = "sparse-bucket";
+      await IndexedDBFS.createBucket(id, 3, 0);
+      const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
+
+      // Only write chunks 0 and 2, skip 1
+      await bucket.write(0, new Uint8Array([1, 2]).buffer);
+      await bucket.write(2, new Uint8Array([5, 6]).buffer);
+
+      const link = await bucket.getLink();
+      expect(link).toBeDefined();
+      expect(link.startsWith("blob:")).toBe(true);
+
+      await IndexedDBFS.deleteBucket(id);
     });
   });
 
