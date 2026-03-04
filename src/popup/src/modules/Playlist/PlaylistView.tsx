@@ -218,7 +218,7 @@ const PlaylistView = ({
                   </div>
                   <div className="flex-1 min-w-[200px] border rounded-md">
                     <select
-                      className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                      className="w-full p-2 text-sm bg-background text-foreground border-r-8 border-r-transparent"
                       value={selectedVideoId ?? ""}
                       onChange={(e) => handleSelectVideo(e.target.value)}
                     >
@@ -272,7 +272,7 @@ const PlaylistView = ({
                   </div>
                   <div className="flex-1 min-w-[200px] border rounded-md">
                     <select
-                      className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                      className="w-full p-2 text-sm bg-background text-foreground border-r-8 border-r-transparent"
                       value={selectedAudioId ?? ""}
                       onChange={(e) => handleSelectAudio(e.target.value)}
                     >
@@ -326,7 +326,7 @@ const PlaylistView = ({
                   </div>
                   <div className="flex-1 min-w-[200px] border rounded-md">
                     <select
-                      className="w-full p-2 text-sm bg-transparent border-r-8 border-r-transparent"
+                      className="w-full p-2 text-sm bg-background text-foreground border-r-8 border-r-transparent"
                       value={selectedSubtitleId ?? ""}
                       onChange={(e) => onSelectSubtitle(e.target.value)}
                     >
