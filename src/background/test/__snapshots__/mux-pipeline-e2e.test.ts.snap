@@ -1,0 +1,116 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Mux Pipeline E2E (host ffmpeg) > audio-only → AAC MP4 1`] = `
+{
+  "duration": "4.010000",
+  "sha256": "4ea88c669b04beef17d5c45ddf39e1b1fa19e177f82488b684188cd9173bc73d",
+  "sizeBytes": 100019,
+  "streams": [
+    {
+      "channels": 2,
+      "codec_name": "aac",
+      "codec_type": "audio",
+      "nb_frames": "189",
+      "sample_rate": "48000",
+    },
+  ],
+}
+`;
+
+exports[`Mux Pipeline E2E (host ffmpeg) > concat 2 muxed v+a segments → MP4 1`] = `
+{
+  "duration": "6.073000",
+  "sha256": "a3d8cea48e0f77ac4143b5298ea4f199b1a8c8a49049ad265f876d1865b520e8",
+  "sizeBytes": 461794,
+  "streams": [
+    {
+      "codec_name": "h264",
+      "codec_type": "video",
+      "height": 480,
+      "nb_frames": "363",
+      "width": 848,
+    },
+    {
+      "channels": 2,
+      "codec_name": "aac",
+      "codec_type": "audio",
+      "nb_frames": "260",
+      "sample_rate": "44100",
+    },
+  ],
+}
+`;
+
+exports[`Mux Pipeline E2E (host ffmpeg) > muxed-with-data-stream → MP4, no data streams (#509) 1`] = `
+{
+  "duration": "4.224000",
+  "sha256": "2b0c00e05930a0c975e1aa2eb47d0924428c5407d4d4897023c4c77f3c4c6360",
+  "sizeBytes": 55577,
+  "streams": [
+    {
+      "codec_name": "h264",
+      "codec_type": "video",
+      "height": 100,
+      "nb_frames": "96",
+      "width": 224,
+    },
+    {
+      "channels": 2,
+      "codec_name": "aac",
+      "codec_type": "audio",
+      "nb_frames": "190",
+      "sample_rate": "48000",
+    },
+    {
+      "channels": 1,
+      "codec_name": "aac",
+      "codec_type": "audio",
+      "nb_frames": "33",
+      "sample_rate": "8000",
+    },
+  ],
+}
+`;
+
+exports[`Mux Pipeline E2E (host ffmpeg) > separate video + audio → MP4 1`] = `
+{
+  "duration": "3.000000",
+  "sha256": "12032a2dc38e4df2e65a0e611add8f7e9981488f38754efdd339c0e59869a85a",
+  "sizeBytes": 84240,
+  "streams": [
+    {
+      "codec_name": "h264",
+      "codec_type": "video",
+      "height": 184,
+      "nb_frames": "90",
+      "width": 320,
+    },
+    {
+      "channels": 2,
+      "codec_name": "aac",
+      "codec_type": "audio",
+      "nb_frames": "140",
+      "sample_rate": "48000",
+    },
+  ],
+}
+`;
+
+exports[`Mux Pipeline E2E (host ffmpeg) > video + subtitles → MKV 1`] = `
+{
+  "duration": "3.000000",
+  "sizeBytes": 56239,
+  "streams": [
+    {
+      "codec_name": "h264",
+      "codec_type": "video",
+      "height": 184,
+      "width": 320,
+    },
+    {
+      "codec_name": "webvtt",
+      "codec_type": "subtitle",
+    },
+  ],
+}
+`;

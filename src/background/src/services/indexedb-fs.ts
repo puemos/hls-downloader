@@ -14,7 +14,7 @@ import {
 import browser from "webextension-polyfill";
 import filenamify from "filenamify";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { muxStreams } from "./ffmpeg-muxer";
+import { writeMediaToFFmpegFS, muxExec } from "./ffmpeg-muxer";
 
 const buckets: Record<string, IndexedDBBucket> = {};
 const chromeApi = (globalThis as any).chrome;
@@ -415,21 +415,30 @@ export class IndexedDBBucket implements Bucket {
     // write somewhere predictable (avoid path/punctuation issues)
     const outputFileName = includeSubtitles ? "output.mkv" : "output.mp4";
 
-    const videoBlob =
-      this.videoLength > 0
-        ? await this.concatenateChunks(0, this.videoLength)
-        : undefined;
-    const audioBlob =
-      this.audioLength > 0
-        ? await this.concatenateChunks(this.videoLength, this.audioLength)
-        : undefined;
+    const hasVideo = this.videoLength > 0;
+    const hasAudio = this.audioLength > 0;
 
     try {
-      const result = await muxStreams({
+      // Phase 1: Load video, write to FFmpeg FS, release
+      if (hasVideo) {
+        const videoData = await this.concatenateChunksToUint8Array(0, this.videoLength);
+        await writeMediaToFFmpegFS(ffmpeg, "video.ts", videoData);
+        // videoData is block-scoped -- eligible for GC
+      }
+
+      // Phase 2: Load audio, write to FFmpeg FS, release
+      if (hasAudio) {
+        const audioData = await this.concatenateChunksToUint8Array(this.videoLength, this.audioLength);
+        await writeMediaToFFmpegFS(ffmpeg, "audio.ts", audioData);
+        // audioData is block-scoped -- eligible for GC
+      }
+
+      // Phase 3: Exec (no large data in JS heap)
+      const result = await muxExec({
         ffmpeg,
         outputFileName,
-        videoBlob,
-        audioBlob,
+        hasVideo,
+        hasAudio,
         subtitleText: subtitle?.text,
         subtitleLanguage: subtitle?.language,
       });
@@ -437,8 +446,9 @@ export class IndexedDBBucket implements Bucket {
       return result.blob;
     } catch (error) {
       console.error(`Muxing failed for ${outputFileName}:`, error);
+      const detail = error instanceof Error ? error.message : String(error);
       throw new Error(
-        `Muxing failed (output file missing). Check audio/subtitle tracks and try again.`
+        `Muxing failed: ${detail}`
       );
     }
   }
@@ -474,6 +484,30 @@ export class IndexedDBBucket implements Bucket {
     }
 
     return new Blob(chunks);
+  }
+
+  private async concatenateChunksToUint8Array(
+    startIndex: number,
+    length: number
+  ): Promise<Uint8Array> {
+    const chunks: Uint8Array[] = [];
+    let totalSize = 0;
+
+    for (let i = 0; i < length; i++) {
+      const chunk = await this.readChunkByIndex(startIndex + i);
+      if (chunk) {
+        chunks.push(chunk);
+        totalSize += chunk.byteLength;
+      }
+    }
+
+    const result = new Uint8Array(totalSize);
+    let offset = 0;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return result;
   }
 }
 
@@ -630,14 +664,25 @@ const saveAs: IFS["saveAs"] = async function (
   }
   const filename = filenamify(path ?? "stream.mp4").normalize("NFC");
 
-  await downloadsApi.download({
+  const downloadId = await downloadsApi.download({
     url: link,
     saveAs: dialog,
     conflictAction: "uniquify",
     filename,
   });
-  // URL.revokeObjectURL(link);
-  return Promise.resolve();
+
+  if (link.startsWith("blob:") && downloadsApi.onChanged && typeof URL.revokeObjectURL === "function") {
+    const listener = (delta: { id: number; state?: { current: string } }) => {
+      if (delta.id !== downloadId) return;
+      if (!delta.state) return;
+      const state = delta.state.current;
+      if (state === "complete" || state === "interrupted") {
+        URL.revokeObjectURL(link);
+        downloadsApi.onChanged.removeListener(listener);
+      }
+    };
+    downloadsApi.onChanged.addListener(listener);
+  }
 };
 
 export const IndexedDBFS: IFS = {
