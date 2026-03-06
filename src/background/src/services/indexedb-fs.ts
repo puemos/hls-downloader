@@ -446,8 +446,9 @@ export class IndexedDBBucket implements Bucket {
       return result.blob;
     } catch (error) {
       console.error(`Muxing failed for ${outputFileName}:`, error);
+      const detail = error instanceof Error ? error.message : String(error);
       throw new Error(
-        `Muxing failed (output file missing). Check audio/subtitle tracks and try again.`
+        `Muxing failed: ${detail}`
       );
     }
   }

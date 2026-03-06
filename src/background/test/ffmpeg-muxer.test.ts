@@ -10,7 +10,7 @@ function createMockFFmpeg() {
   return {
     writeFile: vi.fn().mockResolvedValue(undefined),
     readFile: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3, 4])),
-    exec: vi.fn().mockResolvedValue(undefined),
+    exec: vi.fn().mockResolvedValue(0),
     deleteFile: vi.fn().mockResolvedValue(undefined),
   } as unknown as FFmpeg;
 }
@@ -64,8 +64,8 @@ describe("muxExec", () => {
     const args = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(args).toContain("-i");
     expect(args).toContain("video.ts");
-    expect(args).toContain("-map");
-    expect(args).toContain("0");
+    expect(args).toContain("0:v");
+    expect(args).toContain("0:a?");
     expect(args).toContain("-c");
     expect(args).toContain("copy");
     expect(args).not.toContain("audio.ts");
@@ -206,6 +206,50 @@ describe("muxExec", () => {
     expect(ffmpeg.deleteFile).toHaveBeenCalledWith("video.ts");
     expect(ffmpeg.deleteFile).toHaveBeenCalledWith("audio.ts");
     expect(ffmpeg.deleteFile).toHaveBeenCalledWith("subtitles.vtt");
+  });
+
+  it("throws on non-zero FFmpeg exit code", async () => {
+    (ffmpeg.exec as ReturnType<typeof vi.fn>).mockResolvedValueOnce(1);
+
+    await expect(
+      muxExec({
+        ffmpeg,
+        outputFileName: "output.mp4",
+        hasVideo: true,
+        hasAudio: false,
+      })
+    ).rejects.toThrow("FFmpeg exited with code 1");
+  });
+
+  it("includes -shortest only when both video and audio", async () => {
+    await muxExec({
+      ffmpeg,
+      outputFileName: "output.mp4",
+      hasVideo: true,
+      hasAudio: true,
+    });
+    const argsVA = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(argsVA).toContain("-shortest");
+
+    const ffmpeg2 = createMockFFmpeg();
+    await muxExec({
+      ffmpeg: ffmpeg2,
+      outputFileName: "output.mp4",
+      hasVideo: true,
+      hasAudio: false,
+    });
+    const argsV = (ffmpeg2.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(argsV).not.toContain("-shortest");
+
+    const ffmpeg3 = createMockFFmpeg();
+    await muxExec({
+      ffmpeg: ffmpeg3,
+      outputFileName: "output.mp4",
+      hasVideo: false,
+      hasAudio: true,
+    });
+    const argsA = (ffmpeg3.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(argsA).not.toContain("-shortest");
   });
 
   it("cleanup on exec error: deleteFile still called", async () => {

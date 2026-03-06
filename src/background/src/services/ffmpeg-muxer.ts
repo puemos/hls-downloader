@@ -73,8 +73,8 @@ export async function muxExec({
     }
     args.push("-c:v", "copy", "-c:a", "copy", "-bsf:a", "aac_adtstoasc");
   } else if (hasVideo) {
-    // Map all streams from the video file (preserves embedded audio)
-    args.push("-map", "0", "-c", "copy");
+    // Map video + optional embedded audio, skip data/metadata streams
+    args.push("-map", "0:v", "-map", "0:a?", "-c", "copy");
     if (includeSubtitles) {
       args.push("-map", "1:s:0", "-c:s", "webvtt");
     }
@@ -99,10 +99,16 @@ export async function muxExec({
     args.push("-metadata:s:s:0", `language=${subtitleLanguage || "und"}`);
   }
 
-  args.push("-shortest", outputFileName);
+  if (hasVideo && hasAudio) {
+    args.push("-shortest");
+  }
+  args.push(outputFileName);
 
   try {
-    await ffmpeg.exec(args);
+    const exitCode = await ffmpeg.exec(args);
+    if (exitCode !== 0) {
+      throw new Error(`FFmpeg exited with code ${exitCode}`);
+    }
     const data = await ffmpeg.readFile(outputFileName);
     const mime = includeSubtitles ? "video/x-matroska" : "video/mp4";
     return { blob: new Blob([data], { type: mime }), mime };

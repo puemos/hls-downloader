@@ -40,7 +40,7 @@ vi.mock("@ffmpeg/ffmpeg", () => ({
       on: vi.fn(),
       writeFile: mockWriteFile,
       readFile: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3, 4])),
-      exec: vi.fn().mockResolvedValue(undefined),
+      exec: vi.fn().mockResolvedValue(0),
       deleteFile: vi.fn().mockResolvedValue(undefined),
     };
   }),
