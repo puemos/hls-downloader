@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "HLS Downloader",
   "description": "HTTP Live Stream downloader",
-  "version": "5.4.2",
+  "version": "5.4.3",
   "action": {
     "default_popup": "popup.html",
     "default_title": "HLS Downloader"

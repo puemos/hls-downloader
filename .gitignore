@@ -20,6 +20,7 @@ extension-*-firefox.xpi
 dist.crx
 dist.pem
 source-code.zip
+source-code-*.zip
 
 # misc
 .DS_Store

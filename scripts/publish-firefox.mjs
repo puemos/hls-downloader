@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 import "dotenv/config";
-import { execSync } from "node:child_process";
-import { readFileSync, existsSync, unlinkSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync, unlinkSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
-const required = ["AMO_JWT_ISSUER", "AMO_JWT_SECRET", "AMO_ADDON_ID"];
+const required = ["AMO_JWT_ISSUER", "AMO_JWT_SECRET"];
 const missing = required.filter((k) => !process.env[k]);
 
 if (missing.length) {
@@ -18,49 +18,71 @@ if (missing.length) {
 Set them in .env or export before running:
   AMO_JWT_ISSUER=<your API key>
   AMO_JWT_SECRET=<your API secret>
-  AMO_ADDON_ID=<your addon GUID, e.g. {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}>
 
 Get your API credentials at: https://addons.mozilla.org/developers/addon/api/key/
 `);
   process.exit(1);
 }
 
-const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
 const sourceDir = resolve(root, "dist/mv2");
-const sourceArchive = resolve(root, "source-code.zip");
+
+function run(command, args, options = {}) {
+  execFileSync(command, args, { cwd: root, stdio: "inherit", ...options });
+}
+
+function getOutput(command, args) {
+  return execFileSync(command, args, { cwd: root, encoding: "utf8" }).trim();
+}
+
+function assertCleanWorktree() {
+  const workingTreeStatus = getOutput("git", ["status", "--porcelain"]);
+
+  if (workingTreeStatus) {
+    console.error(
+      "Refusing to publish with uncommitted or untracked non-ignored changes. Commit or stash changes first so the uploaded source archive matches HEAD."
+    );
+    console.error(workingTreeStatus);
+    process.exit(1);
+  }
+}
+
+assertCleanWorktree();
+
+console.log("Building Firefox MV2 package...");
+run("pnpm", ["run", "build:mv2"]);
+assertCleanWorktree();
 
 if (!existsSync(sourceDir)) {
-  console.error("dist/mv2 not found. Run `pnpm run build:mv2` first.");
+  console.error("dist/mv2 was not created by `pnpm run build:mv2`.");
   process.exit(1);
 }
 
-console.log(`Submitting HLS Downloader v${pkg.version || "?"} to Firefox Add-ons...`);
+const manifest = JSON.parse(
+  readFileSync(resolve(sourceDir, "manifest.json"), "utf8")
+);
+const version = manifest.version;
+const gecko = manifest.browser_specific_settings?.gecko;
 
-// Inject gecko addon ID into the built manifest (keeps it out of committed source)
-const manifestPath = resolve(sourceDir, "manifest.json");
-const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-let addonId = process.env.AMO_ADDON_ID;
-// Gecko ID must be in {uuid} format
-if (!addonId.startsWith("{")) addonId = `{${addonId}}`;
-manifest.browser_specific_settings = {
-  gecko: {
-    id: addonId,
-    data_collection_permissions: {
-      required: ["none"],
-    },
-  },
-};
-const { writeFileSync } = await import("node:fs");
-writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+if (
+  !version ||
+  !gecko?.id ||
+  gecko.data_collection_permissions?.required?.[0] !== "none"
+) {
+  console.error(
+    "Built manifest is missing version, Gecko ID, or data_collection_permissions.required."
+  );
+  process.exit(1);
+}
 
-// Create source code archive for AMO review using git archive (respects .gitignore)
+const sourceArchive = resolve(root, `source-code-${version}.zip`);
+
+console.log(`Submitting HLS Downloader v${version} to Firefox Add-ons...`);
+
+// Create source code archive for AMO review from committed files.
 console.log("Creating source code archive for reviewer...");
 try {
   if (existsSync(sourceArchive)) unlinkSync(sourceArchive);
-  execSync(`git archive --format=zip -o "${sourceArchive}" HEAD`, {
-    stdio: "inherit",
-    cwd: root,
-  });
+  run("git", ["archive", "--format=zip", "-o", sourceArchive, "HEAD"]);
 } catch (err) {
   console.error("Failed to create source code archive.");
   process.exit(1);
@@ -69,16 +91,22 @@ try {
 // Submit to AMO
 console.log("Uploading to AMO...");
 try {
-  execSync(
+  run(
+    "pnpm",
     [
-      "npx web-ext sign",
-      `--source-dir "${sourceDir}"`,
+      "exec",
+      "web-ext",
+      "sign",
+      "--source-dir",
+      sourceDir,
       "--channel listed",
-      `--api-key "${process.env.AMO_JWT_ISSUER}"`,
-      `--api-secret "${process.env.AMO_JWT_SECRET}"`,
-      `--upload-source-code "${sourceArchive}"`,
-    ].join(" "),
-    { stdio: "inherit", cwd: root }
+      "--api-key",
+      process.env.AMO_JWT_ISSUER,
+      "--api-secret",
+      process.env.AMO_JWT_SECRET,
+      "--upload-source-code",
+      sourceArchive,
+    ]
   );
   console.log("Submission complete! Check AMO for review status.");
 } catch (err) {

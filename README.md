@@ -158,6 +158,11 @@ pnpm run build:all          # outputs dist/mv2 + dist/mv3
 #       extension-mv3-chrome.zip                            (MV3 contents at archive root; Chromium only)
 ```
 
+For Firefox Add-ons source review, use the exact reproduction steps in
+[AMO_SOURCE_REVIEW.md](./AMO_SOURCE_REVIEW.md). Do not upload a stale local
+`source-code.zip`; `pnpm run publish:firefox` creates a fresh source archive from
+the committed release revision.
+
 > Tip: If pnpm is missing, run `corepack enable && corepack prepare pnpm@10.11.0 --activate` to match the locked toolchain.
 
 Run tests & generate coverage badge:

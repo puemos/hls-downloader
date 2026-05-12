@@ -2,7 +2,7 @@
   "private": true,
   "packageManager": "pnpm@10.11.0",
   "scripts": {
-    "clean": "rimraf dist dist-mv2 dist-mv3 extension-*.zip extension-*.xpi && mkdir -p dist",
+    "clean": "rimraf dist dist-mv2 dist-mv3 extension-*.zip extension-*.xpi source-code*.zip && mkdir -p dist",
     "copy-assets": "node scripts/copy-assets.mjs",
     "prebuild": "pnpm run clean && pnpm run copy-assets",
     "build:core": "pnpm --filter ./src/core run build",

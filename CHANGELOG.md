@@ -1,5 +1,16 @@
 # HLS Downloader Changelog
 
+## 5.4.3
+
+### Fixes
+- Made Firefox Add-ons source review reproducible by committing Firefox manifest metadata and removing post-build manifest mutation from the publish flow.
+- Hardened release packaging so Firefox builds and source archives are created from the same committed revision.
+
+### Testing
+- `pnpm run build:mv2`
+- `pnpm exec web-ext lint --source-dir dist/mv2`
+- `pnpm test`
+
 ## 5.4.2
 
 ### Features

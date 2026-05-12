@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from "child_process";
+import { rmSync } from "fs";
 import { parseArgs } from "util";
 
 const args = process.argv.slice(2).filter((arg) => arg !== "--");
@@ -37,6 +38,12 @@ const env = {
 };
 
 console.log(`Building ${mvVersion}${blocklistSuffix}...`);
+
+rmSync(distDir, { recursive: true, force: true });
+rmSync(`${zipBasename}-chrome.zip`, { force: true });
+rmSync(`${zipBasename}-firefox.xpi`, { force: true });
+rmSync(`dist/${zipBasename}-chrome.zip`, { force: true });
+rmSync(`dist/${zipBasename}-firefox.xpi`, { force: true });
 
 // Run the build steps
 const steps = [
