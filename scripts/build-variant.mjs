@@ -15,10 +15,10 @@ const { values } = parseArgs({
 
 const mvVersion = values.mv; // 'mv2' or 'mv3'
 const hasBlocklist =
-  values.blocklist !== undefined
-    ? values.blocklist
-    : values["no-blocklist"] === true
-      ? false
+  values["no-blocklist"] === true
+    ? false
+    : values.blocklist !== undefined
+      ? values.blocklist
       : true;
 
 // Determine output directory and zip basename

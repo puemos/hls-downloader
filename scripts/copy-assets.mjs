@@ -1,4 +1,4 @@
-import { cp, mkdir, copyFile } from "fs/promises";
+import { cp, mkdir, copyFile, readFile, writeFile } from "fs/promises";
 import { fileURLToPath } from "url";
 import path from "path";
 
@@ -24,15 +24,13 @@ async function run() {
 
   // Copy manifest for the selected target
   if (process.env.NO_BLOCKLIST === "true") {
-    const manifestContent = await import(path.join(assetsDir, manifestFile), {
-      assert: { type: "json" },
-    });
-    const manifest = manifestContent.default;
+    const manifest = JSON.parse(
+      await readFile(path.join(assetsDir, manifestFile), "utf8")
+    );
     manifest.name = "experimental unstable nightly beta alpha hls-downloader";
 
     // We need to write the modified manifest
-    const fs = await import("fs/promises");
-    await fs.writeFile(
+    await writeFile(
       path.join(distDir, "manifest.json"),
       JSON.stringify(manifest, null, 2)
     );
