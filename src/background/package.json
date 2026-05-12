@@ -17,22 +17,23 @@
   },
   "devDependencies": {
     "@types/webextension-polyfill": "0.10.0",
-    "@videojs/vhs-utils": "^1.3.0",
-    "fake-indexeddb": "^6.0.1",
+    "@videojs/vhs-utils": "1.3.0",
+    "fake-indexeddb": "6.2.5",
     "idb": "6.1.2",
-    "m3u8-parser": "^6.2.0",
+    "m3u8-parser": "6.2.0",
     "prettier": "2.8.7",
     "typescript": "5.3.3",
-    "url-toolkit": "^2.1.6",
-    "uuid": "^7.0.3",
-    "vite": "6.4.1",
+    "url-toolkit": "2.2.5",
+    "uuid": "7.0.3",
+    "vite": "6.4.2",
     "vitest": "3.2.4"
   },
   "dependencies": {
-    "@ffmpeg/ffmpeg": "^0.12.10",
-    "@ffmpeg/util": "^0.12.1",
+    "@ffmpeg/ffmpeg": "0.12.15",
+    "@ffmpeg/util": "0.12.2",
     "@hls-downloader/core": "workspace:*",
-    "filenamify": "^6.0.0",
+    "filenamify": "6.0.0",
+    "redux": "4.2.1",
     "webext-redux": "2.1.9",
     "webextension-polyfill": "0.10.0"
   }
