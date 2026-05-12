@@ -1,5 +1,17 @@
 # HLS Downloader Changelog
 
+## 5.4.2
+
+### Features
+- Added sniffer playlist removal from the popup UI.
+
+### Chores
+- Hardened the dependency graph and removed stale package lock files.
+
+### Testing
+- `pnpm test`
+- `pnpm run build:all-variants`
+
 ## 5.4.1
 
 ### Fixes
