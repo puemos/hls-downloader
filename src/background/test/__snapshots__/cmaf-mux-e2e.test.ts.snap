@@ -1,0 +1,42 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CMAF Mux Pipeline E2E (host ffmpeg) > fMP4 video + fMP4 audio → valid MP4 output 1`] = `
+{
+  "duration": "3.000000",
+  "sha256": "4f7b94a5ae9b3435abaf3fb6b76ea4b57b2c87f0f401286f38db87ae0f649547",
+  "sizeBytes": 84233,
+  "streams": [
+    {
+      "codec_name": "h264",
+      "codec_type": "video",
+      "height": 184,
+      "nb_frames": "90",
+      "width": 320,
+    },
+    {
+      "channels": 2,
+      "codec_name": "aac",
+      "codec_type": "audio",
+      "nb_frames": "140",
+      "sample_rate": "48000",
+    },
+  ],
+}
+`;
+
+exports[`CMAF Mux Pipeline E2E (host ffmpeg) > fMP4 video-only → valid output 1`] = `
+{
+  "duration": "3.000000",
+  "sha256": "8eedb1169b82169df813d350c2f1ed12d9613c72b3ce5542b38418062a06fd5f",
+  "sizeBytes": 56696,
+  "streams": [
+    {
+      "codec_name": "h264",
+      "codec_type": "video",
+      "height": 184,
+      "nb_frames": "90",
+      "width": 320,
+    },
+  ],
+}
+`;

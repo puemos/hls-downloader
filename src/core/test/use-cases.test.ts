@@ -115,7 +115,17 @@ describe("use-cases", () => {
       Date.now(),
       'Video "Test" <2024>'
     );
-    const level = new Level("subtitle", "English", "1", "uri", undefined, undefined, undefined, undefined, "en");
+    const level = new Level(
+      "subtitle",
+      "English",
+      "1",
+      "uri",
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "en"
+    );
     const run = generateSubtitleFileName();
     expect(run(playlist, level)).toBe("Video _Test_ _2024_-en.vtt");
   });
@@ -176,6 +186,28 @@ describe("use-cases", () => {
     const data = await run(fragment, 5);
     expect(loader.fetchArrayBuffer).toHaveBeenCalledWith("https://frag", 5);
     expect(data.byteLength).toBe(3);
+  });
+
+  it("downloads fragment with byteRange", async () => {
+    const loader: ILoader = {
+      fetchText: vi.fn(),
+      fetchArrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(100)),
+    };
+    const run = downloadSingleFactory(loader);
+    const fragment = new Fragment(
+      new Key(null, null),
+      "https://example.com/CMAF_720.mp4",
+      1,
+      null,
+      { offset: 833, length: 50000 }
+    );
+    const data = await run(fragment, 3);
+    expect(loader.fetchArrayBuffer).toHaveBeenCalledWith(
+      "https://example.com/CMAF_720.mp4",
+      3,
+      { offset: 833, length: 50000 }
+    );
+    expect(data.byteLength).toBe(100);
   });
 
   it("falls back to fragment without params on fetch failure", async () => {
