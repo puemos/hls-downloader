@@ -1,5 +1,45 @@
 # HLS Downloader Changelog
 
+## 5.4.1
+
+### Fixes
+- Reduced muxing memory usage and preserved HLS byte ranges for CMAF/fMP4 playlists, addressing 0-byte saves and large-output failures reported in #522 and #523.
+- Fixed release variant generation so no-blocklist MV2/MV3 archives are produced correctly.
+- Made no-blocklist manifest generation compatible with current Node JSON module requirements.
+
+### Chores
+- Added automated Firefox AMO submission support.
+- Updated design-system dependency security patches.
+
+### Testing
+- `pnpm test`
+- `pnpm run build:all-variants`
+
+## 5.4.0
+
+### Features
+- Added an auto-delete-after-save option for completed downloads.
+
+### Fixes
+- Preserved embedded audio in muxed HLS streams.
+- Sanitized generated download filenames to remove illegal characters.
+- Improved native select colors in Firefox dark mode.
+
+## 5.3.1
+
+### Features
+- Added the download queue.
+- Added storage usage estimates and total storage reporting.
+- Added sniffer video previews.
+- Added conditional blocklist support with an opt-out build variant.
+- Propagated fallback query parameters through playlist handling.
+
+### Fixes
+- Hardened storage management reliability and added integration coverage.
+
+### Chores
+- Updated dependency security patches and pnpm override ranges.
+
 ## 5.2.0
 
 ### Features
