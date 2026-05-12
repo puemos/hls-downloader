@@ -11,6 +11,7 @@ const SnifferModule = () => {
     playlists,
     currentPlaylistId,
     copyPlaylistsToClipboard,
+    removePlaylist,
     directURI,
     setDirectURI,
     addDirectPlaylist,
@@ -22,6 +23,7 @@ const SnifferModule = () => {
     <SnifferView
       filter={filter}
       clearPlaylists={clearPlaylists}
+      removePlaylist={removePlaylist}
       copyPlaylistsToClipboard={copyPlaylistsToClipboard}
       setFilter={setFilter}
       setCurrentPlaylistId={setCurrentPlaylistId}

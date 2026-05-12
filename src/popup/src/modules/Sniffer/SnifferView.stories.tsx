@@ -52,6 +52,7 @@ export const Empty: Story = {
       currentPlaylistId={undefined}
       filter=""
       clearPlaylists={() => {}}
+      removePlaylist={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
       directURI=""
@@ -71,6 +72,7 @@ export const WithItems: Story = {
       currentPlaylistId={undefined}
       filter=""
       clearPlaylists={() => {}}
+      removePlaylist={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
       directURI=""
@@ -90,6 +92,7 @@ export const Selected: Story = {
       currentPlaylistId="1"
       filter=""
       clearPlaylists={() => {}}
+      removePlaylist={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
       directURI=""
@@ -109,6 +112,7 @@ export const LongTitles: Story = {
       currentPlaylistId={undefined}
       filter=""
       clearPlaylists={() => {}}
+      removePlaylist={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
       directURI=""
@@ -128,6 +132,7 @@ export const WithManualInput: Story = {
       currentPlaylistId={undefined}
       filter=""
       clearPlaylists={() => {}}
+      removePlaylist={() => {}}
       setFilter={() => {}}
       setCurrentPlaylistId={() => {}}
       directURI="https://example.com/manual.m3u8"
@@ -163,6 +168,11 @@ export const TransitionDemo: Story = {
         filter={filter}
         clearPlaylists={() => {
           setCurrentPlaylistId(undefined);
+        }}
+        removePlaylist={(playlistId) => {
+          setExpandedPlaylists((prev) =>
+            prev.filter((id) => id !== playlistId)
+          );
         }}
         setFilter={setFilter}
         setCurrentPlaylistId={setCurrentPlaylistId}

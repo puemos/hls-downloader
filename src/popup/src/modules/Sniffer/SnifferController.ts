@@ -12,6 +12,7 @@ interface ReturnType {
   currentPlaylistId: string | undefined;
   filter: string;
   clearPlaylists: () => void;
+  removePlaylist: (playlistId: string) => void;
   setFilter: (filter: string) => void;
   setCurrentPlaylistId: (playlistId?: string) => void;
   copyPlaylistsToClipboard: () => void;
@@ -67,6 +68,14 @@ const useSnifferController = (): ReturnType => {
     dispatch(playlistsSlice.actions.clearPlaylists());
   }
 
+  function removePlaylist(playlistId: string) {
+    dispatch(playlistsSlice.actions.removePlaylist({ playlistID: playlistId }));
+    setExpandedPlaylists((prev) => prev.filter((id) => id !== playlistId));
+    if (currentPlaylistId === playlistId) {
+      setCurrentPlaylistId(undefined);
+    }
+  }
+
   function addDirectPlaylist() {
     if (!directURI) return;
     dispatch(
@@ -105,6 +114,7 @@ const useSnifferController = (): ReturnType => {
   return {
     filter,
     clearPlaylists,
+    removePlaylist,
     setFilter,
     setCurrentPlaylistId,
     playlists,
