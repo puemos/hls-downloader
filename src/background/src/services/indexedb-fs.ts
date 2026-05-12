@@ -14,7 +14,7 @@ import {
 import browser from "webextension-polyfill";
 import filenamify from "filenamify";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { writeMediaToFFmpegFS, muxExec } from "./ffmpeg-muxer";
+import { writeMediaToFFmpegFS, muxExec, detectFmp4 } from "./ffmpeg-muxer";
 
 const buckets: Record<string, IndexedDBBucket> = {};
 const chromeApi = (globalThis as any).chrome;
@@ -418,18 +418,33 @@ export class IndexedDBBucket implements Bucket {
     const hasVideo = this.videoLength > 0;
     const hasAudio = this.audioLength > 0;
 
+    let videoFileName = "video.ts";
+    let audioFileName = "audio.ts";
+
     try {
       // Phase 1: Load video, write to FFmpeg FS, release
       if (hasVideo) {
-        const videoData = await this.concatenateChunksToUint8Array(0, this.videoLength);
-        await writeMediaToFFmpegFS(ffmpeg, "video.ts", videoData);
+        const videoData = await this.concatenateChunksToUint8Array(
+          0,
+          this.videoLength
+        );
+        if (detectFmp4(videoData)) {
+          videoFileName = "video.mp4";
+        }
+        await writeMediaToFFmpegFS(ffmpeg, videoFileName, videoData);
         // videoData is block-scoped -- eligible for GC
       }
 
       // Phase 2: Load audio, write to FFmpeg FS, release
       if (hasAudio) {
-        const audioData = await this.concatenateChunksToUint8Array(this.videoLength, this.audioLength);
-        await writeMediaToFFmpegFS(ffmpeg, "audio.ts", audioData);
+        const audioData = await this.concatenateChunksToUint8Array(
+          this.videoLength,
+          this.audioLength
+        );
+        if (detectFmp4(audioData)) {
+          audioFileName = "audio.mp4";
+        }
+        await writeMediaToFFmpegFS(ffmpeg, audioFileName, audioData);
         // audioData is block-scoped -- eligible for GC
       }
 
@@ -439,6 +454,8 @@ export class IndexedDBBucket implements Bucket {
         outputFileName,
         hasVideo,
         hasAudio,
+        videoFileName,
+        audioFileName,
         subtitleText: subtitle?.text,
         subtitleLanguage: subtitle?.language,
       });
@@ -447,9 +464,7 @@ export class IndexedDBBucket implements Bucket {
     } catch (error) {
       console.error(`Muxing failed for ${outputFileName}:`, error);
       const detail = error instanceof Error ? error.message : String(error);
-      throw new Error(
-        `Muxing failed: ${detail}`
-      );
+      throw new Error(`Muxing failed: ${detail}`);
     }
   }
   // Helper function to read chunks by index to avoid transaction timeout
@@ -671,7 +686,11 @@ const saveAs: IFS["saveAs"] = async function (
     filename,
   });
 
-  if (link.startsWith("blob:") && downloadsApi.onChanged && typeof URL.revokeObjectURL === "function") {
+  if (
+    link.startsWith("blob:") &&
+    downloadsApi.onChanged &&
+    typeof URL.revokeObjectURL === "function"
+  ) {
     const listener = (delta: { id: number; state?: { current: string } }) => {
       if (delta.id !== downloadId) return;
       if (!delta.state) return;

@@ -124,4 +124,58 @@ audio-only.ts
 #EXT-X-ENDLIST
 M3U8
 
+cat > cmaf-master.m3u8 <<'M3U8'
+#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=500000,CODECS="avc1.64001f",RESOLUTION=848x480
+cmaf-level.m3u8
+M3U8
+
+cat > cmaf-level.m3u8 <<'M3U8'
+#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:4
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-MAP:URI="cmaf-stream.mp4",BYTERANGE="100@0"
+#EXTINF:4.0,
+#EXT-X-BYTERANGE:200@100
+cmaf-stream.mp4
+#EXTINF:4.0,
+#EXT-X-BYTERANGE:200@300
+cmaf-stream.mp4
+#EXT-X-ENDLIST
+M3U8
+
+echo ""
+echo "============================================="
+echo " Generating fMP4 fixtures from TS sources"
+echo "============================================="
+echo ""
+
+# ── 6) fMP4 video-only (remuxed from video-only.ts) ──
+echo "==> Remuxing video-only.ts → fmp4-video-only.mp4 (fragmented MP4)"
+"$FFMPEG" -y -hide_banner -loglevel error \
+  -i video-only.ts -c copy \
+  -movflags +frag_keyframe+empty_moov \
+  -f mp4 e2e-output/fmp4-video-only.mp4
+
+# ── 7) fMP4 audio-only (remuxed from audio-only.ts) ──
+echo "==> Remuxing audio-only.ts → fmp4-audio-only.mp4 (fragmented MP4)"
+"$FFMPEG" -y -hide_banner -loglevel error \
+  -i audio-only.ts -c copy \
+  -movflags +frag_keyframe+empty_moov \
+  -f mp4 e2e-output/fmp4-audio-only.mp4
+
+echo ""
+echo "==> Verifying fMP4 fixtures..."
+for f in e2e-output/fmp4-video-only.mp4 e2e-output/fmp4-audio-only.mp4; do
+  echo "--- $f ---"
+  size=$(wc -c < "$f" | tr -d ' ')
+  duration=$("$FFPROBE" -v error -show_entries format=duration -of csv=p=0 "$f" 2>/dev/null || echo "?")
+  echo "  Size: ${size} bytes  Duration: ${duration}s"
+  "$FFPROBE" -hide_banner -show_entries stream=index,codec_type,codec_name -of compact "$f" 2>/dev/null || true
+  first_bytes=$(xxd -l 8 -p "$f")
+  echo "  First 8 bytes: ${first_bytes}"
+  echo ""
+done
+
 echo "==> Done! All fixtures generated from real HLS streams."

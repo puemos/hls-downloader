@@ -27,12 +27,10 @@ function loadFixture(name: string): Uint8Array {
   return new Uint8Array(fs.readFileSync(path.join(FIXTURES_DIR, name)));
 }
 
-function saveOutput(srcPath: string, name: string): void {
-  fs.copyFileSync(srcPath, path.join(E2E_OUTPUT_DIR, name));
-}
-
-function outputPath(adapter: FFmpegHostAdapter, name: string): string {
-  return path.join(adapter.tempDir, name);
+async function saveOutput(blob: Blob, name: string): Promise<string> {
+  const outputFile = path.join(E2E_OUTPUT_DIR, name);
+  fs.writeFileSync(outputFile, new Uint8Array(await blob.arrayBuffer()));
+  return outputFile;
 }
 
 describe.skipIf(!ffmpegAvailable)("Mux Pipeline E2E (host ffmpeg)", () => {
@@ -68,8 +66,7 @@ describe.skipIf(!ffmpegAvailable)("Mux Pipeline E2E (host ffmpeg)", () => {
     expect(result.blob.size).toBeGreaterThan(0);
     expect(result.mime).toBe("video/mp4");
 
-    const out = outputPath(adapter, "output.mp4");
-    saveOutput(out, "01-concat-muxed.mp4");
+    const out = await saveOutput(result.blob, "01-concat-muxed.mp4");
     expect(await ffprobe(out)).toMatchSnapshot();
   }, 30_000);
 
@@ -93,8 +90,7 @@ describe.skipIf(!ffmpegAvailable)("Mux Pipeline E2E (host ffmpeg)", () => {
 
     expect(result.blob.size).toBeGreaterThan(0);
 
-    const out = outputPath(adapter, "output.mp4");
-    saveOutput(out, "02-separate-va.mp4");
+    const out = await saveOutput(result.blob, "02-separate-va.mp4");
     expect(await ffprobe(out)).toMatchSnapshot();
   }, 30_000);
 
@@ -113,8 +109,7 @@ describe.skipIf(!ffmpegAvailable)("Mux Pipeline E2E (host ffmpeg)", () => {
 
     expect(result.blob.size).toBeGreaterThan(0);
 
-    const out = outputPath(adapter, "output.mp4");
-    saveOutput(out, "03-data-stream-filtered.mp4");
+    const out = await saveOutput(result.blob, "03-data-stream-filtered.mp4");
     expect(await ffprobe(out)).toMatchSnapshot();
   }, 30_000);
 
@@ -133,8 +128,7 @@ describe.skipIf(!ffmpegAvailable)("Mux Pipeline E2E (host ffmpeg)", () => {
 
     expect(result.blob.size).toBeGreaterThan(0);
 
-    const out = outputPath(adapter, "output.mp4");
-    saveOutput(out, "04-audio-only.mp4");
+    const out = await saveOutput(result.blob, "04-audio-only.mp4");
     expect(await ffprobe(out)).toMatchSnapshot();
   }, 30_000);
 
@@ -157,8 +151,7 @@ describe.skipIf(!ffmpegAvailable)("Mux Pipeline E2E (host ffmpeg)", () => {
     expect(result.blob.size).toBeGreaterThan(0);
     expect(result.mime).toBe("video/x-matroska");
 
-    const out = outputPath(adapter, "output.mkv");
-    saveOutput(out, "05-with-subtitles.mkv");
+    const out = await saveOutput(result.blob, "05-with-subtitles.mkv");
     // MKV embeds a muxing timestamp, making sha256 non-deterministic across runs
     const { sha256: _, ...probe } = await ffprobe(out);
     expect(probe).toMatchSnapshot();

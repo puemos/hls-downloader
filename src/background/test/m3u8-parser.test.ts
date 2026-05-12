@@ -130,6 +130,68 @@ describe("M3u8Parser", () => {
     });
   });
 
+  it("parses CMAF byterange playlist with segment and init byteranges", () => {
+    const cmafPlaylist = `#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:4
+#EXT-X-MAP:URI="CMAF_720.mp4",BYTERANGE="833@0"
+#EXTINF:4.0,
+#EXT-X-BYTERANGE:50000@833
+CMAF_720.mp4
+#EXTINF:4.0,
+#EXT-X-BYTERANGE:45000@50833
+CMAF_720.mp4
+`;
+    const fragments = M3u8Parser.parseLevelPlaylist(cmafPlaylist, base);
+
+    // Init fragment + 2 media segments
+    expect(fragments).toHaveLength(3);
+
+    // Init fragment has map byterange
+    expect(fragments[0].uri).toBe(`${base}CMAF_720.mp4`);
+    expect(fragments[0].byteRange).toEqual({ offset: 0, length: 833 });
+
+    // Media segments have their own byteranges
+    expect(fragments[1].uri).toBe(`${base}CMAF_720.mp4`);
+    expect(fragments[1].byteRange).toEqual({ offset: 833, length: 50000 });
+
+    expect(fragments[2].uri).toBe(`${base}CMAF_720.mp4`);
+    expect(fragments[2].byteRange).toEqual({ offset: 50833, length: 45000 });
+  });
+
+  it("parses implicit segment byterange offsets", () => {
+    const cmafPlaylist = `#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:4
+#EXT-X-MAP:URI="CMAF_720.mp4",BYTERANGE="833@0"
+#EXTINF:4.0,
+#EXT-X-BYTERANGE:50000@833
+CMAF_720.mp4
+#EXTINF:4.0,
+#EXT-X-BYTERANGE:45000
+CMAF_720.mp4
+`;
+    const fragments = M3u8Parser.parseLevelPlaylist(cmafPlaylist, base);
+
+    expect(fragments[1].byteRange).toEqual({ offset: 833, length: 50000 });
+    expect(fragments[2].byteRange).toEqual({ offset: 50833, length: 45000 });
+  });
+
+  it("fragments without byterange have null byteRange", () => {
+    const fragments = M3u8Parser.parseLevelPlaylist(playlist, base);
+    // Media segments from a regular TS playlist have no byteRange
+    expect(fragments[1].byteRange).toBeNull();
+    expect(fragments[2].byteRange).toBeNull();
+  });
+
+  it("init fragment byterange from EXT-X-MAP BYTERANGE", () => {
+    const fragments = M3u8Parser.parseLevelPlaylist(byterangePlaylist, base);
+    // First init segment
+    expect(fragments[0].byteRange).toEqual({ offset: 0, length: 1000 });
+    // Second init segment (different byterange)
+    expect(fragments[2].byteRange).toEqual({ offset: 1000, length: 1000 });
+  });
+
   it("inspects level encryption", () => {
     const encryptedPlaylist = `#EXTM3U
 #EXT-X-TARGETDURATION:8

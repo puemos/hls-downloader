@@ -64,8 +64,14 @@ export function captureHelpers(state: FFmpegCaptureState) {
     getWrites: () => state.writes,
     getExecArgs: () => state.execArgs,
     getDeletedFiles: () => state.deletedFiles,
-    getVideoWrite: () => state.writes.find((w) => w.filename === "video.ts"),
-    getAudioWrite: () => state.writes.find((w) => w.filename === "audio.ts"),
+    getVideoWrite: () =>
+      state.writes.find(
+        (w) => w.filename === "video.ts" || w.filename === "video.mp4"
+      ),
+    getAudioWrite: () =>
+      state.writes.find(
+        (w) => w.filename === "audio.ts" || w.filename === "audio.mp4"
+      ),
     getSubtitleWrite: () =>
       state.writes.find((w) => w.filename === "subtitles.vtt"),
     getWriteByFilename: (name: string) =>

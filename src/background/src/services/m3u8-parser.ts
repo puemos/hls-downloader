@@ -37,6 +37,12 @@ export const M3u8Parser: IParser = {
                   }
                 : { iv: null, uri: null },
             uri: mapUri,
+            byteRange: segment.map.byterange
+              ? {
+                  offset: segment.map.byterange.offset,
+                  length: segment.map.byterange.length,
+                }
+              : null,
           });
           index++;
           currentMapUri = mapUri;
@@ -54,6 +60,12 @@ export const M3u8Parser: IParser = {
               }
             : { iv: null, uri: null },
         uri: buildAbsoluteURL(baseurl, segment.uri),
+        byteRange: segment.byterange
+          ? {
+              offset: segment.byterange.offset,
+              length: segment.byterange.length,
+            }
+          : null,
       });
       index++;
     });

@@ -4,8 +4,8 @@ import os from "node:os";
 import crypto from "node:crypto";
 import { execFile, execFileSync } from "node:child_process";
 
-const FFMPEG_PATH = process.env.FFMPEG_PATH ?? "/opt/homebrew/bin/ffmpeg";
-const FFPROBE_PATH = process.env.FFPROBE_PATH ?? "/opt/homebrew/bin/ffprobe";
+const FFMPEG_PATH = process.env.FFMPEG_PATH ?? "ffmpeg";
+const FFPROBE_PATH = process.env.FFPROBE_PATH ?? "ffprobe";
 
 /**
  * Adapter that implements the same 4-method interface as @ffmpeg/ffmpeg's FFmpeg class

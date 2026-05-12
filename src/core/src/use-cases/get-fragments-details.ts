@@ -48,7 +48,8 @@ export const getFragmentsDetailsFactory = (
         new Key(keyPrimaryUri, fragment.key.iv, keyFallbackUri),
         primaryUri,
         fragment.index,
-        fallbackUri
+        fallbackUri,
+        fragment.byteRange
       );
     });
   };

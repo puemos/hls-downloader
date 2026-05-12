@@ -5,6 +5,7 @@ import path from "node:path";
 const CONTENT_TYPES: Record<string, string> = {
   ".m3u8": "application/vnd.apple.mpegurl",
   ".ts": "video/mp2t",
+  ".mp4": "video/mp4",
 };
 
 export interface HlsServer {
@@ -27,6 +28,26 @@ export function createHlsServer(fixturesDir: string): Promise<HlsServer> {
 
       const ext = path.extname(filePath);
       const contentType = CONTENT_TYPES[ext] ?? "application/octet-stream";
+
+      const rangeHeader = req.headers.range;
+      if (rangeHeader) {
+        const match = rangeHeader.match(/bytes=(\d+)-(\d+)?/);
+        if (match) {
+          const fileSize = fs.statSync(filePath).size;
+          const start = parseInt(match[1], 10);
+          const end = match[2] ? parseInt(match[2], 10) : fileSize - 1;
+          const chunkSize = end - start + 1;
+
+          res.writeHead(206, {
+            "Content-Type": contentType,
+            "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+            "Content-Length": chunkSize,
+            "Accept-Ranges": "bytes",
+          });
+          fs.createReadStream(filePath, { start, end }).pipe(res);
+          return;
+        }
+      }
 
       res.writeHead(200, { "Content-Type": contentType });
       fs.createReadStream(filePath).pipe(res);

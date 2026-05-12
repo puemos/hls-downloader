@@ -52,14 +52,39 @@ export async function fetchText(url: string, attempts: number = 1) {
   return fetchWithRetry(fetchFn, attempts);
 }
 
-export async function fetchArrayBuffer(url: string, attempts: number = 1) {
-  const fetchFn: FetchFn<ArrayBuffer> = () =>
-    fetch(url).then((res) => {
+export async function fetchArrayBuffer(
+  url: string,
+  attempts: number = 1,
+  byteRange?: { offset: number; length: number } | null
+) {
+  const fetchFn: FetchFn<ArrayBuffer> = () => {
+    const request = byteRange
+      ? fetch(url, {
+          headers: {
+            Range: `bytes=${byteRange.offset}-${
+              byteRange.offset + byteRange.length - 1
+            }`,
+          },
+        })
+      : fetch(url);
+    return request.then(async (res) => {
       if (!res.ok) {
         throw new HttpError(res.status);
       }
-      return res.arrayBuffer();
+      const buffer = await res.arrayBuffer();
+      if (
+        byteRange &&
+        res.status !== 206 &&
+        buffer.byteLength !== byteRange.length
+      ) {
+        return buffer.slice(
+          byteRange.offset,
+          byteRange.offset + byteRange.length
+        );
+      }
+      return buffer;
     });
+  };
   return fetchWithRetry(fetchFn, attempts);
 }
 export const FetchLoader = {
