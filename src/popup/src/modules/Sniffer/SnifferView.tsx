@@ -13,6 +13,7 @@ import {
   Copy,
   Radio,
   ArrowRight,
+  Trash2,
 } from "lucide-react";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -23,6 +24,7 @@ interface Props {
   currentPlaylistId: string | undefined;
   filter: string;
   clearPlaylists: () => void;
+  removePlaylist: (playlistId: string) => void;
   copyPlaylistsToClipboard: () => void;
   setFilter: (filter: string) => void;
   setCurrentPlaylistId: (playlistId?: string) => void;
@@ -35,6 +37,7 @@ interface Props {
 
 const SnifferView = ({
   clearPlaylists,
+  removePlaylist,
   copyPlaylistsToClipboard,
   setFilter,
   filter,
@@ -199,6 +202,7 @@ const SnifferView = ({
                 expanded={expandedPlaylists.includes(item.id)}
                 onToggle={() => toggleExpandedPlaylist(item.id)}
                 onOpen={() => setCurrentPlaylistId(item.id)}
+                onRemove={() => removePlaylist(item.id)}
               />
             ))}
           </ScrollArea>
@@ -215,11 +219,13 @@ const PlaylistRow = ({
   expanded,
   onToggle,
   onOpen,
+  onRemove,
 }: {
   playlist: Playlist;
   expanded: boolean;
   onToggle: () => void;
   onOpen: () => void;
+  onRemove: () => void;
 }) => {
   const detailsRef = useRef<HTMLDivElement | null>(null);
 
@@ -308,6 +314,14 @@ const PlaylistRow = ({
               onClick={() => navigator.clipboard?.writeText(playlist.uri)}
             >
               Copy URL <Copy className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="gap-1"
+              onClick={onRemove}
+            >
+              Remove <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
