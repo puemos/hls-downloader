@@ -99,7 +99,8 @@ try {
       "sign",
       "--source-dir",
       sourceDir,
-      "--channel listed",
+      "--channel",
+      "listed",
       "--api-key",
       process.env.AMO_JWT_ISSUER,
       "--api-secret",
@@ -111,7 +112,7 @@ try {
   console.log("Submission complete! Check AMO for review status.");
 } catch (err) {
   console.error("Submission failed.");
-  process.exit(1);
+  process.exitCode = 1;
 } finally {
   // Clean up source archive
   if (existsSync(sourceArchive)) unlinkSync(sourceArchive);

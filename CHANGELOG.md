@@ -1,5 +1,14 @@
 # HLS Downloader Changelog
 
+## 5.4.4
+
+### Fixes
+- Fixed the Firefox Add-ons publish command argument handling so AMO receives the listed-channel submission and matching source archive.
+- Ensured failed AMO uploads still remove temporary source archives.
+
+### Testing
+- GitHub release workflow
+
 ## 5.4.3
 
 ### Fixes
