@@ -15,8 +15,10 @@ const SettingsModule = () => {
     saveDialog,
     autoDeleteAfterSave,
     concurrency,
+    outputContainer,
     preferredAudioLanguage,
     onSetPreferredAudioLanguage,
+    onSetOutputContainer,
     maxActiveDownloads,
     activeDownloadsUnlimited,
     onActiveDownloadsDecrease,
@@ -37,6 +39,8 @@ const SettingsModule = () => {
       onConcurrencyDecrease={onConcurrencyDecrease}
       onConcurrencyIncrease={onConcurrencyIncrease}
       concurrency={concurrency}
+      outputContainer={outputContainer}
+      onSetOutputContainer={onSetOutputContainer}
       preferredAudioLanguage={preferredAudioLanguage}
       onSetPreferredAudioLanguage={onSetPreferredAudioLanguage}
       maxActiveDownloads={maxActiveDownloads}

@@ -1,8 +1,9 @@
 import { Playlist, Level } from "../entities";
+import type { OutputContainer } from "../entities/output-container";
 import { sanitizeFilename } from "./sanitize-filename";
 
 type GenerateFileNameOptions = {
-  container?: "mp4" | "mkv";
+  container?: OutputContainer;
 };
 
 export const generateFileName = () => {

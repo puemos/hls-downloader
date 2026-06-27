@@ -1,4 +1,5 @@
 import { IndexedDBFS } from "./services/indexedb-fs";
+import type { OutputContainer } from "@hls-downloader/core/lib/entities";
 
 type OffscreenRequest = {
   target?: string;
@@ -7,6 +8,7 @@ type OffscreenRequest = {
   requestId?: string;
   videoLength?: number;
   audioLength?: number;
+  container?: OutputContainer;
 };
 
 type OffscreenResponse =
@@ -59,19 +61,22 @@ async function handleCreateObjectUrl(
     return { ok: false, message: `Bucket ${message.bucketId} not found` };
   }
 
-  const url = await bucket.getLink((progress, status) => {
-    if (!message.requestId) {
-      return;
-    }
+  const url = await bucket.getLink(
+    (progress, status) => {
+      if (!message.requestId) {
+        return;
+      }
 
-    void chrome.runtime.sendMessage({
-      target: "background",
-      type: "offscreen-progress",
-      requestId: message.requestId,
-      progress,
-      message: status,
-    });
-  });
+      void chrome.runtime.sendMessage({
+        target: "background",
+        type: "offscreen-progress",
+        requestId: message.requestId,
+        progress,
+        message: status,
+      });
+    },
+    { container: message.container ?? "mp4" }
+  );
 
   return { ok: true, url };
 }

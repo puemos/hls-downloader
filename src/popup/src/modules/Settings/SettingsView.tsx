@@ -1,7 +1,8 @@
-import { Button, Switch, Input, Card } from "@hls-downloader/design-system";
+import { Button, Switch, Card } from "@hls-downloader/design-system";
 import React from "react";
 import StorageSummary from "../Storage/StorageSummary";
-import { StorageState } from "@hls-downloader/core/lib/store/slices/storage-slice";
+import type { StorageState } from "@hls-downloader/core/lib/store/slices/storage-slice";
+import type { OutputContainer } from "@hls-downloader/core/lib/entities";
 
 interface Props {
   concurrency: number;
@@ -10,6 +11,7 @@ interface Props {
   fetchAttempts: number;
   saveDialog: boolean;
   autoDeleteAfterSave: boolean;
+  outputContainer: OutputContainer;
   onFetchAttemptsIncrease: () => void;
   onFetchAttemptsDecrease: () => void;
   onSaveDialogToggle: () => void;
@@ -19,6 +21,7 @@ interface Props {
   onActiveDownloadsIncrease: () => void;
   onActiveDownloadsDecrease: () => void;
   onActiveDownloadsUnlimited: () => void;
+  onSetOutputContainer: (outputContainer: OutputContainer) => void;
   preferredAudioLanguage?: string | null;
   onSetPreferredAudioLanguage: (lang: string | null) => void;
   storage: StorageState;
@@ -58,11 +61,17 @@ const LANG_OPTIONS = [
   { code: "ukr", label: "Ukrainian" },
 ];
 
+const OUTPUT_CONTAINER_OPTIONS: { value: OutputContainer; label: string }[] = [
+  { value: "mp4", label: "MP4" },
+  { value: "mkv", label: "MKV" },
+];
+
 const SettingsView = ({
   concurrency,
   fetchAttempts,
   saveDialog,
   autoDeleteAfterSave,
+  outputContainer,
   onConcurrencyIncrease,
   onConcurrencyDecrease,
   onActiveDownloadsIncrease,
@@ -74,6 +83,7 @@ const SettingsView = ({
   onFetchAttemptsDecrease,
   onSaveDialogToggle,
   onAutoDeleteAfterSaveToggle,
+  onSetOutputContainer,
   preferredAudioLanguage = "",
   onSetPreferredAudioLanguage,
   storage,
@@ -141,6 +151,30 @@ const SettingsView = ({
             >
               +
             </Button>
+          </div>
+        </Card>
+
+        <Card className="gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Output format</p>
+            <p className="text-[11px] text-muted-foreground">
+              Used for new downloads without subtitles
+            </p>
+          </div>
+          <div className="flex-1 min-w-[240px] border rounded-md">
+            <select
+              className="w-full p-2 text-sm bg-background text-foreground border-r-8 border-r-transparent"
+              value={outputContainer}
+              onChange={(e) =>
+                onSetOutputContainer(e.target.value as OutputContainer)
+              }
+            >
+              {OUTPUT_CONTAINER_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </Card>
 

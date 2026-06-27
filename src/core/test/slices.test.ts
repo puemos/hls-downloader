@@ -32,6 +32,11 @@ describe("store slices", () => {
       configSlice.actions.setMaxActiveDownloads({ maxActiveDownloads: 3 })
     );
     expect(state.maxActiveDownloads).toBe(3);
+    state = configSlice.reducer(
+      state,
+      configSlice.actions.setOutputContainer({ outputContainer: "mkv" })
+    );
+    expect(state.outputContainer).toBe("mkv");
   });
 
   it("jobs slice reducers", () => {

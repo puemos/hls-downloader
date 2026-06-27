@@ -1,3 +1,9 @@
+import type { OutputContainer } from "../entities";
+
+export type GetLinkOptions = {
+  container?: OutputContainer;
+};
+
 export interface IFS {
   cleanup(): Promise<void>;
   getBucket(id: string): Promise<Bucket>;
@@ -27,7 +33,8 @@ export interface IFS {
 export interface Bucket {
   write(index: number, data: ArrayBuffer): Promise<void>;
   getLink(
-    onProgress?: (progress: number, message: string) => void
+    onProgress?: (progress: number, message: string) => void,
+    options?: GetLinkOptions
   ): Promise<string>;
 }
 
