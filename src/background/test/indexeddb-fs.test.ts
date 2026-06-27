@@ -33,7 +33,7 @@ let mockWriteFile: ReturnType<typeof vi.fn>;
 
 // Mock FFmpeg since we can't load it in tests
 vi.mock("@ffmpeg/ffmpeg", () => ({
-  FFmpeg: vi.fn().mockImplementation(() => {
+  FFmpeg: vi.fn().mockImplementation(function () {
     mockWriteFile = vi.fn().mockResolvedValue(undefined);
     return {
       load: vi.fn().mockResolvedValue(undefined),

@@ -1,7 +1,6 @@
 import { Button } from "@hls-downloader/design-system";
 import {
   Bug,
-  Github,
   Lock,
   Scroll,
   Code2,
@@ -126,7 +125,7 @@ const AboutView = ({ version, name, description }: Props) => {
         {/* Contribute */}
         <div className="flex items-center justify-between p-2">
           <div className="flex items-center gap-2 font-semibold">
-            <Github className="h-4 w-4" />
+            <ExternalLink className="h-4 w-4" />
             Contribute
           </div>
           <Button

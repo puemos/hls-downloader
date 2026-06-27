@@ -38,21 +38,23 @@ export function createCaptureState(): FFmpegCaptureState {
  */
 export function ffmpegMockFactory(state: FFmpegCaptureState) {
   return {
-    FFmpeg: vi.fn().mockImplementation(() => ({
-      load: vi.fn().mockResolvedValue(undefined),
-      on: vi.fn(),
-      writeFile: vi.fn(async (filename: string, data: Uint8Array) => {
-        state.writes.push({ filename, data: new Uint8Array(data) });
-      }),
-      readFile: vi.fn().mockResolvedValue(new Uint8Array([0, 0, 0, 0])),
-      exec: vi.fn(async (args: string[]) => {
-        state.execArgs.push([...args]);
-        return state.execReturnValue;
-      }),
-      deleteFile: vi.fn(async (filename: string) => {
-        state.deletedFiles.push(filename);
-      }),
-    })),
+    FFmpeg: vi.fn().mockImplementation(function () {
+      return {
+        load: vi.fn().mockResolvedValue(undefined),
+        on: vi.fn(),
+        writeFile: vi.fn(async (filename: string, data: Uint8Array) => {
+          state.writes.push({ filename, data: new Uint8Array(data) });
+        }),
+        readFile: vi.fn().mockResolvedValue(new Uint8Array([0, 0, 0, 0])),
+        exec: vi.fn(async (args: string[]) => {
+          state.execArgs.push([...args]);
+          return state.execReturnValue;
+        }),
+        deleteFile: vi.fn(async (filename: string) => {
+          state.deletedFiles.push(filename);
+        }),
+      };
+    }),
   };
 }
 

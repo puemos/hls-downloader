@@ -41,21 +41,23 @@ vi.mock("webextension-polyfill", () => {
 });
 
 vi.mock("@ffmpeg/ffmpeg", () => ({
-  FFmpeg: vi.fn().mockImplementation(() => ({
-    load: vi.fn().mockResolvedValue(undefined),
-    on: vi.fn(),
-    writeFile: vi.fn(async (filename: string, data: Uint8Array) => {
-      capture.writes.push({ filename, data: new Uint8Array(data) });
-    }),
-    readFile: vi.fn().mockResolvedValue(new Uint8Array([0, 0, 0, 0])),
-    exec: vi.fn(async (args: string[]) => {
-      capture.execArgs.push([...args]);
-      return capture.execReturnValue;
-    }),
-    deleteFile: vi.fn(async (filename: string) => {
-      capture.deletedFiles.push(filename);
-    }),
-  })),
+  FFmpeg: vi.fn().mockImplementation(function () {
+    return {
+      load: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
+      writeFile: vi.fn(async (filename: string, data: Uint8Array) => {
+        capture.writes.push({ filename, data: new Uint8Array(data) });
+      }),
+      readFile: vi.fn().mockResolvedValue(new Uint8Array([0, 0, 0, 0])),
+      exec: vi.fn(async (args: string[]) => {
+        capture.execArgs.push([...args]);
+        return capture.execReturnValue;
+      }),
+      deleteFile: vi.fn(async (filename: string) => {
+        capture.deletedFiles.push(filename);
+      }),
+    };
+  }),
 }));
 
 Object.defineProperty(global, "window", {

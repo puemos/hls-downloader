@@ -21,6 +21,7 @@
 ---
 
 ## 📖 Table of Contents
+
 - [Features](#-features)
 - [Get It](#-get-it)
 - [Installation](#️-installation)
@@ -32,28 +33,28 @@
 
 ## ✨ Features
 
-* **Automatic stream discovery**
+- **Automatic stream discovery**
   Detects HLS playlists on the page the moment you open it. No DevTools sniffing required.
-* **Fine-grained quality control**
-  Pick any combination of video resolution (240p → 4K) and audio language/bit-rate *before* you download, so you never waste bandwidth on the wrong track.
-* **100% local merge with `ffmpeg.wasm`**
+- **Fine-grained quality control**
+  Pick any combination of video resolution (240p → 4K) and audio language/bit-rate _before_ you download, so you never waste bandwidth on the wrong track.
+- **100% local merge with `ffmpeg.wasm`**
   A WebAssembly build of FFmpeg runs right inside your tab, muxing the chosen audio + video into a single MP4.
   * Nothing is uploaded, keeping your files private.
-* **Works everywhere you browse**  
+- **Works everywhere you browse**
   Verified on Firefox, Edge, Chrome, Brave, Arc, and other Chromium-based browsers, on Windows, macOS, and Linux.
 
 ---
 
 ## 📦 Get It
 
-| Browser | Download / availability |
-| :-- | :-- |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" height="14" alt="Google Chrome logo" />&nbsp;&nbsp;Google Chrome | Experimental MV3 build available from source (see Development section). |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" height="14" alt="Firefox logo" />&nbsp;&nbsp;Firefox | [Get it on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/) or [use manual installation](#-firefox)|
-| <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" height="14" alt="Microsoft Edge logo" />&nbsp;&nbsp;Microsoft Edge | [Get it from Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc) |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Brave_lion_icon.svg" height="14" alt="Brave logo" />&nbsp;&nbsp;Brave | [Use manual installation](#-brave) |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/Arc_%28browser%29_logo.svg" height="14" alt="Arc logo" />&nbsp;&nbsp;Arc | [Use manual installation](#-arc) |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg" height="14" alt="Opera logo" />&nbsp;&nbsp;Opera | [Use manual installation](#-opera) |
+| Browser                                                                                                                                                                    | Download / availability                                                                                                             |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" height="14" alt="Google Chrome logo" />&nbsp;&nbsp;Google Chrome | Experimental MV3 build available from source (see Development section).                                                             |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" height="14" alt="Firefox logo" />&nbsp;&nbsp;Firefox                               | [Get it on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/hls-downloader/) or [use manual installation](#-firefox) |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" height="14" alt="Microsoft Edge logo" />&nbsp;&nbsp;Microsoft Edge       | [Get it from Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/hls-downloader/ldehhnlpcedapncohebgmghanffggffc)       |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Brave_lion_icon.svg" height="14" alt="Brave logo" />&nbsp;&nbsp;Brave                                        | [Use manual installation](#-brave)                                                                                                  |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/Arc_%28browser%29_logo.svg" height="14" alt="Arc logo" />&nbsp;&nbsp;Arc                                     | [Use manual installation](#-arc)                                                                                                    |
+| <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg" height="14" alt="Opera logo" />&nbsp;&nbsp;Opera                                        | [Use manual installation](#-opera)                                                                                                  |
 
 <sup>*For Brave/Arc/etc. download the ZIP from the [latest release](https://github.com/puemos/hls-downloader/releases) and follow the manual-install steps below.</sup>
 
@@ -67,42 +68,47 @@
 <details>
 <summary>Manual install for versions &lt; 4.1.2 (CRX)</summary>
 
-1. Grab `hls-downloader.crx` from the corresponding legacy release.  
-2. Open `chrome://extensions/`, enable **Developer mode**.  
-3. Drag and drop the CRX onto the extensions page.  
+1. Grab `hls-downloader.crx` from the corresponding legacy release.
+2. Open `chrome://extensions/`, enable **Developer mode**.
+3. Drag and drop the CRX onto the extensions page.
 4. Confirm any prompts.
 
 </details>
 
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" height="14" alt="Google Chrome logo" /> Chrome
-1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).  
-2. Extract the ZIP to a convenient folder.  
-3. Open `chrome://extensions/` and enable **Developer mode**.  
-4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).  
+
+1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).
+2. Extract the ZIP to a convenient folder.
+3. Open `chrome://extensions/` and enable **Developer mode**.
+4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).
 5. Enjoy 🎉
 
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Brave_lion_icon.svg" height="14" alt="Brave logo" /> Brave
-1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).  
-2. Extract the ZIP to a convenient folder.  
-3. Open `brave://extensions/` and enable **Developer mode**.  
-4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).  
+
+1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).
+2. Extract the ZIP to a convenient folder.
+3. Open `brave://extensions/` and enable **Developer mode**.
+4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).
 5. Enjoy 🎉
 
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/Arc_%28browser%29_logo.svg" height="14" alt="Arc logo" /> Arc
-1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).  
-2. Extract the ZIP to a convenient folder.  
-3. Open **Arc Menu → Extensions → Manage Extensions** (or press **Command+T** or **Ctrl+T** and type **Manage Extensions**), then enable **Developer mode**.  
-4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).  
+
+1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).
+2. Extract the ZIP to a convenient folder.
+3. Open **Arc Menu → Extensions → Manage Extensions** (or press **Command+T** or **Ctrl+T** and type **Manage Extensions**), then enable **Developer mode**.
+4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).
 5. Enjoy 🎉
 
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg" height="14" alt="Opera logo" /> Opera
-1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).  
-2. Extract the ZIP to a convenient folder.  
-3. Open `opera://extensions/` and enable **Developer mode**.  
-4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).  
+
+1. Download `extension-mv3-chrome.zip` from the [latest release](https://github.com/puemos/hls-downloader/releases).
+2. Extract the ZIP to a convenient folder.
+3. Open `opera://extensions/` and enable **Developer mode**.
+4. Click **Load unpacked** and select the **extracted folder** (the one that contains `manifest.json`).
 5. Enjoy 🎉
 
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" height="14" alt="Firefox logo" /> Firefox
+
 1. Opem `about:debugging#/runtime/this-firefox`.
 2. Click **Load Temporary Add-on...** and pick the XPI.
 
@@ -172,6 +178,23 @@ pnpm test          # unit tests
 pnpm test:coverage # combined coverage + badge
 ```
 
+Run the local browser e2e smoke test:
+
+```bash
+pnpm test:e2e:local
+```
+
+This builds the MV3 extension, launches Brave on macOS with the unpacked
+extension, opens a real online HLS stream with audio/video/WebVTT subtitles,
+verifies Sniffer, preview, playlist selection, download, and saved `.mkv`
+or equivalent media-container output, then removes generated extension
+artifacts. The downloaded media file stays in a temp directory and the script
+prints its path so you can review it manually. It is intentionally not part of
+CI and skips when `CI=true`. Set `E2E_BROWSER=/path/to/Brave Browser` for a
+custom Brave binary path, `E2E_HLS_URL=https://.../playlist.m3u8` to override
+the stream, or `E2E_CLEAN_DOWNLOAD=1` to delete the downloaded file after the
+run.
+
 ### Live Development
 
 ```bash
@@ -218,9 +241,11 @@ This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md).
 HLS Downloader is available in multiple build variants to accommodate different distribution requirements:
 
 ### Store Builds (Firefox Add-ons / Edge Add-ons)
+
 Official store releases include a blocklist that respects copyright holder opt-out requests. This version complies with distribution platform policies and content owner preferences.
 
-### Independent Builds  
+### Independent Builds
+
 Alternative builds are available for advanced users who prefer complete local control. These "experimental" variants contain no blocklist and allow unrestricted operation:
 
 ```bash
@@ -252,10 +277,10 @@ If you do not wish this tool to operate on your website, you may submit an opt-o
 
 ### How to Submit an Opt-Out Request
 
-1. Create a new **[Issue](https://github.com/puemos/hls-downloader/issues/new?template=opt-out-request.yml)** using the "Opt-Out Request" template  
-2. Use the title format: `[Opt-Out Request] YourDomain.com`  
+1. Create a new **[Issue](https://github.com/puemos/hls-downloader/issues/new?template=opt-out-request.yml)** using the "Opt-Out Request" template
+2. Use the title format: `[Opt-Out Request] YourDomain.com`
 3. Provide the following information for verification:
-   - **Website Domain** (e.g., `example.com`)  
+   - **Website Domain** (e.g., `example.com`)
    - **Contact Email** (for identity verification if necessary)
 
 We commit to honoring legitimate requests and will include verified domains in the blocklist for store-distributed versions. Please note that as an open-source project, update cycles may vary. Thank you for your understanding and cooperation.
