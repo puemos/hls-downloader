@@ -16,15 +16,14 @@
     "test:coverage": "vitest run --coverage --coverage.reporter=json-summary"
   },
   "devDependencies": {
-    "@types/node": "20.19.0",
-    "@types/redux-logger": "3.0.9",
-    "path": "0.12.7",
-    "prettier": "2.8.7",
-    "typescript": "5.0.4",
-    "vitest": "3.2.4"
+    "@types/node": "26.0.1",
+    "@types/redux-logger": "3.0.13",
+    "prettier": "3.9.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.9"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "1.9.3",
+    "@reduxjs/toolkit": "1.9.7",
     "redux": "4.2.1",
     "redux-logger": "3.0.6",
     "redux-observable": "2.0.0",

@@ -1,11 +1,13 @@
 import { createStore } from "@hls-downloader/core/lib/store/configure-store";
-import { wrapStore } from "webext-redux";
+import { createWrapStore } from "webext-redux";
 import { subscribeListeners } from "./listeners";
 import { getState, saveState } from "./persistState";
 import { CryptoDecryptor } from "./services/crypto-decryptor";
 import { FetchLoader } from "./services/fetch-loader";
 import { IndexedDBFS } from "./services/indexedb-fs";
 import { M3u8Parser } from "./services/m3u8-parser";
+
+const wrapStore = createWrapStore();
 
 (async () => {
   const state = await getState();
@@ -16,7 +18,7 @@ import { M3u8Parser } from "./services/m3u8-parser";
       loader: FetchLoader,
       parser: M3u8Parser,
     },
-    state
+    state,
   );
 
   wrapStore(store);
