@@ -7,3 +7,4 @@ export * from "./playlist-status";
 export * from "./job";
 export * from "./job-status";
 export * from "./inspection";
+export * from "./output-container";

@@ -184,6 +184,22 @@ describe("Mux Pipeline Integration", () => {
     await IndexedDBFS.deleteBucket(id);
   });
 
+  it("uses requested mkv output without subtitles", async () => {
+    const id = "mkv-output-test";
+    await IndexedDBFS.createBucket(id, 1, 1);
+    const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
+
+    await bucket.write(0, videoOnly.buffer);
+    await bucket.write(1, audioOnly.buffer);
+
+    await bucket.getLink(undefined, { container: "mkv" });
+
+    const args = mock.getExecArgs()[0];
+    expect(args).toContain("output.mkv");
+
+    await IndexedDBFS.deleteBucket(id);
+  });
+
   it("muxed with extra stream: maps 0:v and 0:a?, not bare 0", async () => {
     const id = "data-stream-test";
     await IndexedDBFS.createBucket(id, 1, 0);

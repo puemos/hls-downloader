@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import SettingsView from "./SettingsView";
+import type { StorageState } from "@hls-downloader/core/lib/store/slices/storage-slice";
 
 const meta: Meta<typeof SettingsView> = {
   title: "popup/views/SettingsView",
@@ -8,6 +9,15 @@ const meta: Meta<typeof SettingsView> = {
 
 export default meta;
 type Story = StoryObj<typeof SettingsView>;
+
+const storage: StorageState = {
+  loading: false,
+  buckets: {},
+  totalUsedBytes: 0,
+  estimateSource: "unknown",
+  nearQuota: false,
+  cleanupStatus: "idle",
+};
 
 export const Default: Story = {
   render: () => (
@@ -18,6 +28,7 @@ export const Default: Story = {
       fetchAttempts={5}
       saveDialog={true}
       autoDeleteAfterSave={false}
+      outputContainer="mp4"
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
       onActiveDownloadsIncrease={() => {}}
@@ -27,8 +38,12 @@ export const Default: Story = {
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
       onAutoDeleteAfterSaveToggle={() => {}}
+      onSetOutputContainer={() => {}}
       preferredAudioLanguage={"eng"}
       onSetPreferredAudioLanguage={() => {}}
+      storage={storage}
+      onCleanupStorage={() => {}}
+      onRefreshStorage={() => {}}
     />
   ),
 };
@@ -42,6 +57,7 @@ export const Minimal: Story = {
       fetchAttempts={1}
       saveDialog={false}
       autoDeleteAfterSave={true}
+      outputContainer="mkv"
       onConcurrencyIncrease={() => {}}
       onConcurrencyDecrease={() => {}}
       onActiveDownloadsIncrease={() => {}}
@@ -51,8 +67,12 @@ export const Minimal: Story = {
       onFetchAttemptsDecrease={() => {}}
       onSaveDialogToggle={() => {}}
       onAutoDeleteAfterSaveToggle={() => {}}
+      onSetOutputContainer={() => {}}
       preferredAudioLanguage={null}
       onSetPreferredAudioLanguage={() => {}}
+      storage={storage}
+      onCleanupStorage={() => {}}
+      onRefreshStorage={() => {}}
     />
   ),
 };
