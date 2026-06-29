@@ -43,6 +43,10 @@ function isMp4Container(
   return container ? container === "mp4" : isMp4ContainerFile(fileName);
 }
 
+function getMimeForOutputFile(fileName: string): string {
+  return /\.mkv$/i.test(fileName) ? "video/x-matroska" : "video/mp4";
+}
+
 export async function writeMediaToFFmpegFS(
   ffmpeg: FFmpeg,
   filename: string,
@@ -147,7 +151,7 @@ export async function muxExec({
       throw new Error(`FFmpeg exited with code ${exitCode}`);
     }
     const data = await ffmpeg.readFile(outputFileName);
-    const mime = includeSubtitles ? "video/x-matroska" : "video/mp4";
+    const mime = getMimeForOutputFile(outputFileName);
     return { blob: new Blob([data], { type: mime }), mime };
   } finally {
     const cleanupFiles = [

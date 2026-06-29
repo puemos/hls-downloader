@@ -18,6 +18,9 @@ export const saveAsJobEpic: Epic<
     mergeMap((jobId) => {
       const job = store$.value.jobs.jobs[jobId]!;
       const dialog = store$.value.config.saveDialog;
+      const container =
+        job.outputContainer ??
+        (job.filename.toLowerCase().endsWith(".mkv") ? "mkv" : "mp4");
 
       const ensureSubtitle$ =
         job?.subtitleText !== undefined && job.subtitleText !== null
@@ -42,12 +45,15 @@ export const saveAsJobEpic: Epic<
       return ensureSubtitle$.pipe(
         mergeMap(() =>
           from(
-            getLinkBucketFactory(fs)(jobId, (progress, message) =>
-              jobsSlice.actions.setSaveProgress({
-                jobId,
-                progress,
-                message,
-              })
+            getLinkBucketFactory(fs)(
+              jobId,
+              (progress, message) =>
+                jobsSlice.actions.setSaveProgress({
+                  jobId,
+                  progress,
+                  message,
+                }),
+              { container }
             )
           )
         ),

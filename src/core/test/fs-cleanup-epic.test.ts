@@ -10,6 +10,8 @@ describe("fsCleanupOnInitEpic", () => {
       getBucket: vi.fn(),
       createBucket: vi.fn(),
       deleteBucket: vi.fn(),
+      setSubtitleText: vi.fn(),
+      getSubtitleText: vi.fn(),
       saveAs: vi.fn(),
       getStorageStats: vi.fn(),
     };

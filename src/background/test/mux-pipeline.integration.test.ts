@@ -43,21 +43,23 @@ vi.mock("webextension-polyfill", () => {
 });
 
 vi.mock("@ffmpeg/ffmpeg", () => ({
-  FFmpeg: vi.fn().mockImplementation(() => ({
-    load: vi.fn().mockResolvedValue(undefined),
-    on: vi.fn(),
-    writeFile: vi.fn(async (filename: string, data: Uint8Array) => {
-      capture.writes.push({ filename, data: new Uint8Array(data) });
-    }),
-    readFile: vi.fn().mockResolvedValue(new Uint8Array([0, 0, 0, 0])),
-    exec: vi.fn(async (args: string[]) => {
-      capture.execArgs.push([...args]);
-      return capture.execReturnValue;
-    }),
-    deleteFile: vi.fn(async (filename: string) => {
-      capture.deletedFiles.push(filename);
-    }),
-  })),
+  FFmpeg: vi.fn().mockImplementation(function () {
+    return {
+      load: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
+      writeFile: vi.fn(async (filename: string, data: Uint8Array) => {
+        capture.writes.push({ filename, data: new Uint8Array(data) });
+      }),
+      readFile: vi.fn().mockResolvedValue(new Uint8Array([0, 0, 0, 0])),
+      exec: vi.fn(async (args: string[]) => {
+        capture.execArgs.push([...args]);
+        return capture.execReturnValue;
+      }),
+      deleteFile: vi.fn(async (filename: string) => {
+        capture.deletedFiles.push(filename);
+      }),
+    };
+  }),
 }));
 
 Object.defineProperty(global, "window", {
@@ -184,6 +186,22 @@ describe("Mux Pipeline Integration", () => {
     expect(args).toContain("1:a:0?");
     expect(args).toContain("-bsf:a");
     expect(args).toContain("aac_adtstoasc");
+
+    await IndexedDBFS.deleteBucket(id);
+  });
+
+  it("uses requested mkv output without subtitles", async () => {
+    const id = "mkv-output-test";
+    await IndexedDBFS.createBucket(id, 1, 1);
+    const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
+
+    await bucket.write(0, videoOnly.buffer);
+    await bucket.write(1, audioOnly.buffer);
+
+    await bucket.getLink(undefined, { container: "mkv" });
+
+    const args = mock.getExecArgs()[0];
+    expect(args).toContain("output.mkv");
 
     await IndexedDBFS.deleteBucket(id);
   });

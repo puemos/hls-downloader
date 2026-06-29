@@ -100,5 +100,23 @@ describe("persistState", () => {
       expect(result).not.toHaveProperty("downloads");
       expect(result).not.toHaveProperty("ui");
     });
+
+    it("defaults output container to mp4 for older persisted config", async () => {
+      mockGet.mockResolvedValue({ state: { config: {} } });
+
+      const result = await getState();
+
+      expect(result?.config?.outputContainer).toBe("mp4");
+    });
+
+    it("preserves persisted mkv output container", async () => {
+      mockGet.mockResolvedValue({
+        state: { config: { outputContainer: "mkv" } },
+      });
+
+      const result = await getState();
+
+      expect(result?.config?.outputContainer).toBe("mkv");
+    });
   });
 });

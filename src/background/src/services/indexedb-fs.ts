@@ -6,10 +6,11 @@ import {
   IDBPCursorWithValue,
 } from "idb";
 
-import {
+import type {
   Bucket,
   IFS,
   StorageSnapshot,
+  GetLinkOptions,
 } from "@hls-downloader/core/lib/services";
 import browser from "webextension-polyfill";
 import filenamify from "filenamify";
@@ -42,6 +43,8 @@ type FFmpegInput = {
   container: MediaContainer;
   cleanupFileNames: string[];
 };
+
+type OutputContainer = NonNullable<GetLinkOptions["container"]>;
 
 let bucketMetaCache: Record<string, BucketMeta> | null = null;
 
@@ -388,9 +391,11 @@ export class IndexedDBBucket implements Bucket {
   }
 
   async getLink(
-    onProgress?: (progress: number, message: string) => void
+    onProgress?: (progress: number, message: string) => void,
+    options: GetLinkOptions = {}
   ): Promise<string> {
     await this.ensureDb();
+    const container = options.container ?? "mp4";
 
     if (shouldUseOffscreen()) {
       return await requestObjectUrlOffscreen(
@@ -398,14 +403,15 @@ export class IndexedDBBucket implements Bucket {
           bucketId: this.id,
           videoLength: this.videoLength,
           audioLength: this.audioLength,
+          container,
         },
         onProgress
       );
     }
 
     try {
-      const mp4Blob = await this.streamToMp4Blob(onProgress);
-      const url = URL.createObjectURL(mp4Blob);
+      const mediaBlob = await this.streamToMediaBlob(container, onProgress);
+      const url = URL.createObjectURL(mediaBlob);
       return url;
     } catch (error) {
       console.error("getLink failed:", error);
@@ -414,7 +420,8 @@ export class IndexedDBBucket implements Bucket {
     }
   }
 
-  private async streamToMp4Blob(
+  private async streamToMediaBlob(
+    container: OutputContainer,
     onProgress?: (progress: number, message: string) => void
   ) {
     await this.ensureDb();
@@ -423,8 +430,9 @@ export class IndexedDBBucket implements Bucket {
 
     const subtitle = await getSubtitleText(this.id);
     const includeSubtitles = subtitle !== undefined;
+    const outputContainer = includeSubtitles ? "mkv" : container;
     // write somewhere predictable (avoid path/punctuation issues)
-    const outputFileName = includeSubtitles ? "output.mkv" : "output.mp4";
+    const outputFileName = `output.${outputContainer}`;
 
     const hasVideo = this.videoLength > 0;
     const hasAudio = this.audioLength > 0;
@@ -767,6 +775,7 @@ async function requestObjectUrlOffscreen(
     bucketId: string;
     videoLength: number;
     audioLength: number;
+    container: OutputContainer;
   },
   onProgress?: (progress: number, message: string) => void
 ) {
@@ -796,6 +805,7 @@ async function requestObjectUrlOffscreen(
         bucketId: payload.bucketId,
         videoLength: payload.videoLength,
         audioLength: payload.audioLength,
+        container: payload.container,
         requestId,
       },
       (response: { ok: boolean; url?: string; message?: string }) => {

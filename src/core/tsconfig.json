@@ -3,9 +3,10 @@
     "target": "es2022",
     "module": "ES2022",
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "declaration": true,
     "strict": true,
-    "lib": ["es2015", "dom"],
+    "lib": ["es2022", "dom"],
     "outDir": "lib",
     "rootDir": "src"
   },

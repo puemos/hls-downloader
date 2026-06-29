@@ -1,4 +1,5 @@
 import { Fragment } from "./fragment";
+import type { OutputContainer } from "./output-container";
 
 export class Job {
   constructor(
@@ -14,6 +15,7 @@ export class Job {
     readonly link?: string,
     readonly subtitleText?: string,
     readonly subtitleLanguage?: string,
-    readonly subtitleName?: string
+    readonly subtitleName?: string,
+    readonly outputContainer?: OutputContainer
   ) {}
 }

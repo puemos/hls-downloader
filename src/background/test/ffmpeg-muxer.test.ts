@@ -195,6 +195,17 @@ describe("muxExec", () => {
     expect(result.mime).toBe("video/x-matroska");
   });
 
+  it("returns video/x-matroska MIME for mkv output without subtitles", async () => {
+    const result = await muxExec({
+      ffmpeg,
+      outputFileName: "output.mkv",
+      hasVideo: true,
+      hasAudio: false,
+    });
+
+    expect(result.mime).toBe("video/x-matroska");
+  });
+
   it("cleanup: deleteFile called for all written files", async () => {
     await muxExec({
       ffmpeg,

@@ -10,6 +10,7 @@ import {
   createMockState,
   createMockLoader,
   createMockParser,
+  createMockFS,
   toObservable,
 } from "./test-utils";
 
@@ -17,11 +18,13 @@ describe("addDownloadJobEpic", () => {
   // Setup test fixtures
   let videoLevel;
   let audioLevel;
+  let subtitleLevel;
   let playlist;
   let videoFragment;
   let audioFragment;
   let mockLoader;
   let mockParser;
+  let mockFS;
   let mockState;
 
   beforeEach(() => {
@@ -42,6 +45,13 @@ describe("addDownloadJobEpic", () => {
       type: "audio",
     });
 
+    subtitleLevel = createTestLevel({
+      id: "s",
+      playlistID: "p",
+      uri: "subtitle",
+      type: "subtitle",
+    });
+
     playlist = createTestPlaylist({
       id: "p",
       uri: "http://example.com/master.m3u8",
@@ -54,6 +64,7 @@ describe("addDownloadJobEpic", () => {
     // Create mock services
     mockLoader = createMockLoader();
     mockParser = createMockParser();
+    mockFS = createMockFS();
 
     // Configure mock parser to return different fragments based on URI
     mockParser.parseLevelPlaylist = vi
@@ -64,7 +75,7 @@ describe("addDownloadJobEpic", () => {
 
     // Create mock state
     mockState = createMockState({
-      levels: { v: videoLevel, a: audioLevel },
+      levels: { v: videoLevel, a: audioLevel, s: subtitleLevel },
       playlists: { p: playlist },
       fetchAttempts: 1,
     });
@@ -90,6 +101,7 @@ describe("addDownloadJobEpic", () => {
     const { job } = (result as any).payload;
     expect(job).toMatchObject({
       filename: "page-master.mp4",
+      outputContainer: "mp4",
       videoFragments: [videoFragment],
       audioFragments: [audioFragment],
       bitrate: 1000,
@@ -166,6 +178,42 @@ describe("addDownloadJobEpic", () => {
     expect((result as any).payload.job.filename).toBe(
       "My Custom Title-master.mp4"
     );
+  });
+
+  it("uses configured mkv output for new download jobs", async () => {
+    mockState.config.outputContainer = "mkv";
+    const action$ = toObservable(
+      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
+    );
+    const deps = { loader: mockLoader, parser: mockParser };
+
+    const result = await firstValueFrom(
+      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
+    );
+
+    expect(result.type).toBe(jobsSlice.actions.add.type);
+    expect((result as any).payload.job).toMatchObject({
+      filename: "page-master.mkv",
+      outputContainer: "mkv",
+    });
+  });
+
+  it("forces mkv output when subtitles are selected", async () => {
+    mockState.config.outputContainer = "mp4";
+    const action$ = toObservable(
+      levelsSlice.actions.download({ levelID: "v", subtitleLevelID: "s" })
+    );
+    const deps = { loader: mockLoader, parser: mockParser, fs: mockFS };
+
+    const result = await firstValueFrom(
+      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
+    );
+
+    expect(result.type).toBe(jobsSlice.actions.add.type);
+    expect((result as any).payload.job).toMatchObject({
+      filename: "page-master.mkv",
+      outputContainer: "mkv",
+    });
   });
 
   it("handles errors when fetching fragments", async () => {

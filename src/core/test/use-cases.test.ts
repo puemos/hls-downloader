@@ -35,6 +35,8 @@ const createFsMock = () => {
     createBucket: vi.fn().mockResolvedValue(undefined),
     deleteBucket: vi.fn().mockResolvedValue(undefined),
     getBucket: vi.fn().mockResolvedValue(bucket),
+    setSubtitleText: vi.fn().mockResolvedValue(undefined),
+    getSubtitleText: vi.fn().mockResolvedValue(undefined),
     saveAs: vi.fn().mockResolvedValue(undefined),
     getStorageStats: vi.fn().mockResolvedValue({
       buckets: [],
@@ -84,6 +86,19 @@ describe("use-cases", () => {
     expect(link).toBe("link");
   });
 
+  it("passes output options when getting a link from bucket", async () => {
+    const { fs, bucket } = createFsMock();
+    const onProgress = vi.fn();
+    const link = await getLinkBucketFactory(fs)("id", onProgress, {
+      container: "mkv",
+    });
+
+    expect(bucket.getLink).toHaveBeenCalledWith(onProgress, {
+      container: "mkv",
+    });
+    expect(link).toBe("link");
+  });
+
   it("generates file name with page title", () => {
     const playlist = new Playlist(
       "1",
@@ -94,6 +109,18 @@ describe("use-cases", () => {
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
     expect(run(playlist, level)).toBe("page-c.mp4");
+  });
+
+  it("generates mkv file name when requested", () => {
+    const playlist = new Playlist(
+      "1",
+      "https://a/b/c.m3u8",
+      Date.now(),
+      "page"
+    );
+    const level = new Level("stream", "l", "1", "uri");
+    const run = generateFileName();
+    expect(run(playlist, level, { container: "mkv" })).toBe("page-c.mkv");
   });
 
   it("sanitizes illegal characters in page title", () => {

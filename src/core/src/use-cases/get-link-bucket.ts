@@ -1,12 +1,13 @@
-import { IFS } from "../services";
+import type { GetLinkOptions, IFS } from "../services";
 
 export const getLinkBucketFactory = (fs: IFS) => {
   const run = async (
     bucketID: string,
-    onProgress?: (progress: number, message: string) => void
+    onProgress?: (progress: number, message: string) => void,
+    options?: GetLinkOptions
   ): Promise<string> => {
     const bucket = await fs.getBucket(bucketID);
-    return await bucket.getLink(onProgress);
+    return await bucket.getLink(onProgress, options);
   };
   return run;
 };
