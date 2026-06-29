@@ -16,11 +16,15 @@ export type MuxExecRequest = {
   hasAudio: boolean;
   videoFileName?: string;
   audioFileName?: string;
+  videoContainer?: MediaContainer;
+  audioContainer?: MediaContainer;
+  cleanupFileNames?: string[];
   subtitleText?: string;
   subtitleLanguage?: string;
 };
 
 export type MuxResult = { blob: Blob; mime: string };
+export type MediaContainer = "mp4" | "mpegts";
 
 export function detectFmp4(data: Uint8Array): boolean {
   if (data.length < 8) return false;
@@ -30,6 +34,13 @@ export function detectFmp4(data: Uint8Array): boolean {
 
 function isMp4ContainerFile(fileName: string): boolean {
   return /\.(m4a|m4v|mp4)$/i.test(fileName);
+}
+
+function isMp4Container(
+  fileName: string,
+  container?: MediaContainer
+): boolean {
+  return container ? container === "mp4" : isMp4ContainerFile(fileName);
 }
 
 function getMimeForOutputFile(fileName: string): string {
@@ -64,6 +75,9 @@ export async function muxExec({
   hasAudio,
   videoFileName = "video.ts",
   audioFileName = "audio.ts",
+  videoContainer,
+  audioContainer,
+  cleanupFileNames = [],
   subtitleText,
   subtitleLanguage,
 }: MuxExecRequest): Promise<MuxResult> {
@@ -75,7 +89,8 @@ export async function muxExec({
 
   await writeSubtitles(ffmpeg, subtitleText);
 
-  const audioNeedsAdtsToAsc = hasAudio && !isMp4ContainerFile(audioFileName);
+  const audioNeedsAdtsToAsc =
+    hasAudio && !isMp4Container(audioFileName, audioContainer);
 
   const args: string[] = ["-y"];
 
@@ -90,7 +105,7 @@ export async function muxExec({
   }
 
   if (hasVideo && hasAudio) {
-    args.push("-map", "0:v:0", "-map", "1:a:0");
+    args.push("-map", "0:v:0", "-map", "1:a:0?");
     if (includeSubtitles) {
       args.push("-map", "2:s:0");
     }
@@ -144,6 +159,7 @@ export async function muxExec({
       hasAudio ? audioFileName : null,
       includeSubtitles ? "subtitles.vtt" : null,
       outputFileName,
+      ...cleanupFileNames,
     ].filter((fileName): fileName is string => fileName !== null);
 
     for (const fileName of cleanupFiles) {
@@ -183,6 +199,8 @@ export async function muxStreams({
     hasAudio: Boolean(audioData),
     videoFileName,
     audioFileName,
+    videoContainer: videoFileName.endsWith(".mp4") ? "mp4" : "mpegts",
+    audioContainer: audioFileName.endsWith(".mp4") ? "mp4" : "mpegts",
     subtitleText,
     subtitleLanguage,
   });

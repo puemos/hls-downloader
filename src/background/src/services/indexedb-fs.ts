@@ -15,7 +15,12 @@ import type {
 import browser from "webextension-polyfill";
 import filenamify from "filenamify";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { writeMediaToFFmpegFS, muxExec, detectFmp4 } from "./ffmpeg-muxer";
+import {
+  writeMediaToFFmpegFS,
+  muxExec,
+  detectFmp4,
+  type MediaContainer,
+} from "./ffmpeg-muxer";
 
 const buckets: Record<string, IndexedDBBucket> = {};
 const chromeApi = (globalThis as any).chrome;
@@ -31,6 +36,12 @@ type BucketMeta = {
   bytesWritten?: number;
   storedChunks?: number;
   updatedAt?: number;
+};
+
+type FFmpegInput = {
+  fileName: string;
+  container: MediaContainer;
+  cleanupFileNames: string[];
 };
 
 type OutputContainer = NonNullable<GetLinkOptions["container"]>;
@@ -426,34 +437,28 @@ export class IndexedDBBucket implements Bucket {
     const hasVideo = this.videoLength > 0;
     const hasAudio = this.audioLength > 0;
 
-    let videoFileName = "video.ts";
-    let audioFileName = "audio.ts";
+    let videoInput: FFmpegInput | undefined;
+    let audioInput: FFmpegInput | undefined;
 
     try {
       // Phase 1: Load video, write to FFmpeg FS, release
       if (hasVideo) {
-        const videoData = await this.concatenateChunksToUint8Array(
+        videoInput = await this.writeChunksToFFmpegInput(
+          ffmpeg,
+          "video",
           0,
           this.videoLength
         );
-        if (detectFmp4(videoData)) {
-          videoFileName = "video.mp4";
-        }
-        await writeMediaToFFmpegFS(ffmpeg, videoFileName, videoData);
-        // videoData is block-scoped -- eligible for GC
       }
 
       // Phase 2: Load audio, write to FFmpeg FS, release
       if (hasAudio) {
-        const audioData = await this.concatenateChunksToUint8Array(
+        audioInput = await this.writeChunksToFFmpegInput(
+          ffmpeg,
+          "audio",
           this.videoLength,
           this.audioLength
         );
-        if (detectFmp4(audioData)) {
-          audioFileName = "audio.mp4";
-        }
-        await writeMediaToFFmpegFS(ffmpeg, audioFileName, audioData);
-        // audioData is block-scoped -- eligible for GC
       }
 
       // Phase 3: Exec (no large data in JS heap)
@@ -462,8 +467,14 @@ export class IndexedDBBucket implements Bucket {
         outputFileName,
         hasVideo,
         hasAudio,
-        videoFileName,
-        audioFileName,
+        videoFileName: videoInput?.fileName,
+        audioFileName: audioInput?.fileName,
+        videoContainer: videoInput?.container,
+        audioContainer: audioInput?.container,
+        cleanupFileNames: [
+          ...(videoInput?.cleanupFileNames ?? []),
+          ...(audioInput?.cleanupFileNames ?? []),
+        ],
         subtitleText: subtitle?.text,
         subtitleLanguage: subtitle?.language,
       });
@@ -492,45 +503,56 @@ export class IndexedDBBucket implements Bucket {
     }
   }
 
-  // Helper function to concatenate chunks using streams
-  private async concatenateChunks(
+  private async writeChunksToFFmpegInput(
+    ffmpeg: FFmpeg,
+    prefix: "video" | "audio",
     startIndex: number,
     length: number
-  ): Promise<Blob> {
-    const chunks: Uint8Array[] = [];
+  ): Promise<FFmpegInput> {
+    const chunkFiles: string[] = [];
+    let container: MediaContainer | undefined;
 
     for (let i = 0; i < length; i++) {
       const chunk = await this.readChunkByIndex(startIndex + i);
-      if (chunk) {
-        chunks.push(chunk);
+      if (!chunk) {
+        continue;
       }
-    }
 
-    return new Blob(chunks);
-  }
-
-  private async concatenateChunksToUint8Array(
-    startIndex: number,
-    length: number
-  ): Promise<Uint8Array> {
-    const chunks: Uint8Array[] = [];
-    let totalSize = 0;
-
-    for (let i = 0; i < length; i++) {
-      const chunk = await this.readChunkByIndex(startIndex + i);
-      if (chunk) {
-        chunks.push(chunk);
-        totalSize += chunk.byteLength;
+      if (!container) {
+        container = detectFmp4(chunk) ? "mp4" : "mpegts";
       }
+
+      const extension = container === "mp4" ? "mp4" : "ts";
+      const fileName =
+        length === 1
+          ? `${prefix}.${extension}`
+          : `${prefix}-${String(i).padStart(6, "0")}.${extension}`;
+
+      await writeMediaToFFmpegFS(ffmpeg, fileName, chunk);
+      chunkFiles.push(fileName);
     }
 
-    const result = new Uint8Array(totalSize);
-    let offset = 0;
-    for (const chunk of chunks) {
-      result.set(chunk, offset);
-      offset += chunk.byteLength;
+    if (!container || chunkFiles.length === 0) {
+      throw new Error(`No ${prefix} chunks available for muxing`);
     }
-    return result;
+
+    if (chunkFiles.length === 1) {
+      return {
+        fileName: chunkFiles[0],
+        container,
+        cleanupFileNames: [],
+      };
+    }
+
+    const listFileName = `${prefix}.concat.txt`;
+    const listText = `${chunkFiles.join("\n")}\n`;
+    await ffmpeg.writeFile(listFileName, new TextEncoder().encode(listText));
+
+    return {
+      fileName: `concatf:${listFileName}`,
+      container,
+      cleanupFileNames: [listFileName, ...chunkFiles],
+    };
   }
 }
 

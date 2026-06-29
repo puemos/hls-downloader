@@ -90,6 +90,15 @@ function loadFixture(name: string): Uint8Array {
 
 const TS_SYNC_BYTE = 0x47;
 
+function writesMatching(pattern: RegExp) {
+  return mock.getWrites().filter((write) => pattern.test(write.filename));
+}
+
+function decodedWrite(name: string) {
+  const write = mock.getWriteByFilename(name);
+  return write ? new TextDecoder().decode(write.data) : undefined;
+}
+
 // ── Tests ──
 
 describe("Mux Pipeline Integration", () => {
@@ -124,26 +133,21 @@ describe("Mux Pipeline Integration", () => {
 
     await bucket.getLink();
 
-    const videoWrite = mock.getVideoWrite();
-    expect(videoWrite).toBeDefined();
+    const videoWrites = writesMatching(/^video-\d{6}\.ts$/);
+    expect(videoWrites).toHaveLength(2);
 
-    // Concatenated data should equal both segments joined
-    const expectedSize = videoAudioMuxed.byteLength + videoAudioSeg2.byteLength;
-    expect(videoWrite!.data.byteLength).toBe(expectedSize);
+    expect(videoWrites[0].filename).toBe("video-000000.ts");
+    expect(videoWrites[0].data).toEqual(videoAudioMuxed);
+    expect(videoWrites[0].data[0]).toBe(TS_SYNC_BYTE);
 
-    // First byte of concatenated data must be TS sync byte
-    expect(videoWrite!.data[0]).toBe(TS_SYNC_BYTE);
+    expect(videoWrites[1].filename).toBe("video-000001.ts");
+    expect(videoWrites[1].data).toEqual(videoAudioSeg2);
+    expect(videoWrites[1].data[0]).toBe(TS_SYNC_BYTE);
 
-    // The second segment should start at the right offset
-    const seg2Start = videoAudioMuxed.byteLength;
-    expect(videoWrite!.data[seg2Start]).toBe(TS_SYNC_BYTE);
-
-    // Verify each segment's bytes match the original fixture exactly
-    const firstSegSlice = videoWrite!.data.slice(0, videoAudioMuxed.byteLength);
-    expect(firstSegSlice).toEqual(videoAudioMuxed);
-
-    const secondSegSlice = videoWrite!.data.slice(seg2Start);
-    expect(secondSegSlice).toEqual(videoAudioSeg2);
+    expect(decodedWrite("video.concat.txt")).toBe(
+      "video-000000.ts\nvideo-000001.ts\n"
+    );
+    expect(mock.getExecArgs()[0]).toContain("concatf:video.concat.txt");
 
     await IndexedDBFS.deleteBucket(id);
   });
@@ -179,7 +183,7 @@ describe("Mux Pipeline Integration", () => {
     // Check exec args map video and audio from separate inputs
     const args = mock.getExecArgs()[0];
     expect(args).toContain("0:v:0");
-    expect(args).toContain("1:a:0");
+    expect(args).toContain("1:a:0?");
     expect(args).toContain("-bsf:a");
     expect(args).toContain("aac_adtstoasc");
 
@@ -275,26 +279,19 @@ describe("Mux Pipeline Integration", () => {
 
     await bucket.getLink();
 
-    const videoWrite = mock.getVideoWrite();
-    expect(videoWrite).toBeDefined();
+    const videoWrites = writesMatching(/^video-\d{6}\.ts$/);
+    expect(videoWrites.map((write) => write.filename)).toEqual([
+      "video-000000.ts",
+      "video-000001.ts",
+      "video-000002.ts",
+    ]);
 
-    const expectedSize =
-      chunk0.byteLength + chunk1.byteLength + chunk2.byteLength;
-    expect(videoWrite!.data.byteLength).toBe(expectedSize);
-
-    // Verify ordering: chunk0 comes first, then chunk1, then chunk2
-    const slice0 = videoWrite!.data.slice(0, chunk0.byteLength);
-    const slice1 = videoWrite!.data.slice(
-      chunk0.byteLength,
-      chunk0.byteLength + chunk1.byteLength
+    expect(videoWrites[0].data).toEqual(chunk0);
+    expect(videoWrites[1].data).toEqual(chunk1);
+    expect(videoWrites[2].data).toEqual(chunk2);
+    expect(decodedWrite("video.concat.txt")).toBe(
+      "video-000000.ts\nvideo-000001.ts\nvideo-000002.ts\n"
     );
-    const slice2 = videoWrite!.data.slice(
-      chunk0.byteLength + chunk1.byteLength
-    );
-
-    expect(slice0).toEqual(chunk0);
-    expect(slice1).toEqual(chunk1);
-    expect(slice2).toEqual(chunk2);
 
     await IndexedDBFS.deleteBucket(id);
   });
@@ -346,14 +343,17 @@ describe("Mux Pipeline Integration", () => {
 
     await bucket.getLink();
 
-    const videoWrite = mock.getVideoWrite();
-    expect(videoWrite).toBeDefined();
+    const videoWrites = writesMatching(/^video-\d{6}\.ts$/);
+    expect(videoWrites.map((write) => write.filename)).toEqual([
+      "video-000000.ts",
+      "video-000002.ts",
+    ]);
 
-    const expectedSize = chunk0.byteLength + chunk2.byteLength;
-    expect(videoWrite!.data.byteLength).toBe(expectedSize);
-
-    expect(videoWrite!.data.slice(0, chunk0.byteLength)).toEqual(chunk0);
-    expect(videoWrite!.data.slice(chunk0.byteLength)).toEqual(chunk2);
+    expect(videoWrites[0].data).toEqual(chunk0);
+    expect(videoWrites[1].data).toEqual(chunk2);
+    expect(decodedWrite("video.concat.txt")).toBe(
+      "video-000000.ts\nvideo-000002.ts\n"
+    );
 
     await IndexedDBFS.deleteBucket(id);
   });

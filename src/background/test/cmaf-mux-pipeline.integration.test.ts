@@ -98,6 +98,15 @@ function buildFmp4Data(size: number, fillByte: number = 0): Uint8Array {
 
 // ── Tests ──
 
+function writesMatching(pattern: RegExp) {
+  return mock.getWrites().filter((write) => pattern.test(write.filename));
+}
+
+function decodedWrite(name: string) {
+  const write = mock.getWriteByFilename(name);
+  return write ? new TextDecoder().decode(write.data) : undefined;
+}
+
 describe("CMAF Mux Pipeline Integration", () => {
   beforeEach(() => {
     mock.reset();
@@ -266,25 +275,21 @@ describe("CMAF Mux Pipeline Integration", () => {
 
     await bucket.getLink();
 
-    const videoWrite = mock.getVideoWrite();
-    expect(videoWrite).toBeDefined();
+    const videoWrites = writesMatching(/^video-\d{6}\.mp4$/);
+    expect(videoWrites.map((write) => write.filename)).toEqual([
+      "video-000000.mp4",
+      "video-000001.mp4",
+      "video-000002.mp4",
+    ]);
 
-    // Concatenated size should be all 3 chunks
-    const expectedSize =
-      chunk0.byteLength + chunk1.byteLength + chunk2.byteLength;
-    expect(videoWrite!.data.byteLength).toBe(expectedSize);
+    expect(videoWrites[0].data).toEqual(chunk0);
+    expect(videoWrites[1].data).toEqual(chunk1);
+    expect(videoWrites[2].data).toEqual(chunk2);
 
-    // Format detection: first chunk has ftyp → filename should be .mp4
-    expect(videoWrite!.filename).toBe("video.mp4");
-
-    // Verify ordering
-    const slice0 = videoWrite!.data.slice(0, 128);
-    const slice1 = videoWrite!.data.slice(128, 256);
-    const slice2 = videoWrite!.data.slice(256, 384);
-
-    expect(slice0).toEqual(chunk0);
-    expect(slice1).toEqual(chunk1);
-    expect(slice2).toEqual(chunk2);
+    expect(decodedWrite("video.concat.txt")).toBe(
+      "video-000000.mp4\nvideo-000001.mp4\nvideo-000002.mp4\n"
+    );
+    expect(mock.getExecArgs()[0]).toContain("concatf:video.concat.txt");
 
     await IndexedDBFS.deleteBucket(id);
   });
