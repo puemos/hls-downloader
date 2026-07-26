@@ -9,6 +9,7 @@ import {
 import InlineConfirm from "../../components/InlineConfirm";
 import { formatBytes } from "../../utils/format-bytes";
 import { CleanupStatus } from "@hls-downloader/core/lib/store/slices/storage-slice";
+import { HardDrive, RefreshCcw } from "lucide-react";
 
 interface StorageSummaryProps {
   usedBytes: number;
@@ -50,80 +51,88 @@ const StorageSummary = ({
   const cleaned = cleanupStatus === "success";
 
   return (
-    <Card className={cn("p-3", compact ? "space-y-2" : "space-y-3")}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold">Browser storage</p>
-            {quotaExempt && (
-              <Badge variant="secondary" className="text-[11px]">
-                No fixed limit
-              </Badge>
+    <Card
+      className={cn("rounded-[11px] p-3", compact ? "space-y-2" : "space-y-3")}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-2.5">
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[8px] bg-foreground text-background">
+            <HardDrive className="h-4 w-4" />
+          </div>
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <p className="text-[12px] font-bold">Browser storage</p>
+              {quotaExempt && (
+                <Badge variant="secondary" className="px-1.5 py-0 text-[9px]">
+                  No fixed limit
+                </Badge>
+              )}
+              {persisted && (
+                <Badge variant="outline" className="px-1.5 py-0 text-[9px]">
+                  Persistent
+                </Badge>
+              )}
+              {nearQuota && (
+                <Badge variant="destructive" className="px-1.5 py-0 text-[9px]">
+                  Low space
+                </Badge>
+              )}
+              {cleaned && (
+                <Badge variant="secondary" className="px-1.5 py-0 text-[9px]">
+                  Cleaned
+                </Badge>
+              )}
+            </div>
+            <p className="text-[10px] leading-relaxed text-muted-foreground">
+              Stored {formatBytes(usedBytes)}{" "}
+              {quotaIsAdvisory
+                ? quotaBytes !== undefined && (
+                    <>
+                      • Browser estimate{" "}
+                      {formatBytes(quotaBytes, { precision: 1 })}
+                    </>
+                  )
+                : availableBytes !== undefined && (
+                    <>
+                      • Available {formatBytes(availableBytes)}{" "}
+                      {quotaBytes !== undefined && (
+                        <>of {formatBytes(quotaBytes, { precision: 1 })}</>
+                      )}
+                    </>
+                  )}
+            </p>
+            {!compact && (
+              <p className="text-[10px] leading-relaxed text-muted-foreground">
+                {quotaIsAdvisory ? (
+                  <>
+                    The browser estimate is informational, not a fixed download
+                    limit.
+                  </>
+                ) : persisted ? (
+                  "Persistent storage is enabled."
+                ) : (
+                  "Available storage is managed by your browser."
+                )}
+              </p>
             )}
-            {persisted && (
-              <Badge variant="outline" className="text-[11px]">
-                Persistent
-              </Badge>
-            )}
-            {nearQuota && (
-              <Badge variant="destructive" className="text-[11px]">
-                Low space
-              </Badge>
-            )}
-            {cleaned && (
-              <Badge variant="secondary" className="text-[11px]">
-                Cleaned
-              </Badge>
+            {subtitlesBytes !== undefined && subtitlesBytes > 0 && (
+              <p className="text-[10px] leading-relaxed text-muted-foreground">
+                Subtitles: {formatBytes(subtitlesBytes)} (included)
+              </p>
             )}
           </div>
-          <p className="text-[11px] text-muted-foreground leading-tight">
-            Stored {formatBytes(usedBytes)}{" "}
-            {quotaIsAdvisory
-              ? quotaBytes !== undefined && (
-                  <>
-                    • Browser estimate{" "}
-                    {formatBytes(quotaBytes, { precision: 1 })}
-                  </>
-                )
-              : availableBytes !== undefined && (
-                  <>
-                    • Available {formatBytes(availableBytes)}{" "}
-                    {quotaBytes !== undefined && (
-                      <>of {formatBytes(quotaBytes, { precision: 1 })}</>
-                    )}
-                  </>
-                )}
-          </p>
-          <p className="text-[11px] text-muted-foreground leading-tight">
-            {quotaIsAdvisory ? (
-              <>
-                The browser estimate is informational, not a fixed download
-                limit.
-              </>
-            ) : persisted ? (
-              "Persistent storage is enabled."
-            ) : (
-              "Available storage is managed by your browser."
-            )}
-          </p>
-          {subtitlesBytes !== undefined && subtitlesBytes > 0 && (
-            <p className="text-[11px] text-muted-foreground leading-tight">
-              Subtitles: {formatBytes(subtitlesBytes)} (included)
-            </p>
-          )}
-          <p className="text-[11px] text-muted-foreground leading-tight">
-            Downloads are stored privately by your browser.
-            {loading && " • updating..."}
-          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1">
           {onRefresh && (
             <button
-              className="text-[12px] text-muted-foreground underline"
+              className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-[color,background-color,transform] duration-150 hover:bg-accent hover:text-foreground active:scale-[0.96]"
               onClick={onRefresh}
               disabled={loading}
+              aria-label="Refresh storage"
             >
-              Refresh
+              <RefreshCcw
+                className={cn("h-3.5 w-3.5", loading && "animate-spin")}
+              />
             </button>
           )}
           <InlineConfirm
@@ -131,7 +140,7 @@ const StorageSummary = ({
             confirmLabel="Clean"
             cancelLabel="Keep"
             onConfirm={onCleanup}
-            disabled={loading}
+            disabled={loading || usedBytes === 0}
             busy={cleaning}
             variant={nearQuota ? "destructive" : "outline"}
           />
@@ -140,7 +149,7 @@ const StorageSummary = ({
       {percent !== undefined && (
         <div className="space-y-2">
           <Progress value={percent} className="h-2 rounded-full" />
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground">
             <span>{percent}% of browser allowance</span>
             {availableBytes !== undefined && (
               <span>Free {formatBytes(availableBytes)}</span>
@@ -150,7 +159,7 @@ const StorageSummary = ({
       )}
       {!compact && <Separator />}
       {!compact && (
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[10px] leading-relaxed text-muted-foreground">
           Cleaning stops active downloads and clears cached fragments for this
           extension from browser storage only.
         </p>

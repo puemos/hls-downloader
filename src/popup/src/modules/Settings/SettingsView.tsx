@@ -1,5 +1,6 @@
 import { Button, Switch, Card } from "@hls-downloader/design-system";
 import React from "react";
+import { ChevronDown, Minus, Plus } from "lucide-react";
 import StorageSummary from "../Storage/StorageSummary";
 import type { StorageState } from "@hls-downloader/core/lib/store/slices/storage-slice";
 import type { OutputContainer } from "@hls-downloader/core/lib/entities";
@@ -91,8 +92,12 @@ const SettingsView = ({
   onRefreshStorage,
 }: Props) => {
   return (
-    <div className="flex flex-col px-4 pb-4 space-y-4">
-      <h2 className="text-lg font-semibold">Settings</h2>
+    <div className="app-scrollbar h-full overflow-y-auto px-4 pb-6 pt-4">
+      <div className="mb-3 px-1">
+        <h2 className="text-[18px] font-extrabold leading-tight tracking-[-0.035em]">
+          Settings
+        </h2>
+      </div>
       <StorageSummary
         compact
         usedBytes={storage.totalUsedBytes}
@@ -108,64 +113,77 @@ const SettingsView = ({
         onCleanup={onCleanupStorage}
         onRefresh={onRefreshStorage}
       />
-      <div className="space-y-3">
-        <Card className="flex-row items-center justify-between gap-2">
+      <div className="mb-2 mt-4 px-1">
+        <p className="eyebrow">Download behavior</p>
+      </div>
+      <div className="space-y-2">
+        <Card className="flex-row items-center justify-between gap-3 rounded-[11px] shadow-none">
           <div className="flex flex-col">
-            <p className="text-sm font-medium">Active downloads</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[12px] font-bold">Active downloads</p>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
               Limit how many jobs run at once
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             <Button
               size="sm"
               variant={activeDownloadsUnlimited ? "default" : "outline"}
+              className="h-7 px-2 text-[10px]"
               aria-label="set active downloads to unlimited"
               onClick={onActiveDownloadsUnlimited}
             >
               Unlimited
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              aria-label="decrease active downloads"
-              onClick={onActiveDownloadsDecrease}
-              disabled={activeDownloadsUnlimited || maxActiveDownloads <= 1}
-            >
-              -
-            </Button>
-            <div className="w-16 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm px-2">
-              <div>
-                {activeDownloadsUnlimited ? (
-                  "∞"
-                ) : (
-                  <span className="inline-flex leading-tight min-w-[1ch] justify-center">
+            {activeDownloadsUnlimited ? (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 px-2.5 text-[10px]"
+                onClick={onActiveDownloadsIncrease}
+              >
+                Set limit
+              </Button>
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 w-7 p-0"
+                  aria-label="decrease active downloads"
+                  onClick={onActiveDownloadsDecrease}
+                  disabled={maxActiveDownloads <= 1}
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <div className="flex h-7 w-10 items-center justify-center rounded-lg border bg-muted/60 px-2 text-center text-[11px] font-bold tabular-nums">
+                  <span className="inline-flex min-w-[1ch] justify-center leading-tight">
                     {maxActiveDownloads}
                   </span>
-                )}
-              </div>
-            </div>
-            <Button
-              size="sm"
-              variant="outline"
-              aria-label="increase active downloads"
-              onClick={onActiveDownloadsIncrease}
-            >
-              +
-            </Button>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 w-7 p-0"
+                  aria-label="increase active downloads"
+                  onClick={onActiveDownloadsIncrease}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </>
+            )}
           </div>
         </Card>
 
-        <Card className="gap-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">Output format</p>
-            <p className="text-[11px] text-muted-foreground">
+        <Card className="gap-2.5 rounded-[11px] shadow-none">
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-[12px] font-bold">Output format</p>
+            <p className="max-w-[245px] text-right text-[10px] leading-relaxed text-muted-foreground">
               Used for new downloads without subtitles
             </p>
           </div>
-          <div className="flex-1 min-w-[240px] border rounded-md">
+          <div className="relative min-w-[240px] flex-1">
             <select
-              className="w-full p-2 text-sm bg-background text-foreground border-r-8 border-r-transparent"
+              className="h-9 w-full appearance-none rounded-[10px] border bg-background/80 px-3 pr-9 text-[11px] font-semibold text-foreground outline-none transition-[border-color,box-shadow] focus:border-primary/45 focus:ring-4 focus:ring-primary/10"
               value={outputContainer}
               onChange={(e) =>
                 onSetOutputContainer(e.target.value as OutputContainer)
@@ -177,26 +195,28 @@ const SettingsView = ({
                 </option>
               ))}
             </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           </div>
         </Card>
 
-        <Card className="flex-row items-center justify-between gap-2">
+        <Card className="flex-row items-center justify-between gap-3 rounded-[11px] shadow-none">
           <div className="flex flex-col">
-            <p className="text-sm font-medium">Fragment concurrency</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[12px] font-bold">Fragment concurrency</p>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
               Number of fragments fetched in parallel
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             <Button
               size="sm"
               variant="outline"
+              className="h-7 w-7 p-0"
               aria-label="decrease fragment concurrency"
               onClick={onConcurrencyDecrease}
             >
-              -
+              <Minus className="h-3 w-3" />
             </Button>
-            <div className="w-16 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm">
+            <div className="flex h-7 w-10 items-center justify-center rounded-lg border bg-muted/60 text-center text-[11px] font-bold tabular-nums">
               <div className="inline-flex leading-tight min-w-[2ch] justify-center">
                 {concurrency}
               </div>
@@ -204,31 +224,33 @@ const SettingsView = ({
             <Button
               size="sm"
               variant="outline"
+              className="h-7 w-7 p-0"
               aria-label="increase fragment concurrency"
               onClick={onConcurrencyIncrease}
             >
-              +
+              <Plus className="h-3 w-3" />
             </Button>
           </div>
         </Card>
 
-        <Card className="flex-row items-center justify-between gap-2">
+        <Card className="flex-row items-center justify-between gap-3 rounded-[11px] shadow-none">
           <div className="flex flex-col">
-            <p className="text-sm font-medium">Fetch attempts</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[12px] font-bold">Fetch attempts</p>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
               Retry count per fragment request
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             <Button
               size="sm"
               variant="outline"
+              className="h-7 w-7 p-0"
               aria-label="decrease fetch attempts"
               onClick={onFetchAttemptsDecrease}
             >
-              -
+              <Minus className="h-3 w-3" />
             </Button>
-            <div className="w-16 border rounded-md h-8 flex items-center bg-muted justify-center text-center text-sm">
+            <div className="flex h-7 w-10 items-center justify-center rounded-lg border bg-muted/60 text-center text-[11px] font-bold tabular-nums">
               <div className="inline-flex leading-tight min-w-[2ch] justify-center">
                 {fetchAttempts}
               </div>
@@ -236,18 +258,19 @@ const SettingsView = ({
             <Button
               size="sm"
               variant="outline"
+              className="h-7 w-7 p-0"
               aria-label="increase fetch attempts"
               onClick={onFetchAttemptsIncrease}
             >
-              +
+              <Plus className="h-3 w-3" />
             </Button>
           </div>
         </Card>
 
-        <Card className="flex-row items-center justify-between gap-2">
+        <Card className="flex-row items-center justify-between gap-3 rounded-[11px] shadow-none">
           <div className="flex flex-col">
-            <p className="text-sm font-medium">Save dialog</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[12px] font-bold">Save dialog</p>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
               Ask for a location before saving files
             </p>
           </div>
@@ -258,10 +281,10 @@ const SettingsView = ({
           ></Switch>
         </Card>
 
-        <Card className="flex-row items-center justify-between gap-2">
+        <Card className="flex-row items-center justify-between gap-3 rounded-[11px] shadow-none">
           <div className="flex flex-col">
-            <p className="text-sm font-medium">Auto delete after save</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[12px] font-bold">Auto delete after save</p>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
               Remove downloaded data after saving
             </p>
           </div>
@@ -272,16 +295,16 @@ const SettingsView = ({
           ></Switch>
         </Card>
 
-        <Card className="gap-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">Preferred audio language</p>
-            <p className="text-[11px] text-muted-foreground">
+        <Card className="gap-2.5 rounded-[11px] shadow-none">
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-[12px] font-bold">Preferred audio language</p>
+            <p className="max-w-[245px] text-right text-[10px] leading-relaxed text-muted-foreground">
               Used to auto-pick audio when available
             </p>
           </div>
-          <div className="flex-1 min-w-[240px] border rounded-md">
+          <div className="relative min-w-[240px] flex-1">
             <select
-              className="w-full p-2 text-sm bg-background text-foreground border-r-8 border-r-transparent"
+              className="h-9 w-full appearance-none rounded-[10px] border bg-background/80 px-3 pr-9 text-[11px] font-semibold text-foreground outline-none transition-[border-color,box-shadow] focus:border-primary/45 focus:ring-4 focus:ring-primary/10"
               value={preferredAudioLanguage ?? ""}
               onChange={(e) =>
                 onSetPreferredAudioLanguage(e.target.value || null)
@@ -293,6 +316,7 @@ const SettingsView = ({
                 </option>
               ))}
             </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           </div>
         </Card>
       </div>

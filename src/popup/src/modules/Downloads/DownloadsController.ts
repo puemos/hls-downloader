@@ -36,12 +36,11 @@ const useDownloadsController = (): ReturnType => {
     (state) => state.jobs.jobs
   );
 
-  const jobs = Object.values(jobsRecord)
-    .flatMap((f) => (f ? [f] : []))
-    .filter(jobsFilter(filter));
+  const allJobs = Object.values(jobsRecord).flatMap((f) => (f ? [f] : []));
+  const jobs = allJobs.filter(jobsFilter(filter));
 
   jobs.sort((a, b) => b!.createdAt - a!.createdAt);
-  const hasJobs = jobs.length > 0;
+  const hasJobs = allJobs.length > 0;
 
   return {
     jobs,

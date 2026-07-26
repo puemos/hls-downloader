@@ -7,7 +7,7 @@ function App() {
   return (
     <div
       id="hls-downloader-ext"
-      className="w-[500px] h-[600px] transition-all pt-4 font-sans antialiased"
+      className="relative isolate h-[600px] w-[500px] overflow-hidden bg-background font-sans antialiased"
     >
       <RouterModule></RouterModule>
     </div>

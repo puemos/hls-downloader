@@ -9,6 +9,7 @@ import {
 import { Banana } from "lucide-react";
 import React from "react";
 import PlaylistModule from "../Playlist/PlaylistModule";
+import BackButton from "../../components/BackButton";
 
 interface Props {
   playlists: Playlist[];
@@ -39,13 +40,10 @@ const DirectView = ({
     <div className="flex flex-col p-1 mt-4 space-y-3">
       {currentPlaylistId && (
         <>
-          <Button
+          <BackButton
             onClick={() => setCurrentPlaylistId()}
-            size="sm"
-            variant="secondary"
-          >
-            Back
-          </Button>
+            label="All streams"
+          />
           <PlaylistModule id={currentPlaylistId}></PlaylistModule>
         </>
       )}

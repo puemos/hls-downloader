@@ -10,13 +10,14 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "flex flex-col gap-2 rounded-lg border bg-card p-3 text-card-foreground shadow-md",
-        interactive && "cursor-pointer hover:bg-muted transition-colors",
-        className
+        "flex flex-col gap-2 rounded-[11px] border border-border bg-card p-3 text-card-foreground",
+        interactive &&
+          "cursor-pointer transition-[background-color,border-color,transform] duration-150 ease-snappy hover:border-foreground/20 hover:bg-muted/50 active:scale-[0.99]",
+        className,
       )}
       {...props}
     />
-  )
+  ),
 );
 Card.displayName = "Card";
 

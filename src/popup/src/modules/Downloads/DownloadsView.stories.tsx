@@ -61,3 +61,22 @@ export const Selected: Story = {
     />
   ),
 };
+
+export const LowStorageWarning: Story = {
+  render: () => (
+    <DownloadsView
+      {...commonProps}
+      jobs={sampleJobs}
+      hasJobs
+      showFilterInput
+      currentJobId={undefined}
+      storage={{
+        ...initialStorageState,
+        totalUsedBytes: 7.9 * 1024 * 1024 * 1024,
+        availableBytes: 100 * 1024 * 1024,
+        quotaBytes: 8 * 1024 * 1024 * 1024,
+        nearQuota: true,
+      }}
+    />
+  ),
+};

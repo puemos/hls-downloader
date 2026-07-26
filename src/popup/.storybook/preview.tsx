@@ -27,7 +27,7 @@ const videoLevel = new Level(
   1920,
   1080,
   4_500_000,
-  30
+  30,
 );
 const audioLevel = new Level(
   "audio",
@@ -39,7 +39,7 @@ const audioLevel = new Level(
   192_000,
   undefined,
   "en",
-  "English"
+  "English",
 );
 const subtitleLevel = new Level(
   "subtitle",
@@ -52,28 +52,30 @@ const subtitleLevel = new Level(
   undefined,
   "en",
   "English",
-  "cc"
+  "cc",
 );
 
 const jobOne = new Job(
   "1",
+  playlistId,
   [new Fragment(new Key(), "v1.ts", 0)],
   [new Fragment(new Key(), "a1.ts", 0)],
   "Example video.mp4",
   Date.now(),
   1920,
   1080,
-  4_500_000
+  4_500_000,
 );
 const jobTwo = new Job(
   "2",
+  otherPlaylistId,
   [new Fragment(new Key(), "v2.ts", 0)],
   [],
   "Second video.mp4",
   Date.now(),
   1280,
   720,
-  2_000_000
+  2_000_000,
 );
 
 // Seed Storybook with a lightweight Redux store so hooks using `useSelector` and `useDispatch` work out of the box.
@@ -88,14 +90,14 @@ const preloadedState: RootState = {
         "https://example.com/master.m3u8",
         Date.now(),
         "Storybook playlist",
-        "storybook"
+        "storybook",
       ),
       [otherPlaylistId]: new Playlist(
         otherPlaylistId,
         "https://example.com/other.m3u8",
         Date.now(),
         "Another playlist",
-        "storybook"
+        "storybook",
       ),
     },
     playlistsStatus: {
@@ -134,6 +136,27 @@ const preloadedState: RootState = {
       },
     },
   },
+  storage: {
+    ...baseState.storage,
+    buckets: {
+      [jobOne.id]: {
+        id: jobOne.id,
+        storedBytes: 126 * 1024 * 1024,
+        storedChunks: 2,
+        totalFragments: 2,
+        averageChunkBytes: 63 * 1024 * 1024,
+        expectedBytes: 126 * 1024 * 1024,
+        videoLength: 1,
+        audioLength: 1,
+        updatedAt: Date.now(),
+      },
+    },
+    totalUsedBytes: 126 * 1024 * 1024,
+    availableBytes: 7.88 * 1024 * 1024 * 1024,
+    quotaBytes: 8 * 1024 * 1024 * 1024,
+    persisted: true,
+    lastUpdated: Date.now(),
+  },
 };
 
 const createStore = () =>
@@ -147,10 +170,13 @@ const createStore = () =>
   });
 
 const preview: Preview = {
+  parameters: {
+    layout: "fullscreen",
+  },
   decorators: [
     (Story) => (
       <Provider store={createStore()}>
-        <div className="w-[500px] h-[600px] border">
+        <div className="h-[600px] w-[500px] overflow-hidden">
           <Story />
         </div>
       </Provider>

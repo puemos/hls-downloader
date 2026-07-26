@@ -46,9 +46,6 @@ describe("StorageSummary", () => {
     expect(container.textContent).toContain(
       "The browser estimate is informational, not a fixed download limit.",
     );
-    expect(container.textContent).toContain(
-      "Downloads are stored privately by your browser.",
-    );
     expect(container.textContent).not.toMatch(/OPFS|IndexedDB/);
     expect(container.textContent).not.toContain("% of browser allowance");
   });

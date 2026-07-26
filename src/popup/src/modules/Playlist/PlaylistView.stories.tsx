@@ -5,6 +5,19 @@ import PlaylistView from "./PlaylistView";
 const meta: Meta<typeof PlaylistView> = {
   title: "popup/views/PlaylistView",
   component: PlaylistView,
+  decorators: [
+    (Story, context) => (
+      <div
+        className={
+          context.parameters.dark
+            ? "dark h-full bg-background px-4 pt-4 text-foreground"
+            : "h-full px-4 pt-4"
+        }
+      >
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
@@ -18,7 +31,7 @@ const videoLevel = new Level(
   1280,
   720,
   3000000,
-  30
+  30,
 );
 const audioLevel = new Level(
   "audio",
@@ -37,7 +50,7 @@ const audioLevel = new Level(
   true,
   true,
   undefined,
-  "audio"
+  "audio",
 );
 const subtitleLevel = new Level(
   "subtitle",
@@ -49,14 +62,14 @@ const subtitleLevel = new Level(
   undefined,
   undefined,
   "eng",
-  "English"
+  "English",
 );
 const samplePlaylist = new Playlist(
   "p1",
   "https://example.com/master.m3u8",
   Date.now(),
   "Sample playlist",
-  "storybook"
+  "storybook",
 );
 
 export const Ready: Story = {
@@ -74,6 +87,7 @@ export const Ready: Story = {
       onSelectAudio={() => {}}
       onSelectSubtitle={() => {}}
       onDownload={() => {}}
+      onBack={() => {}}
       canDownload={true}
       encryptionSummaries={[
         {
@@ -86,8 +100,14 @@ export const Ready: Story = {
       ]}
       inspectionPending={false}
       encryptionBlocked={false}
+      estimate={{ expectedBytes: 58.6 * 1024 * 1024 }}
     />
   ),
+};
+
+export const ReadyDark: Story = {
+  ...Ready,
+  parameters: { dark: true },
 };
 
 export const Fetching: Story = {
@@ -102,6 +122,7 @@ export const Fetching: Story = {
       onSelectSubtitle={() => {}}
       onDownload={() => {}}
       canDownload={false}
+      onBack={() => {}}
       encryptionSummaries={[]}
       inspectionPending={false}
       encryptionBlocked={false}
@@ -124,6 +145,7 @@ export const DisabledDownload: Story = {
       onSelectAudio={() => {}}
       onSelectSubtitle={() => {}}
       onDownload={() => {}}
+      onBack={() => {}}
       canDownload={false}
       encryptionSummaries={[
         {
@@ -137,6 +159,27 @@ export const DisabledDownload: Story = {
       ]}
       inspectionPending={false}
       encryptionBlocked={true}
+    />
+  ),
+};
+
+export const NoCompatibleTracks: Story = {
+  render: () => (
+    <PlaylistView
+      status={{ status: "ready" }}
+      playlist={samplePlaylist}
+      videoLevels={[]}
+      audioLevels={[]}
+      subtitleLevels={[]}
+      onSelectVideo={() => {}}
+      onSelectAudio={() => {}}
+      onSelectSubtitle={() => {}}
+      onDownload={() => {}}
+      onBack={() => {}}
+      canDownload={false}
+      encryptionSummaries={[]}
+      inspectionPending={false}
+      encryptionBlocked={false}
     />
   ),
 };

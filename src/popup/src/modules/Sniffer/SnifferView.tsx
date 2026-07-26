@@ -1,26 +1,24 @@
 import { Playlist } from "@hls-downloader/core/lib/entities";
+import { Button, Input, Card } from "@hls-downloader/design-system";
 import {
-  Button,
-  Input,
-  ScrollArea,
-  Card,
-  cn,
-} from "@hls-downloader/design-system";
-import {
-  Banana,
-  ChevronDown,
-  Clock4,
+  Check,
+  ChevronRight,
   Copy,
-  Radio,
-  ArrowRight,
+  Link2,
+  ScanSearch,
+  Search,
   Trash2,
+  X,
 } from "lucide-react";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import React, { useEffect, useRef, useState } from "react";
 import PlaylistModule from "../Playlist/PlaylistModule";
+import ScreenHeader from "../../components/ScreenHeader";
+import DetailScreen from "../../components/DetailScreen";
+import BottomSheet from "../../components/BottomSheet";
 
 interface Props {
   playlists: Playlist[];
+  hasPlaylists: boolean;
   currentPlaylistId: string | undefined;
   filter: string;
   clearPlaylists: () => void;
@@ -31,8 +29,6 @@ interface Props {
   directURI: string;
   setDirectURI: (uri: string) => void;
   addDirectPlaylist: () => void;
-  expandedPlaylists: string[];
-  toggleExpandedPlaylist: (id: string) => void;
 }
 
 const SnifferView = ({
@@ -42,172 +38,224 @@ const SnifferView = ({
   setFilter,
   filter,
   playlists,
+  hasPlaylists,
   currentPlaylistId,
   setCurrentPlaylistId,
   directURI,
   setDirectURI,
   addDirectPlaylist,
-  expandedPlaylists,
-  toggleExpandedPlaylist,
 }: Props) => {
-  const listRef = useRef<HTMLDivElement | null>(null);
-  const detailRef = useRef<HTMLDivElement | null>(null);
-  const [visibleDetailId, setVisibleDetailId] = useState<string | undefined>(
-    currentPlaylistId
+  const manualInputRef = useRef<HTMLInputElement | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
+  const seenPlaylistIds = useRef(
+    new Set(playlists.map((playlist) => playlist.id)),
   );
-  const currentIdRef = useRef<string | undefined>(currentPlaylistId);
+  const enteringPlaylistIds = new Set(
+    playlists
+      .filter((playlist) => !seenPlaylistIds.current.has(playlist.id))
+      .map((playlist) => playlist.id),
+  );
 
   useEffect(() => {
-    if (currentPlaylistId) {
-      setVisibleDetailId(currentPlaylistId);
-    }
-  }, [currentPlaylistId]);
+    playlists.forEach((playlist) => {
+      seenPlaylistIds.current.add(playlist.id);
+    });
+  }, [playlists]);
 
   useEffect(() => {
-    currentIdRef.current = currentPlaylistId;
-  }, [currentPlaylistId]);
-
-  useLayoutEffect(() => {
-    const listEl = listRef.current;
-    const detailEl = detailRef.current;
-    if (!listEl || !detailEl) {
+    if (!manualOpen) {
       return;
     }
-    gsap.killTweensOf([listEl, detailEl]);
-    const tl = gsap.timeline();
-
-    if (!currentPlaylistId && !visibleDetailId) {
-      gsap.set(listEl, { display: "block", opacity: 1, x: 0 });
-      gsap.set(detailEl, { display: "none", opacity: 0, x: 0 });
-      return;
-    }
-
-    if (currentPlaylistId && visibleDetailId === currentPlaylistId) {
-      tl.set(listEl, { display: "none", opacity: 0 })
-        .set(detailEl, { display: "block", x: 32, opacity: 0 })
-        .to(detailEl, {
-          x: 0,
-          opacity: 1,
-          duration: 0.28,
-          ease: "power2.out",
-        });
-    } else if (!currentPlaylistId && visibleDetailId) {
-      tl.to(detailEl, {
-        x: 32,
-        opacity: 0,
-        duration: 0.24,
-        ease: "power2.in",
-      })
-        .set(detailEl, { display: "none", x: 0 })
-        .set(listEl, { display: "block", opacity: 0, x: -12 })
-        .to(listEl, {
-          opacity: 1,
-          x: 0,
-          duration: 0.24,
-          ease: "power2.out",
-          onComplete: () => {
-            if (!currentIdRef.current) {
-              setVisibleDetailId(undefined);
-            }
-          },
-        });
-    }
-
-    return () => {
-      tl.kill();
+    manualInputRef.current?.focus();
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setManualOpen(false);
+      }
     };
-  }, [currentPlaylistId, visibleDetailId]);
-
-  useLayoutEffect(() => {
-    gsap.killTweensOf(listRef.current);
-  }, [playlists.length, filter]);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [manualOpen]);
 
   return (
-    <div className="flex flex-col px-4 pb-4 space-y-4">
-      <div ref={detailRef} className="space-y-3" aria-hidden={!visibleDetailId}>
-        {visibleDetailId && (
+    <div
+      className={`flex h-full min-h-0 flex-col px-4 pt-4 ${
+        currentPlaylistId ? "pb-0" : "pb-3"
+      }`}
+    >
+      {currentPlaylistId ? (
+        <DetailScreen>
           <PlaylistModule
-            id={visibleDetailId}
+            id={currentPlaylistId}
             onBack={() => setCurrentPlaylistId()}
           />
-        )}
-      </div>
+        </DetailScreen>
+      ) : (
+        <div className="flex h-full min-h-0 flex-col gap-3">
+          <ScreenHeader
+            title="Capture"
+            action={
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 shrink-0 gap-1.5 px-2.5 text-[10px]"
+                onClick={() => setManualOpen(true)}
+              >
+                <Link2 className="h-3.5 w-3.5" />
+                Add URL
+              </Button>
+            }
+          />
 
-      <div ref={listRef} className="space-y-4" aria-hidden={!!visibleDetailId}>
-        <div className="flex flex-col space-y-3">
-          <h3 className="text-base font-semibold">Sniffer</h3>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                className="p-2 border rounded-md flex-1"
-                placeholder="https://.../playlist.m3u8"
-                value={directURI}
-                onChange={(e) => setDirectURI(e.target.value)}
+          {hasPlaylists && (
+            <div className="flex shrink-0 items-center gap-2">
+              <div className="relative min-w-0 flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  aria-label="Filter captured streams"
+                  className="h-9 pl-9 text-[12px]"
+                  placeholder="Filter captured streams"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                />
+              </div>
+              <div className="flex h-9 shrink-0 items-center rounded-[9px] border border-input bg-card p-0.5">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  onClick={copyPlaylistsToClipboard}
+                  aria-label="Copy all captured URLs"
+                  title="Copy all URLs"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+                <div className="h-4 w-px bg-border" />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={clearPlaylists}
+                  aria-label="Clear all captured streams"
+                  title="Clear captured streams"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {!hasPlaylists && (
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center pb-4 text-center">
+              <div className="relative mb-4 grid h-[68px] w-[68px] place-items-center rounded-[18px] border border-border bg-card text-primary">
+                <ScanSearch className="h-8 w-8" strokeWidth={1.8} />
+                <span className="absolute -right-1 top-1 h-3 w-3 rounded-full border-2 border-background bg-emerald-500" />
+              </div>
+              <h3 className="text-[15px] font-bold tracking-[-0.01em]">
+                Ready to detect a stream
+              </h3>
+              <p className="mt-1.5 max-w-[280px] text-[11px] leading-relaxed text-muted-foreground">
+                Start playback on the current page. Captured HLS playlists will
+                appear here automatically.
+              </p>
+            </div>
+          )}
+
+          {hasPlaylists && playlists.length === 0 && (
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center pb-8 text-center">
+              <Search
+                className="mb-3 h-6 w-6 text-muted-foreground"
+                strokeWidth={1.8}
               />
+              <h3 className="text-[14px] font-bold tracking-[-0.01em]">
+                No matching streams
+              </h3>
+              <p className="mt-1.5 max-w-[260px] text-[11px] leading-relaxed text-muted-foreground">
+                Nothing matches “{filter}”. Try another search or clear the
+                filter.
+              </p>
               <Button
                 size="sm"
-                variant="secondary"
-                onClick={addDirectPlaylist}
-                disabled={!directURI}
+                variant="outline"
+                className="mt-3"
+                onClick={() => setFilter("")}
               >
-                Add
+                Clear filter
               </Button>
             </div>
-            <div className="flex items-center gap-2">
-              <Input
-                type="text"
-                className="p-2 border rounded-md flex-1"
-                placeholder="Filter playlists..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-              />
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={copyPlaylistsToClipboard}
-                disabled={playlists.length === 0}
-              >
-                Copy URLs
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={clearPlaylists}
-                disabled={playlists.length === 0}
-              >
-                Clear all
-              </Button>
+          )}
+
+          {playlists.length > 0 && (
+            <div className="app-scrollbar mt-1 min-h-0 flex-1 overflow-y-auto pr-1">
+              {playlists.map((item) => (
+                <PlaylistRow
+                  key={item.id}
+                  playlist={item}
+                  onOpen={() => setCurrentPlaylistId(item.id)}
+                  onRemove={() => removePlaylist(item.id)}
+                  animateEntry={enteringPlaylistIds.has(item.id)}
+                />
+              ))}
             </div>
-          </div>
+          )}
         </div>
+      )}
 
-        {playlists.length === 0 && (
-          <div className="flex flex-col items-center justify-center mt-12">
-            <Banana />
-
-            <h3 className="mt-4 text-lg font-semibold">No videos found</h3>
-            <p className="mt-2 mb-4 text-sm text-muted-foreground text-center">
-              Try sniffing a page or paste a playlist URL above.
-            </p>
+      <BottomSheet
+        open={!currentPlaylistId && manualOpen}
+        onClose={() => setManualOpen(false)}
+        labelledBy="add-playlist-title"
+        closeLabel="Close add URL"
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <h3
+            id="add-playlist-title"
+            className="text-[14px] font-extrabold tracking-[-0.02em]"
+          >
+            Add playlist URL
+          </h3>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8"
+            onClick={() => setManualOpen(false)}
+            aria-label="Close add URL"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Link2 className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              ref={manualInputRef}
+              type="url"
+              aria-label="Playlist URL"
+              className="h-10 pl-9 text-[12px]"
+              placeholder="https://example.com/stream.m3u8"
+              value={directURI}
+              onChange={(e) => setDirectURI(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && directURI) {
+                  addDirectPlaylist();
+                  setManualOpen(false);
+                }
+              }}
+            />
           </div>
-        )}
-
-        {playlists.length > 0 && (
-          <ScrollArea className="h-[calc(100vh-14rem)] w-full max-w-full view-transition view-enter-active">
-            {playlists.map((item) => (
-              <PlaylistRow
-                key={item.id}
-                playlist={item}
-                expanded={expandedPlaylists.includes(item.id)}
-                onToggle={() => toggleExpandedPlaylist(item.id)}
-                onOpen={() => setCurrentPlaylistId(item.id)}
-                onRemove={() => removePlaylist(item.id)}
-              />
-            ))}
-          </ScrollArea>
-        )}
-      </div>
+          <Button
+            className="h-10 min-w-[76px]"
+            onClick={() => {
+              addDirectPlaylist();
+              setManualOpen(false);
+            }}
+            disabled={!directURI}
+            aria-label="Add playlist"
+          >
+            Add
+          </Button>
+        </div>
+      </BottomSheet>
     </div>
   );
 };
@@ -216,115 +264,108 @@ export default SnifferView;
 
 const PlaylistRow = ({
   playlist,
-  expanded,
-  onToggle,
   onOpen,
   onRemove,
+  animateEntry,
 }: {
   playlist: Playlist;
-  expanded: boolean;
-  onToggle: () => void;
   onOpen: () => void;
   onRemove: () => void;
+  animateEntry: boolean;
 }) => {
-  const detailsRef = useRef<HTMLDivElement | null>(null);
+  const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useLayoutEffect(() => {
-    const el = detailsRef.current;
-    if (!el) return;
-    gsap.killTweensOf(el);
-    if (expanded) {
-      gsap.set(el, { display: "block" });
-      gsap.fromTo(
-        el,
-        { height: 0, opacity: 0 },
-        {
-          height: "auto",
-          opacity: 1,
-          duration: 0.2,
-          ease: "power1.out",
-          clearProps: "height",
-        }
-      );
-    } else {
-      gsap.to(el, {
-        height: 0,
-        opacity: 0,
-        duration: 0.15,
-        ease: "power1.in",
-        onComplete: () => {
-          gsap.set(el, { display: "none" });
-        },
-      });
+  useEffect(
+    () => () => {
+      if (copiedTimer.current) {
+        clearTimeout(copiedTimer.current);
+      }
+    },
+    [],
+  );
+
+  async function copyPlaylistUrl() {
+    if (!navigator.clipboard) return;
+
+    try {
+      await navigator.clipboard.writeText(playlist.uri);
+      setCopied(true);
+      if (copiedTimer.current) {
+        clearTimeout(copiedTimer.current);
+      }
+      copiedTimer.current = setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
     }
-  }, [expanded]);
+  }
 
   return (
     <Card
       data-playlist-row
-      className="mb-2 w-full overflow-hidden text-left text-sm"
+      className={`mb-2 w-full flex-row gap-0 overflow-hidden rounded-[11px] p-0 text-left text-sm ${
+        animateEntry ? "motion-list-entry" : ""
+      }`}
     >
       <button
-        className="flex w-full items-center gap-3 px-3 py-2 hover:bg-muted/60 transition-colors"
-        onClick={onToggle}
-        aria-label="Toggle playlist details"
+        className="group flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left transition-colors duration-150 hover:bg-accent/35 active:bg-accent/55"
+        onClick={onOpen}
+        aria-label={`Choose quality for ${playlist.pageTitle || "captured stream"}`}
       >
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 shrink-0 transition-transform",
-            expanded ? "rotate-180" : ""
-          )}
-        />
-        <div className="flex flex-1 items-center gap-2 min-w-0">
-          <div className="truncate font-semibold">{playlist.pageTitle}</div>
-        </div>
-        <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
-          <Clock4 className="h-3.5 w-3.5" />
-          {new Date(playlist.createdAt!).toLocaleTimeString()}
-        </div>
-      </button>
-      <div
-        ref={detailsRef}
-        className="px-3 pb-3 space-y-2 overflow-hidden"
-        style={{ display: expanded ? "block" : "none" }}
-      >
-        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-          <Radio className="h-3.5 w-3.5" />
-          <span className="truncate">
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[12px] font-bold leading-tight">
+            {playlist.pageTitle}
+          </div>
+          <div className="mt-1 truncate text-[10px] font-medium text-muted-foreground">
             {playlist.initiator || "Detected source"}
+          </div>
+        </div>
+        <time className="shrink-0 text-[10px] font-medium text-muted-foreground">
+          {new Date(playlist.createdAt!).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </time>
+        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-foreground" />
+      </button>
+      <div className="flex shrink-0 items-center border-l border-border/70 px-1">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8 text-muted-foreground"
+          onClick={copyPlaylistUrl}
+          aria-label={
+            copied
+              ? `URL copied for ${playlist.pageTitle || "captured stream"}`
+              : `Copy URL for ${playlist.pageTitle || "captured stream"}`
+          }
+          title={copied ? "URL copied" : "Copy URL"}
+        >
+          <span className="grid h-3.5 w-3.5 place-items-center">
+            <Copy
+              data-active={!copied}
+              className={`motion-copy-icon col-start-1 row-start-1 h-3.5 w-3.5 ${
+                copied ? "scale-90 opacity-0" : "scale-100 opacity-100"
+              }`}
+            />
+            <Check
+              data-active={copied}
+              className={`motion-copy-icon col-start-1 row-start-1 h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 ${
+                copied ? "scale-100 opacity-100" : "scale-90 opacity-0"
+              }`}
+            />
           </span>
-        </div>
-        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-          <div className="font-medium text-foreground text-sm truncate">
-            {playlist.uri}
-          </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            <Button
-              size="sm"
-              variant="default"
-              onClick={onOpen}
-              className="gap-1"
-            >
-              Open <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="gap-1"
-              onClick={() => navigator.clipboard?.writeText(playlist.uri)}
-            >
-              Copy URL <Copy className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="gap-1"
-              onClick={onRemove}
-            >
-              Remove <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </div>
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+          onClick={onRemove}
+          aria-label={`Remove ${playlist.pageTitle || "captured stream"}`}
+          title="Remove stream"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
       </div>
     </Card>
   );

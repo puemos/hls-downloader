@@ -248,6 +248,22 @@ async function clickButton(cdp, sessionId, label) {
   assert(clicked, `Could not click enabled button containing "${label}"`);
 }
 
+async function clickButtonByAriaLabel(cdp, sessionId, label) {
+  const clicked = await evaluate(
+    cdp,
+    sessionId,
+    `(() => {
+      const button = [...document.querySelectorAll("button")].find(
+        (item) => item.getAttribute("aria-label") === ${JSON.stringify(label)}
+      );
+      if (!button || button.disabled) return false;
+      button.click();
+      return true;
+    })()`,
+  );
+  assert(clicked, `Could not click enabled button labeled "${label}"`);
+}
+
 async function clickTab(cdp, sessionId, label) {
   const box = await evaluate(
     cdp,
@@ -531,19 +547,26 @@ async function parsedPlaylistDetail(cdp, sessionId) {
     }))()`,
   );
   const text = String(value?.text ?? "");
+  const textLower = text.toLocaleLowerCase();
   const options = value?.videoOptions ?? [];
   if (
-    text.includes("Estimated size") &&
-    text.includes("Video") &&
-    text.includes("Audio") &&
-    text.includes("Subtitles") &&
+    textLower.includes("estimate") &&
+    textLower.includes("video") &&
+    textLower.includes("audio") &&
+    textLower.includes("subtitles") &&
     options.some((option) => String(option).includes("540")) &&
     options.some((option) => String(option).includes("ENGLISH")) &&
     options.some((option) => String(option).includes("Text"))
   ) {
     return value;
   }
-  return null;
+  throw new Error(
+    `Current playlist detail did not match: ${JSON.stringify({
+      text,
+      options,
+      selectCount: value?.selectCount,
+    })}`,
+  );
 }
 
 async function assertStartDownloadEnabled(cdp, sessionId) {
@@ -736,20 +759,11 @@ async function main() {
       { timeoutMs: 30000, intervalMs: 250 },
     );
 
-    await evaluate(
+    await clickButtonByAriaLabel(
       cdp,
       popupSession.sessionId,
-      `document
-        .querySelector('[data-playlist-row] button[aria-label="Toggle playlist details"]')
-        ?.click()`,
+      "Choose quality for HLS E2E Real Stream Page",
     );
-    await waitForText(
-      cdp,
-      popupSession.sessionId,
-      "expanded sniffed playlist URL",
-      sniffUrl,
-    );
-    await clickButton(cdp, popupSession.sessionId, "Open");
 
     const sniffedDetail = await waitFor(
       "parsed sniffed playlist detail with subtitles",
@@ -763,31 +777,45 @@ async function main() {
       () => assertStartDownloadEnabled(cdp, popupSession.sessionId),
       { timeoutMs: 20000, intervalMs: 250 },
     );
-    await clickButton(cdp, popupSession.sessionId, "Show");
+    await clickButtonByAriaLabel(
+      cdp,
+      popupSession.sessionId,
+      "Open stream preview",
+    );
     await waitFor(
       "HLS preview to become ready",
       async () => {
-        const text = await evaluate(
+        const value = await evaluate(
           cdp,
           popupSession.sessionId,
-          "document.body.innerText",
+          `(() => ({
+            text: document.body.innerText,
+            ready: Boolean(document.querySelector(
+              'button[aria-label="Reload preview"]'
+            ))
+          }))()`,
         );
-        if (String(text).includes("Preview unavailable")) {
+        if (String(value?.text).includes("Preview unavailable")) {
           throw new Error("Preview reported unavailable");
         }
-        return String(text).includes("Preview ready") ? text : null;
+        return value?.ready ? value : null;
       },
       { timeoutMs: 30000, intervalMs: 250 },
     );
 
-    await clickButton(cdp, popupSession.sessionId, "Back");
+    await clickButtonByAriaLabel(cdp, popupSession.sessionId, "Close preview");
+    await clickButtonByAriaLabel(cdp, popupSession.sessionId, "All streams");
     await waitForText(
       cdp,
       popupSession.sessionId,
-      "Sniffer list after Back",
-      "Sniffer",
+      "Capture list after returning from stream detail",
+      "Capture",
     );
-    await clickButton(cdp, popupSession.sessionId, "Clear all");
+    await clickButtonByAriaLabel(
+      cdp,
+      popupSession.sessionId,
+      "Clear all captured streams",
+    );
     await waitFor("sniffer list cleared", async () => {
       const rows = await evaluate(
         cdp,
@@ -797,13 +825,14 @@ async function main() {
       return rows === 0 ? true : null;
     });
 
+    await clickButton(cdp, popupSession.sessionId, "Add URL");
     await setInputValue(
       cdp,
       popupSession.sessionId,
-      'input[placeholder="https://.../playlist.m3u8"]',
+      'input[placeholder="https://example.com/stream.m3u8"]',
       directUrl,
     );
-    await clickButton(cdp, popupSession.sessionId, "Add");
+    await clickButtonByAriaLabel(cdp, popupSession.sessionId, "Add playlist");
     const directDetail = await waitFor(
       "parsed direct playlist detail with subtitles",
       () => parsedPlaylistDetail(cdp, popupSession.sessionId),
@@ -851,7 +880,7 @@ async function main() {
       "Fragment concurrency",
     );
     await clickTab(cdp, popupSession.sessionId, "About");
-    await waitForText(cdp, popupSession.sessionId, "About tab", "Version");
+    await waitForText(cdp, popupSession.sessionId, "About tab", "Source code");
 
     const exceptions = {
       background: sessionExceptions(cdp, backgroundSession.sessionId),

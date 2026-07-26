@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "@hls-downloader/design-system";
+import { Button, cn } from "@hls-downloader/design-system";
 
 interface InlineConfirmProps {
   label: string;
@@ -10,12 +10,7 @@ interface InlineConfirmProps {
   onConfirm: () => void;
   onCancel?: () => void;
   variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
+    "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }
 
 const InlineConfirm = ({
@@ -39,33 +34,58 @@ const InlineConfirm = ({
     onCancel?.();
   }
 
-  if (confirming) {
-    return (
-      <div className="flex items-center gap-2">
+  return (
+    <div className="inline-grid">
+      <div
+        aria-hidden={!confirming}
+        data-active={confirming}
+        className={cn(
+          "motion-state-layer col-start-1 row-start-1 flex items-center gap-2 justify-self-end",
+          confirming
+            ? "pointer-events-auto scale-100 opacity-100"
+            : "pointer-events-none scale-[0.97] opacity-0",
+        )}
+      >
         <Button
           size="sm"
           variant="destructive"
           onClick={handleConfirm}
-          disabled={busy}
+          disabled={!confirming || busy}
+          tabIndex={confirming ? undefined : -1}
         >
           {confirmLabel}
         </Button>
-        <Button size="sm" variant="ghost" onClick={handleCancel}>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleCancel}
+          disabled={!confirming}
+          tabIndex={confirming ? undefined : -1}
+        >
           {cancelLabel}
         </Button>
       </div>
-    );
-  }
-
-  return (
-    <Button
-      size="sm"
-      variant={variant}
-      onClick={() => setConfirming(true)}
-      disabled={disabled || busy}
-    >
-      {label}
-    </Button>
+      <div
+        aria-hidden={confirming}
+        data-active={!confirming}
+        className={cn(
+          "motion-state-layer col-start-1 row-start-1 justify-self-end",
+          confirming
+            ? "pointer-events-none scale-[0.97] opacity-0"
+            : "pointer-events-auto scale-100 opacity-100",
+        )}
+      >
+        <Button
+          size="sm"
+          variant={variant}
+          onClick={() => setConfirming(true)}
+          disabled={confirming || disabled || busy}
+          tabIndex={confirming ? -1 : undefined}
+        >
+          {label}
+        </Button>
+      </div>
+    </div>
   );
 };
 
