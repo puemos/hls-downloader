@@ -20,6 +20,9 @@ export type StorageStats = {
   totalUsedBytes: number;
   availableBytes?: number;
   quotaBytes?: number;
+  persisted?: boolean;
+  quotaExempt: boolean;
+  quotaIsAdvisory: boolean;
   estimateSource: StorageEstimate["source"];
   nearQuota: boolean;
   subtitlesBytes?: number;
@@ -30,7 +33,7 @@ export const getStorageStatsFactory = (
   options?: {
     warningRatio?: number;
     minAvailableBytes?: number;
-  }
+  },
 ) => {
   const run = async (): Promise<StorageStats> => {
     const snapshot: StorageSnapshot = await fs.getStorageStats();
@@ -38,7 +41,7 @@ export const getStorageStatsFactory = (
     const buckets: StorageBucketStats[] = snapshot.buckets.map((bucket) => {
       const totalFragments = Math.max(
         0,
-        (bucket.videoLength ?? 0) + (bucket.audioLength ?? 0)
+        (bucket.videoLength ?? 0) + (bucket.audioLength ?? 0),
       );
       const averageChunkBytes =
         bucket.storedChunks > 0
@@ -64,7 +67,7 @@ export const getStorageStatsFactory = (
 
     const fragmentBytes = buckets.reduce(
       (sum, bucket) => sum + bucket.storedBytes,
-      0
+      0,
     );
     const subtitlesBytes = snapshot.subtitlesBytes ?? 0;
 
@@ -81,19 +84,24 @@ export const getStorageStatsFactory = (
     const warningRatio = options?.warningRatio ?? STORAGE_WARNING_RATIO;
     const minAvailableBytes =
       options?.minAvailableBytes ?? STORAGE_WARNING_MIN_AVAILABLE_BYTES;
+    const quotaIsAdvisory = snapshot.estimate?.quotaIsAdvisory ?? false;
 
     const nearQuota =
-      (quotaBytes !== undefined &&
+      !quotaIsAdvisory &&
+      ((quotaBytes !== undefined &&
         usageForAvailable !== undefined &&
         quotaBytes > 0 &&
         usageForAvailable / quotaBytes >= warningRatio) ||
-      (availableBytes !== undefined && availableBytes <= minAvailableBytes);
+        (availableBytes !== undefined && availableBytes <= minAvailableBytes));
 
     return {
       buckets,
       totalUsedBytes,
       quotaBytes,
       availableBytes,
+      persisted: snapshot.estimate?.persisted,
+      quotaExempt: snapshot.estimate?.quotaExempt ?? false,
+      quotaIsAdvisory,
       estimateSource: snapshot.estimate?.source ?? "unknown",
       nearQuota,
       subtitlesBytes,

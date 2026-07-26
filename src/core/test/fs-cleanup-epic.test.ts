@@ -12,6 +12,7 @@ describe("fsCleanupOnInitEpic", () => {
       deleteBucket: vi.fn(),
       setSubtitleText: vi.fn(),
       getSubtitleText: vi.fn(),
+      prepareTextDownload: vi.fn(),
       saveAs: vi.fn(),
       getStorageStats: vi.fn(),
     };
@@ -22,7 +23,7 @@ describe("fsCleanupOnInitEpic", () => {
         loader: {} as any,
         decryptor: {} as any,
         parser: {} as any,
-      })
+      }),
     );
     expect(fs.cleanup).toHaveBeenCalled();
     expect(result.type).toBe("init/done");

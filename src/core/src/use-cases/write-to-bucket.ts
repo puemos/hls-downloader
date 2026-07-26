@@ -4,9 +4,12 @@ export const writeToBucketFactory = (fs: IFS) => {
   const run = async (
     bucketID: string,
     index: number,
-    data: ArrayBuffer
+    data: ArrayBuffer,
   ): Promise<void> => {
     const bucket = await fs.getBucket(bucketID);
+    if (!bucket) {
+      throw new Error(`Download data for ${bucketID} was not found`);
+    }
     await bucket.write(index, data);
   };
   return run;

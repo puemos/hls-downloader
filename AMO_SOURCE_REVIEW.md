@@ -26,11 +26,20 @@ uses that directory as its source package.
 
 - `dist/mv2/manifest.json`
 - `dist/mv2/background.js`
+- `dist/mv2/assets/worker-*.js`
+- `dist/mv2/assets/disk-mux-worker-*.js`
 - `dist/mv2/popup.html`
 - `dist/mv2/popup.css`
 - `dist/mv2/popup.js`
 - `dist/extension-mv2-firefox.xpi`
 
 `browser_specific_settings.gecko.id` and
+`browser_specific_settings.gecko.strict_min_version: "115.0"` and
 `data_collection_permissions.required: ["none"]` are committed in
 `src/assets/manifest.json`; no post-build manifest edits are required.
+
+The two generated workers are local build artifacts. `worker-*.js` is the
+`@ffmpeg/ffmpeg` compatibility worker for pre-existing IndexedDB jobs.
+`disk-mux-worker-*.js` handles new OPFS-backed jobs. Its dynamic import URL is
+always built with the extension runtime API and points only to the committed
+`assets/ffmpeg/ffmpeg-core.js`; it does not load remote code.

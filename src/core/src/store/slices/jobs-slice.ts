@@ -36,7 +36,6 @@ export interface ISaveAsJobPayload {
 }
 export interface ISaveAsJobSuccessPayload {
   jobId: string;
-  link?: string;
 }
 export interface ISetSaveProgressPayload {
   jobId: string;
@@ -167,7 +166,7 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
     },
     incDownloadStatus(
       state,
-      action: PayloadAction<IIncJobDownloadStatusPayload>
+      action: PayloadAction<IIncJobDownloadStatusPayload>,
     ) {
       const { jobId: jobId } = action.payload;
       const jobStatus = state.jobsStatus[jobId];
@@ -187,7 +186,6 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
       const job = state.jobs[jobId];
       const jobStatus = state.jobsStatus[jobId];
       if (!job || !jobStatus) return;
-      job.link = action.payload.link;
       jobStatus.status = "done";
     },
     setSaveProgress(state, action: PayloadAction<ISetSaveProgressPayload>) {

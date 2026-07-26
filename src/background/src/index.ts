@@ -4,17 +4,25 @@ import { subscribeListeners } from "./listeners";
 import { getState, saveState } from "./persistState";
 import { CryptoDecryptor } from "./services/crypto-decryptor";
 import { FetchLoader } from "./services/fetch-loader";
-import { IndexedDBFS } from "./services/indexedb-fs";
+import {
+  DiskBackedFS,
+  initializeDownloadTracking,
+} from "./services/disk-backed-fs";
 import { M3u8Parser } from "./services/m3u8-parser";
 
 const wrapStore = createWrapStore();
 
 (async () => {
+  try {
+    await initializeDownloadTracking();
+  } catch (error) {
+    console.warn("[downloads] failed to restore artifact tracking", error);
+  }
   const state = await getState();
   const store = createStore(
     {
       decryptor: CryptoDecryptor,
-      fs: IndexedDBFS,
+      fs: DiskBackedFS,
       loader: FetchLoader,
       parser: M3u8Parser,
     },

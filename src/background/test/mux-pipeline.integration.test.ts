@@ -78,7 +78,11 @@ Object.defineProperty(global, "window", {
 
 // ── Imports (after mocks) ──
 
-import { IndexedDBFS, IndexedDBBucket } from "../src/services/indexedb-fs";
+import {
+  IndexedDBFS,
+  IndexedDBBucket,
+  createLegacyBucketForTests,
+} from "../src/services/disk-backed-fs";
 
 // ── Fixture loading ──
 
@@ -125,13 +129,13 @@ describe("Mux Pipeline Integration", () => {
 
   it("muxed v+a: 2 segments stored, concatenated correctly with valid TS data", async () => {
     const id = "mux-concat-test";
-    await IndexedDBFS.createBucket(id, 2, 0);
+    await createLegacyBucketForTests(id, 2, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, videoAudioMuxed.buffer);
     await bucket.write(1, videoAudioSeg2.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrites = writesMatching(/^video-\d{6}\.ts$/);
     expect(videoWrites).toHaveLength(2);
@@ -145,7 +149,7 @@ describe("Mux Pipeline Integration", () => {
     expect(videoWrites[1].data[0]).toBe(TS_SYNC_BYTE);
 
     expect(decodedWrite("video.concat.txt")).toBe(
-      "video-000000.ts\nvideo-000001.ts\n"
+      "video-000000.ts\nvideo-000001.ts\n",
     );
     expect(mock.getExecArgs()[0]).toContain("concatf:video.concat.txt");
 
@@ -154,13 +158,13 @@ describe("Mux Pipeline Integration", () => {
 
   it("separate video + audio: two writeFile calls with correct data", async () => {
     const id = "separate-va-test";
-    await IndexedDBFS.createBucket(id, 1, 1);
+    await createLegacyBucketForTests(id, 1, 1);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, videoOnly.buffer);
     await bucket.write(1, audioOnly.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrite = mock.getVideoWrite();
     const audioWrite = mock.getAudioWrite();
@@ -192,13 +196,13 @@ describe("Mux Pipeline Integration", () => {
 
   it("uses requested mkv output without subtitles", async () => {
     const id = "mkv-output-test";
-    await IndexedDBFS.createBucket(id, 1, 1);
+    await createLegacyBucketForTests(id, 1, 1);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, videoOnly.buffer);
     await bucket.write(1, audioOnly.buffer);
 
-    await bucket.getLink(undefined, { container: "mkv" });
+    await bucket.prepareDownload(undefined, { container: "mkv" });
 
     const args = mock.getExecArgs()[0];
     expect(args).toContain("output.mkv");
@@ -208,12 +212,12 @@ describe("Mux Pipeline Integration", () => {
 
   it("muxed with extra stream: maps 0:v and 0:a?, not bare 0", async () => {
     const id = "data-stream-test";
-    await IndexedDBFS.createBucket(id, 1, 0);
+    await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, muxedWithData.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrite = mock.getVideoWrite();
     expect(videoWrite).toBeDefined();
@@ -239,12 +243,12 @@ describe("Mux Pipeline Integration", () => {
 
   it("audio-only bucket: only audio.ts writeFile, correct exec args", async () => {
     const id = "audio-only-test";
-    await IndexedDBFS.createBucket(id, 0, 1);
+    await createLegacyBucketForTests(id, 0, 1);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, audioOnly.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     // Should only write audio.ts, no video.ts
     expect(mock.getVideoWrite()).toBeUndefined();
@@ -265,7 +269,7 @@ describe("Mux Pipeline Integration", () => {
 
   it("out-of-order chunk writes produce correct sequential order", async () => {
     const id = "ooo-test";
-    await IndexedDBFS.createBucket(id, 3, 0);
+    await createLegacyBucketForTests(id, 3, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     const chunk0 = videoAudioMuxed;
@@ -277,7 +281,7 @@ describe("Mux Pipeline Integration", () => {
     await bucket.write(0, chunk0.buffer);
     await bucket.write(1, chunk1.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrites = writesMatching(/^video-\d{6}\.ts$/);
     expect(videoWrites.map((write) => write.filename)).toEqual([
@@ -290,7 +294,7 @@ describe("Mux Pipeline Integration", () => {
     expect(videoWrites[1].data).toEqual(chunk1);
     expect(videoWrites[2].data).toEqual(chunk2);
     expect(decodedWrite("video.concat.txt")).toBe(
-      "video-000000.ts\nvideo-000001.ts\nvideo-000002.ts\n"
+      "video-000000.ts\nvideo-000001.ts\nvideo-000002.ts\n",
     );
 
     await IndexedDBFS.deleteBucket(id);
@@ -298,7 +302,7 @@ describe("Mux Pipeline Integration", () => {
 
   it("subtitles produce MKV with subtitle metadata in args", async () => {
     const id = "subtitle-test";
-    await IndexedDBFS.createBucket(id, 1, 0);
+    await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, videoOnly.buffer);
@@ -308,7 +312,7 @@ describe("Mux Pipeline Integration", () => {
       language: "en",
     });
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     // Check that subtitles.vtt was written to FFmpeg FS
     const subtitleWrite = mock.getSubtitleWrite();
@@ -329,9 +333,9 @@ describe("Mux Pipeline Integration", () => {
     await IndexedDBFS.deleteBucket(id);
   });
 
-  it("sparse bucket (missing chunk) still muxes with available data", async () => {
+  it("sparse legacy bucket fails with a re-download instruction", async () => {
     const id = "sparse-test";
-    await IndexedDBFS.createBucket(id, 3, 0);
+    await createLegacyBucketForTests(id, 3, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     const chunk0 = videoAudioMuxed;
@@ -341,26 +345,17 @@ describe("Mux Pipeline Integration", () => {
     // Skip index 1
     await bucket.write(2, chunk2.buffer);
 
-    await bucket.getLink();
-
-    const videoWrites = writesMatching(/^video-\d{6}\.ts$/);
-    expect(videoWrites.map((write) => write.filename)).toEqual([
-      "video-000000.ts",
-      "video-000002.ts",
-    ]);
-
-    expect(videoWrites[0].data).toEqual(chunk0);
-    expect(videoWrites[1].data).toEqual(chunk2);
-    expect(decodedWrite("video.concat.txt")).toBe(
-      "video-000000.ts\nvideo-000002.ts\n"
+    await expect(bucket.prepareDownload()).rejects.toThrow(
+      /Missing video fragment 1.*Re-download/,
     );
+    expect(mock.getExecArgs()).toHaveLength(0);
 
     await IndexedDBFS.deleteBucket(id);
   });
 
   it("FFmpeg exit code 1 propagates error", async () => {
     const id = "exit-code-test";
-    await IndexedDBFS.createBucket(id, 1, 0);
+    await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, videoOnly.buffer);
@@ -368,22 +363,24 @@ describe("Mux Pipeline Integration", () => {
     // Make FFmpeg return non-zero exit code via capture state
     capture.execReturnValue = 1;
 
-    await expect(bucket.getLink()).rejects.toThrow("FFmpeg exited with code 1");
+    await expect(bucket.prepareDownload()).rejects.toThrow(
+      "FFmpeg exited with code 1",
+    );
 
     await IndexedDBFS.deleteBucket(id);
   });
 
-  it("progress callback fires with Done", async () => {
+  it("progress callback reports when the legacy artifact is ready", async () => {
     const id = "progress-test";
-    await IndexedDBFS.createBucket(id, 1, 0);
+    await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     await bucket.write(0, videoOnly.buffer);
 
     const progressMock = vi.fn();
-    await bucket.getLink(progressMock);
+    await bucket.prepareDownload(progressMock);
 
-    expect(progressMock).toHaveBeenCalledWith(1, "Done");
+    expect(progressMock).toHaveBeenCalledWith(1, "Ready to download");
 
     await IndexedDBFS.deleteBucket(id);
   });
@@ -391,11 +388,11 @@ describe("Mux Pipeline Integration", () => {
   it("-shortest only present with both video and audio", async () => {
     // video+audio: should have -shortest
     const id1 = "shortest-va";
-    await IndexedDBFS.createBucket(id1, 1, 1);
+    await createLegacyBucketForTests(id1, 1, 1);
     const bucket1 = (await IndexedDBFS.getBucket(id1)) as IndexedDBBucket;
     await bucket1.write(0, videoOnly.buffer);
     await bucket1.write(1, audioOnly.buffer);
-    await bucket1.getLink();
+    await bucket1.prepareDownload();
 
     expect(mock.getExecArgs()[0]).toContain("-shortest");
 
@@ -403,10 +400,10 @@ describe("Mux Pipeline Integration", () => {
 
     // video-only: should NOT have -shortest
     const id2 = "shortest-v";
-    await IndexedDBFS.createBucket(id2, 1, 0);
+    await createLegacyBucketForTests(id2, 1, 0);
     const bucket2 = (await IndexedDBFS.getBucket(id2)) as IndexedDBBucket;
     await bucket2.write(0, videoOnly.buffer);
-    await bucket2.getLink();
+    await bucket2.prepareDownload();
 
     expect(mock.getExecArgs()[0]).not.toContain("-shortest");
 
@@ -414,10 +411,10 @@ describe("Mux Pipeline Integration", () => {
 
     // audio-only: should NOT have -shortest
     const id3 = "shortest-a";
-    await IndexedDBFS.createBucket(id3, 0, 1);
+    await createLegacyBucketForTests(id3, 0, 1);
     const bucket3 = (await IndexedDBFS.getBucket(id3)) as IndexedDBBucket;
     await bucket3.write(0, audioOnly.buffer);
-    await bucket3.getLink();
+    await bucket3.prepareDownload();
 
     expect(mock.getExecArgs()[0]).not.toContain("-shortest");
 

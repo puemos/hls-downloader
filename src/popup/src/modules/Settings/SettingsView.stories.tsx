@@ -14,6 +14,8 @@ const storage: StorageState = {
   loading: false,
   buckets: {},
   totalUsedBytes: 0,
+  quotaExempt: false,
+  quotaIsAdvisory: false,
   estimateSource: "unknown",
   nearQuota: false,
   cleanupStatus: "idle",

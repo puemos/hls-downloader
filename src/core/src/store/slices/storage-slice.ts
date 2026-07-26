@@ -19,6 +19,9 @@ export interface StorageState {
   totalUsedBytes: number;
   availableBytes?: number;
   quotaBytes?: number;
+  persisted?: boolean;
+  quotaExempt: boolean;
+  quotaIsAdvisory: boolean;
   estimateSource: StorageEstimate["source"];
   nearQuota: boolean;
   subtitlesBytes?: number;
@@ -31,6 +34,8 @@ export const initialStorageState: StorageState = {
   loading: false,
   buckets: {},
   totalUsedBytes: 0,
+  quotaExempt: false,
+  quotaIsAdvisory: false,
   estimateSource: "unknown",
   nearQuota: false,
   cleanupStatus: "idle",
@@ -62,14 +67,20 @@ export const storageSlice: Slice<StorageState, StorageReducers, "storage"> =
         state.lastUpdated = Date.now();
         state.availableBytes = action.payload.availableBytes;
         state.quotaBytes = action.payload.quotaBytes;
+        state.persisted = action.payload.persisted;
+        state.quotaExempt = action.payload.quotaExempt;
+        state.quotaIsAdvisory = action.payload.quotaIsAdvisory;
         state.estimateSource = action.payload.estimateSource;
         state.nearQuota = action.payload.nearQuota;
         state.totalUsedBytes = action.payload.totalUsedBytes;
         state.subtitlesBytes = action.payload.subtitlesBytes;
-        state.buckets = action.payload.buckets.reduce((acc, bucket) => {
-          acc[bucket.id] = bucket;
-          return acc;
-        }, {} as Record<string, StorageBucketStats>);
+        state.buckets = action.payload.buckets.reduce(
+          (acc, bucket) => {
+            acc[bucket.id] = bucket;
+            return acc;
+          },
+          {} as Record<string, StorageBucketStats>,
+        );
       },
       refreshFailure(state, action: PayloadAction<{ error: string }>) {
         state.loading = false;

@@ -7,12 +7,18 @@ import { Job } from "../src/entities/index.ts";
 describe("saveAsJobEpic", () => {
   it("saves job to file and emits success", async () => {
     const job = new Job("1", "p1", [], [], "file.mp4", Date.now());
-    const getLink = vi.fn().mockResolvedValue("link");
+    const download = {
+      url: "blob:download",
+      exportId: "export.mp4",
+      mime: "video/mp4",
+      size: 42,
+    };
+    const prepareDownload = vi.fn().mockResolvedValue(download);
     const fs = {
       getBucket: vi.fn().mockResolvedValue({
-        getLink,
+        prepareDownload,
       }),
-      saveAs: vi.fn().mockResolvedValue(undefined),
+      saveAs: vi.fn().mockResolvedValue(1),
     };
     const action$ = of(jobsSlice.actions.saveAs({ jobId: "1" }));
     const state = {
@@ -20,17 +26,15 @@ describe("saveAsJobEpic", () => {
       config: { saveDialog: true },
     };
     const result = await firstValueFrom(
-      saveAsJobEpic(action$, { value: state } as any, { fs } as any)
+      saveAsJobEpic(action$, { value: state } as any, { fs } as any),
     );
-    expect(fs.saveAs).toHaveBeenCalledWith("file.mp4", "link", {
+    expect(fs.saveAs).toHaveBeenCalledWith("file.mp4", download, {
       dialog: true,
     });
-    expect(getLink).toHaveBeenCalledWith(expect.any(Function), {
+    expect(prepareDownload).toHaveBeenCalledWith(expect.any(Function), {
       container: "mp4",
     });
-    expect(result).toEqual(
-      jobsSlice.actions.saveAsSuccess({ jobId: "1", link: "link" })
-    );
+    expect(result).toEqual(jobsSlice.actions.saveAsSuccess({ jobId: "1" }));
   });
 
   it("passes stored mkv output container when creating the save link", async () => {
@@ -43,12 +47,17 @@ describe("saveAsJobEpic", () => {
       createdAt: Date.now(),
       outputContainer: "mkv" as const,
     };
-    const getLink = vi.fn().mockResolvedValue("link");
+    const prepareDownload = vi.fn().mockResolvedValue({
+      url: "blob:download",
+      exportId: "export.mkv",
+      mime: "video/x-matroska",
+      size: 42,
+    });
     const fs = {
       getBucket: vi.fn().mockResolvedValue({
-        getLink,
+        prepareDownload,
       }),
-      saveAs: vi.fn().mockResolvedValue(undefined),
+      saveAs: vi.fn().mockResolvedValue(1),
     };
     const action$ = of(jobsSlice.actions.saveAs({ jobId: "1" }));
     const state = {
@@ -57,10 +66,10 @@ describe("saveAsJobEpic", () => {
     };
 
     await firstValueFrom(
-      saveAsJobEpic(action$, { value: state } as any, { fs } as any)
+      saveAsJobEpic(action$, { value: state } as any, { fs } as any),
     );
 
-    expect(getLink).toHaveBeenCalledWith(expect.any(Function), {
+    expect(prepareDownload).toHaveBeenCalledWith(expect.any(Function), {
       container: "mkv",
     });
   });

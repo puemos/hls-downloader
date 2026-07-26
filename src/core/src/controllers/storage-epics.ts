@@ -29,11 +29,11 @@ export const fetchStorageStatsEpic: Epic<
               error:
                 (error as Error)?.message ??
                 "Failed to read storage information",
-            })
-          )
-        )
-      )
-    )
+            }),
+          ),
+        ),
+      ),
+    ),
   );
 
 const STORAGE_TRIGGER_ACTIONS: Array<(action: RootAction) => boolean> = [
@@ -56,7 +56,7 @@ export const autoRefreshStorageStatsEpic: Epic<
   action$.pipe(
     filter((action) => STORAGE_TRIGGER_ACTIONS.some((match) => match(action))),
     throttleTime(700, undefined, { leading: true, trailing: true }),
-    map(() => storageSlice.actions.refresh())
+    map(() => storageSlice.actions.refresh()),
   );
 
 export const cleanupStorageEpic: Epic<
@@ -75,12 +75,12 @@ export const cleanupStorageEpic: Epic<
           return false;
         }
         return ["downloading", "queued", "saving", "ready"].includes(
-          status.status
+          status.status,
         );
       });
 
       const cancelActions = cancellableJobs.map((jobId) =>
-        jobsSlice.actions.cancel({ jobId })
+        jobsSlice.actions.cancel({ jobId }),
       );
 
       return concat(
@@ -90,19 +90,19 @@ export const cleanupStorageEpic: Epic<
             of(
               storageSlice.actions.cleanupSuccess(),
               jobsSlice.actions.clear(),
-              storageSlice.actions.refresh()
-            )
+              storageSlice.actions.refresh(),
+            ),
           ),
           catchError((error: unknown) =>
             of(
               storageSlice.actions.cleanupFailure({
                 error:
                   (error as Error)?.message ??
-                  "Failed to clean IndexedDB storage",
-              })
-            )
-          )
-        )
+                  "Failed to clean browser storage",
+              }),
+            ),
+          ),
+        ),
       );
-    })
+    }),
   );

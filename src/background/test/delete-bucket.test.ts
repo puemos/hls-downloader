@@ -18,7 +18,10 @@ vi.mock("webextension-polyfill", () => {
   };
 });
 import "fake-indexeddb/auto";
-import { IndexedDBFS } from "../src/services/indexedb-fs";
+import {
+  IndexedDBFS,
+  createLegacyBucketForTests,
+} from "../src/services/disk-backed-fs";
 
 describe("IndexedDBFS deleteBucket", () => {
   beforeEach(async () => {
@@ -31,7 +34,7 @@ describe("IndexedDBFS deleteBucket", () => {
 
   it("removes bucket data from indexedDB", async () => {
     const bucketId = "job-delete-test";
-    await IndexedDBFS.createBucket(bucketId, 1, 0);
+    await createLegacyBucketForTests(bucketId, 1, 0);
     const bucket = await IndexedDBFS.getBucket(bucketId);
     await bucket?.write(0, new ArrayBuffer(1));
 

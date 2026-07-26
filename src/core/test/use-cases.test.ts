@@ -5,7 +5,7 @@ import {
   writeToBucketFactory,
   saveAsFactory,
   fsCleanupFactory,
-  getLinkBucketFactory,
+  prepareDownloadBucketFactory,
   generateFileName,
   generateSubtitleFileName,
   decryptSingleFragmentFactory,
@@ -14,6 +14,7 @@ import {
   getLevelsFactory,
   getStorageStatsFactory,
   getPlaylistDurationFactory,
+  downloadSubtitleTrackFactory,
 } from "../src/use-cases/index.ts";
 import { Playlist, Level, Key, Fragment } from "../src/entities/index.ts";
 import type {
@@ -25,9 +26,15 @@ import type {
 } from "../src/services/index.ts";
 
 const createFsMock = () => {
+  const download = {
+    url: "blob:download",
+    exportId: "export.mp4",
+    mime: "video/mp4",
+    size: 42,
+  };
   const bucket: Bucket = {
     write: vi.fn().mockResolvedValue(undefined),
-    getLink: vi.fn().mockResolvedValue("link"),
+    prepareDownload: vi.fn().mockResolvedValue(download),
   };
 
   const fs: IFS = {
@@ -37,13 +44,14 @@ const createFsMock = () => {
     getBucket: vi.fn().mockResolvedValue(bucket),
     setSubtitleText: vi.fn().mockResolvedValue(undefined),
     getSubtitleText: vi.fn().mockResolvedValue(undefined),
-    saveAs: vi.fn().mockResolvedValue(undefined),
+    prepareTextDownload: vi.fn().mockResolvedValue(download),
+    saveAs: vi.fn().mockResolvedValue(1),
     getStorageStats: vi.fn().mockResolvedValue({
       buckets: [],
       estimate: { source: "fallback" },
     }),
   };
-  return { fs, bucket };
+  return { fs, bucket, download };
 };
 
 describe("use-cases", () => {
@@ -67,9 +75,9 @@ describe("use-cases", () => {
   });
 
   it("saves to file", async () => {
-    const { fs } = createFsMock();
-    await saveAsFactory(fs)("p", "l", { dialog: true });
-    expect(fs.saveAs).toHaveBeenCalledWith("p", "l", { dialog: true });
+    const { fs, download } = createFsMock();
+    await saveAsFactory(fs)("p", download, { dialog: true });
+    expect(fs.saveAs).toHaveBeenCalledWith("p", download, { dialog: true });
   });
 
   it("cleans up fs", async () => {
@@ -78,25 +86,25 @@ describe("use-cases", () => {
     expect(fs.cleanup).toHaveBeenCalled();
   });
 
-  it("gets link from bucket", async () => {
-    const { fs, bucket } = createFsMock();
-    const link = await getLinkBucketFactory(fs)("id");
+  it("prepares a download from a bucket", async () => {
+    const { fs, bucket, download } = createFsMock();
+    const result = await prepareDownloadBucketFactory(fs)("id");
     expect(fs.getBucket).toHaveBeenCalledWith("id");
-    expect(bucket.getLink).toHaveBeenCalled();
-    expect(link).toBe("link");
+    expect(bucket.prepareDownload).toHaveBeenCalled();
+    expect(result).toBe(download);
   });
 
-  it("passes output options when getting a link from bucket", async () => {
-    const { fs, bucket } = createFsMock();
+  it("passes output options when preparing a download", async () => {
+    const { fs, bucket, download } = createFsMock();
     const onProgress = vi.fn();
-    const link = await getLinkBucketFactory(fs)("id", onProgress, {
+    const result = await prepareDownloadBucketFactory(fs)("id", onProgress, {
       container: "mkv",
     });
 
-    expect(bucket.getLink).toHaveBeenCalledWith(onProgress, {
+    expect(bucket.prepareDownload).toHaveBeenCalledWith(onProgress, {
       container: "mkv",
     });
-    expect(link).toBe("link");
+    expect(result).toBe(download);
   });
 
   it("generates file name with page title", () => {
@@ -104,7 +112,7 @@ describe("use-cases", () => {
       "1",
       "https://a/b/c.m3u8",
       Date.now(),
-      "page"
+      "page",
     );
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
@@ -116,7 +124,7 @@ describe("use-cases", () => {
       "1",
       "https://a/b/c.m3u8",
       Date.now(),
-      "page"
+      "page",
     );
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
@@ -128,11 +136,64 @@ describe("use-cases", () => {
       "1",
       "https://a/b/stream.m3u8",
       Date.now(),
-      'Video "Test" <2024>'
+      'Video "Test" <2024>',
     );
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
     expect(run(playlist, level)).toBe("Video _Test_ _2024_-stream.mp4");
+  });
+
+  it("prepares standalone subtitles through the filesystem owner", async () => {
+    const { fs, download } = createFsMock();
+    const loader: ILoader = {
+      fetchText: vi
+        .fn()
+        .mockResolvedValueOnce("#EXTM3U")
+        .mockResolvedValueOnce(" WEBVTT\n\n00:00.000 --> 00:01.000\nHello "),
+      fetchArrayBuffer: vi.fn(),
+    };
+    const parser: IParser = {
+      parseMasterPlaylist: vi.fn().mockReturnValue([]),
+      parseLevelPlaylist: vi.fn().mockReturnValue([]),
+      inspectLevelEncryption: vi.fn().mockReturnValue({
+        methods: [],
+        keyUris: [],
+        iv: null,
+      }),
+    };
+    const playlist = new Playlist(
+      "playlist",
+      "https://example.com/master.m3u8",
+      Date.now(),
+      "Episode",
+    );
+    const level = new Level(
+      "subtitle",
+      "English",
+      playlist.uri,
+      "subtitles.m3u8",
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "en",
+    );
+
+    const fileName = await downloadSubtitleTrackFactory(loader, parser, fs)(
+      level,
+      playlist,
+      2,
+      false,
+    );
+
+    expect(fs.prepareTextDownload).toHaveBeenCalledWith(
+      "WEBVTT\n\n00:00.000 --> 00:01.000\nHello",
+      "text/vtt",
+    );
+    expect(fs.saveAs).toHaveBeenCalledWith("Episode-en.vtt", download, {
+      dialog: false,
+    });
+    expect(fileName).toBe("Episode-en.vtt");
   });
 
   it("sanitizes illegal characters in subtitle page title", () => {
@@ -140,7 +201,7 @@ describe("use-cases", () => {
       "1",
       "https://a/b/stream.m3u8",
       Date.now(),
-      'Video "Test" <2024>'
+      'Video "Test" <2024>',
     );
     const level = new Level(
       "subtitle",
@@ -151,7 +212,7 @@ describe("use-cases", () => {
       undefined,
       undefined,
       undefined,
-      "en"
+      "en",
     );
     const run = generateSubtitleFileName();
     expect(run(playlist, level)).toBe("Video _Test_ _2024_-en.vtt");
@@ -162,7 +223,7 @@ describe("use-cases", () => {
       "1",
       "https://a/b/c.m3u8",
       Date.now(),
-      "Cafe\u0301"
+      "Cafe\u0301",
     );
     const level = new Level("stream", "l", "1", "uri");
     const run = generateFileName();
@@ -226,13 +287,13 @@ describe("use-cases", () => {
       "https://example.com/CMAF_720.mp4",
       1,
       null,
-      { offset: 833, length: 50000 }
+      { offset: 833, length: 50000 },
     );
     const data = await run(fragment, 3);
     expect(loader.fetchArrayBuffer).toHaveBeenCalledWith(
       "https://example.com/CMAF_720.mp4",
       3,
-      { offset: 833, length: 50000 }
+      { offset: 833, length: 50000 },
     );
     expect(data.byteLength).toBe(100);
   });
@@ -250,19 +311,19 @@ describe("use-cases", () => {
       new Key(null, null),
       "https://example.com/frag.ts?token=abc",
       0,
-      "https://example.com/frag.ts"
+      "https://example.com/frag.ts",
     );
     const data = await run(fragment, 2);
 
     expect(loader.fetchArrayBuffer).toHaveBeenNthCalledWith(
       1,
       "https://example.com/frag.ts?token=abc",
-      2
+      2,
     );
     expect(loader.fetchArrayBuffer).toHaveBeenNthCalledWith(
       2,
       "https://example.com/frag.ts",
-      2
+      2,
     );
     expect(data.byteLength).toBe(1);
   });
@@ -284,17 +345,17 @@ describe("use-cases", () => {
       "stream",
       "l1",
       "http://example.com/master.m3u8",
-      "http://example.com/level.m3u8"
+      "http://example.com/level.m3u8",
     );
     const run = getFragmentsDetailsFactory(loader, parser);
     const result = await run(level, 7);
     expect(loader.fetchText).toHaveBeenCalledWith(
       "http://example.com/level.m3u8",
-      7
+      7,
     );
     expect(parser.parseLevelPlaylist).toHaveBeenCalledWith(
       "playlist",
-      "http://example.com/level.m3u8"
+      "http://example.com/level.m3u8",
     );
     expect(result).toHaveLength(1);
     expect(result[0]!.uri).toBe("http://example.com/f1.ts");
@@ -313,7 +374,7 @@ describe("use-cases", () => {
       new Fragment(
         new Key("http://example.com/key", new Uint8Array([1])),
         "http://example.com/video.ts",
-        0
+        0,
       ),
     ];
     const parser: IParser = {
@@ -325,7 +386,7 @@ describe("use-cases", () => {
       "stream",
       "l1",
       "http://example.com/master.m3u8?session=abc",
-      "http://example.com/level.m3u8"
+      "http://example.com/level.m3u8",
     );
     const run = getFragmentsDetailsFactory(loader, parser);
     const result = await run(level, 3, {
@@ -334,7 +395,7 @@ describe("use-cases", () => {
 
     expect(loader.fetchText).toHaveBeenCalledWith(
       "http://example.com/level.m3u8?session=abc",
-      3
+      3,
     );
     expect(result[0]!.uri).toBe("http://example.com/video.ts?session=abc");
     expect(result[0]!.fallbackUri).toBe("http://example.com/video.ts");
@@ -359,11 +420,11 @@ describe("use-cases", () => {
     const result = await run("http://example.com/master.m3u8", 9);
     expect(loader.fetchText).toHaveBeenCalledWith(
       "http://example.com/master.m3u8",
-      9
+      9,
     );
     expect(parser.parseMasterPlaylist).toHaveBeenCalledWith(
       "master",
-      "http://example.com/master.m3u8"
+      "http://example.com/master.m3u8",
     );
     expect(result).toEqual(levels);
   });
@@ -489,6 +550,31 @@ describe("use-cases", () => {
     expect(stats.nearQuota).toBe(false);
   });
 
+  it("does not warn on an advisory quota estimate", async () => {
+    const snapshot = {
+      buckets: [],
+      subtitlesBytes: 0,
+      estimate: {
+        usage: 9_500,
+        quota: 10_000,
+        available: 500,
+        persisted: false,
+        quotaExempt: true,
+        quotaIsAdvisory: true,
+        source: "navigator" as const,
+      },
+    };
+    const { fs } = createFsMock();
+    (fs.getStorageStats as any).mockResolvedValue(snapshot);
+
+    const stats = await getStorageStatsFactory(fs as any)();
+
+    expect(stats.nearQuota).toBe(false);
+    expect(stats.persisted).toBe(false);
+    expect(stats.quotaExempt).toBe(true);
+    expect(stats.quotaIsAdvisory).toBe(true);
+  });
+
   it("handles empty buckets array", async () => {
     const snapshot = {
       buckets: [],
@@ -547,7 +633,7 @@ describe("use-cases", () => {
     const duration = await run("http://example.com/l.m3u8", null, 2);
     expect(loader.fetchText).toHaveBeenCalledWith(
       "http://example.com/l.m3u8",
-      2
+      2,
     );
     expect(duration).toBeCloseTo(7.5);
   });
