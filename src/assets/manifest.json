@@ -27,11 +27,11 @@
     "persistent": true
   },
   "web_accessible_resources": ["assets/**/*"],
-  "content_security_policy": "script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
   "browser_specific_settings": {
     "gecko": {
       "id": "{e3ec0551-9bfa-4233-b9dd-6b36f6a80962}",
-      "strict_min_version": "115.0",
+      "strict_min_version": "128.0",
       "data_collection_permissions": {
         "required": ["none"]
       }

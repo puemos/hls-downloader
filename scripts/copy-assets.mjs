@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
 const distDir = path.resolve(
   repoRoot,
-  process.env.DIST_DIR ? process.env.DIST_DIR : "dist"
+  process.env.DIST_DIR ? process.env.DIST_DIR : "dist",
 );
 const assetsDir = path.join(repoRoot, "src", "assets");
 
@@ -25,26 +25,26 @@ async function run() {
   // Copy manifest for the selected target
   if (process.env.NO_BLOCKLIST === "true") {
     const manifest = JSON.parse(
-      await readFile(path.join(assetsDir, manifestFile), "utf8")
+      await readFile(path.join(assetsDir, manifestFile), "utf8"),
     );
-    manifest.name = "experimental unstable nightly beta alpha hls-downloader";
+    manifest.name = "HLS Downloader (Experimental No Blocklist)";
 
     // We need to write the modified manifest
     await writeFile(
       path.join(distDir, "manifest.json"),
-      JSON.stringify(manifest, null, 2)
+      JSON.stringify(manifest, null, 2),
     );
   } else {
     await copyFile(
       path.join(assetsDir, manifestFile),
-      path.join(distDir, "manifest.json")
+      path.join(distDir, "manifest.json"),
     );
   }
 
   if (target === "mv3") {
     await copyFile(
       path.join(assetsDir, "offscreen.html"),
-      path.join(distDir, "offscreen.html")
+      path.join(distDir, "offscreen.html"),
     );
   }
 }

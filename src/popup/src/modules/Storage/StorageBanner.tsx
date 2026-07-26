@@ -25,7 +25,7 @@ const StorageBanner = ({
   const cleaning = cleanupStatus === "running";
 
   return (
-    <div className="mx-4 mb-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-900 shadow-sm">
+    <div className="mx-4 mb-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-900 shadow-xs">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-col">
           <div className="text-sm font-semibold">Low storage</div>

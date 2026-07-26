@@ -175,7 +175,6 @@ const PlaylistPreview = ({ playlist, status, onDuration }: Props) => {
               size="sm"
               variant="secondary"
               onClick={() => setReloadKey((key) => key + 1)}
-              disabled={state === "loading"}
             >
               Try again
             </Button>

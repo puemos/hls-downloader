@@ -58,7 +58,7 @@
 
 <sup>*For Brave/Arc/etc. download the ZIP from the [latest release](https://github.com/puemos/hls-downloader/releases) and follow the manual-install steps below.</sup>
 
-Current releases require Firefox 115 or newer, or Chromium 109 or newer.
+Current releases require Firefox 128 or newer, or Chromium 111 or newer.
 
 ---
 
@@ -139,7 +139,7 @@ of memory, delete it and download it again.
 
 ### Clone & Build
 
-Requires Node.js 20+ (includes [Corepack](https://nodejs.org/api/corepack.html)) and the `zip` command.
+Requires Node.js 22.12+ (includes [Corepack](https://nodejs.org/api/corepack.html)) and the `zip` command.
 
 ```bash
 git clone https://github.com/puemos/hls-downloader.git
@@ -268,7 +268,7 @@ pnpm run build:mv3:no-blocklist
 pnpm run build:all-variants
 ```
 
-Non-blocklist builds are named "experimental unstable nightly beta alpha hls-downloader" and are intended for personal use only—not for redistribution on official stores.
+Non-blocklist builds are named "HLS Downloader (Experimental No Blocklist)" and are intended for personal use only—not for redistribution on official stores.
 
 ---
 

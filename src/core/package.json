@@ -12,21 +12,23 @@
   "scripts": {
     "dev": "tsc -w",
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage --coverage.reporter=json-summary"
   },
   "devDependencies": {
-    "@types/node": "26.0.1",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "@types/node": "26.1.1",
     "@types/redux-logger": "3.0.13",
-    "prettier": "3.9.0",
-    "typescript": "6.0.3",
-    "vitest": "4.1.9"
+    "prettier": "3.9.6",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "vitest": "4.1.10"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "1.9.7",
-    "redux": "4.2.1",
+    "@reduxjs/toolkit": "2.12.0",
+    "redux": "5.0.1",
     "redux-logger": "3.0.6",
-    "redux-observable": "2.0.0",
+    "redux-observable": "3.0.0-rc.3",
     "rxjs": "7.8.2",
     "typesafe-actions": "5.1.0"
   }

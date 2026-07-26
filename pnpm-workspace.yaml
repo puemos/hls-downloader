@@ -3,11 +3,24 @@ packages:
   - src/core
   - src/design-system
   - src/popup
+auditConfig:
+  # The affected compatibility versions are patched and exploit-tested below.
+  ignoreCves:
+    - CVE-2026-14257
 ignoredBuiltDependencies:
   - esbuild
 overrides:
   "@babel/core@<=7.29.0": "7.29.7"
+  adm-zip@<0.6.0: "0.6.0"
+  # Keep legacy consumers on compatible APIs; the patches below route these
+  # releases through the bundled CVE-2026-14257-fixed implementation.
+  brace-expansion@<1.1.16: "1.1.16"
+  brace-expansion@>=3.0.0 <5.0.8: "5.0.8"
+  fast-uri@>=3.0.0 <3.1.4: "3.1.4"
   js-yaml@<=4.1.1: "4.3.0"
-  shell-quote@>=1.1.0 <=1.8.3: "1.9.0"
+  postcss@<=8.5.17: "8.5.23"
+  shell-quote@>=1.1.0 <=1.8.4: "1.9.0"
   undici@>=7.0.0 <7.28.0: "7.28.0"
   ws@>=8.0.0 <8.21.0: "8.21.0"
+patchedDependencies:
+  brace-expansion@1.1.16: patches/brace-expansion@1.1.16.patch

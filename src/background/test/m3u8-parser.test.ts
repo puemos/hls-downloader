@@ -207,4 +207,20 @@ file0.ts
     expect(inspection.keyUris).toEqual([`${base}enc.key`]);
     expect(inspection.iv).toEqual("0x00000000000000000000000000000001");
   });
+
+  it("normalizes explicit IVs to network-order bytes", () => {
+    const encryptedPlaylist = `#EXTM3U
+#EXT-X-TARGETDURATION:8
+#EXT-X-KEY:METHOD=AES-128,URI="enc.key",IV=0x00112233445566778899aabbccddeeff
+#EXTINF:8,
+file0.ts
+`;
+
+    const [fragment] = M3u8Parser.parseLevelPlaylist(encryptedPlaylist, base);
+
+    expect(Array.from(fragment.key.iv ?? [])).toEqual([
+      0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+      0xcc, 0xdd, 0xee, 0xff,
+    ]);
+  });
 });

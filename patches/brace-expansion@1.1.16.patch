@@ -1,0 +1,16 @@
+diff --git a/index.js b/index.js
+index c1c1263f3649935f314cef7244240938e3eae2c1..2502bda083533cd8f7d9d357dc97074a358e76c1 100644
+--- a/index.js
++++ b/index.js
+@@ -207,3 +207,11 @@ function expand(str, max, isTop) {
+     return expansions;
+   }
+ }
++
++// The compatibility release includes the CVE-2026-14257 fix under dist/
++// without wiring its legacy CommonJS entry point to that implementation.
++var fixedBalancedMatch = require('balanced-match');
++fixedBalancedMatch.balanced = fixedBalancedMatch.balanced || fixedBalancedMatch;
++var fixedImplementation = require('./dist/commonjs/index.js');
++module.exports = fixedImplementation.expand;
++Object.assign(module.exports, fixedImplementation);

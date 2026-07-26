@@ -1,6 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Job } from "@hls-downloader/core/lib/entities";
+import { initialStorageState } from "@hls-downloader/core/lib/store/slices";
 import DownloadsView from "./DownloadsView";
 
 const meta: Meta<typeof DownloadsView> = {
@@ -16,14 +17,23 @@ const sampleJobs = [
   new Job("2", undefined, [], [], "video2.mp4", Date.now()),
 ];
 
+const commonProps = {
+  filter: "",
+  setCurrentJobId: () => {},
+  setFilter: () => {},
+  storage: initialStorageState,
+  onCleanup: () => {},
+  onRefreshStorage: () => {},
+};
+
 export const Empty: Story = {
   render: () => (
     <DownloadsView
+      {...commonProps}
       jobs={[]}
+      hasJobs={false}
+      showFilterInput={false}
       currentJobId={undefined}
-      filter=""
-      setCurrentJobId={() => {}}
-      setFilter={() => {}}
     />
   ),
 };
@@ -31,11 +41,11 @@ export const Empty: Story = {
 export const WithJobs: Story = {
   render: () => (
     <DownloadsView
+      {...commonProps}
       jobs={sampleJobs}
+      hasJobs
+      showFilterInput
       currentJobId={undefined}
-      filter=""
-      setCurrentJobId={() => {}}
-      setFilter={() => {}}
     />
   ),
 };
@@ -43,11 +53,11 @@ export const WithJobs: Story = {
 export const Selected: Story = {
   render: () => (
     <DownloadsView
+      {...commonProps}
       jobs={sampleJobs}
+      hasJobs
+      showFilterInput
       currentJobId="1"
-      filter=""
-      setCurrentJobId={() => {}}
-      setFilter={() => {}}
     />
   ),
 };

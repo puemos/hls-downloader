@@ -1,4 +1,4 @@
-import { configureStore, Middleware } from "@reduxjs/toolkit";
+import { configureStore, Tuple } from "@reduxjs/toolkit";
 import { createEpicMiddleware } from "redux-observable";
 import { createRootEpic } from "../controllers/root-epic";
 import { Dependencies } from "../services";
@@ -16,11 +16,9 @@ export function createStore(
   >({ dependencies });
 
   const rootEpic = createRootEpic();
-  const middleware = [logger, epicMiddleware] as Middleware<{}, RootState>[];
-
   const store = configureStore({
     reducer: rootReducer,
-    middleware: () => middleware,
+    middleware: () => new Tuple(logger, epicMiddleware),
     preloadedState,
   });
 

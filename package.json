@@ -1,15 +1,19 @@
 {
   "private": true,
   "packageManager": "pnpm@10.34.4",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "clean": "rimraf dist dist-mv2 dist-mv3 extension-*.zip extension-*.xpi source-code*.zip && mkdir -p dist",
     "copy-assets": "node scripts/copy-assets.mjs",
+    "security:audit": "pnpm audit --audit-level moderate && node scripts/verify-security-patches.mjs",
     "prebuild": "pnpm run clean && pnpm run copy-assets",
     "build:core": "pnpm --filter ./src/core run build",
     "build:design-system": "pnpm --filter ./src/design-system run build",
     "build:background": "pnpm --filter ./src/background run build",
     "build:popup": "pnpm --filter ./src/popup run build",
-    "build:packages": "pnpm run build:core && pnpm run build:design-system && run-p build:background build:popup",
+    "build:packages": "pnpm run build:core && pnpm run build:design-system && pnpm --parallel --filter ./src/background --filter ./src/popup run build",
     "build:zip": "DIST_DIR=${DIST_DIR:-dist}; ZIP_BASENAME=${ZIP_BASENAME:-extension}; (cd \"$DIST_DIR\" && zip -r \"../${ZIP_BASENAME}-chrome.zip\" . && if [ \"${MAKE_FIREFOX:-true}\" = \"true\" ]; then zip -r \"../${ZIP_BASENAME}-firefox.xpi\" .; fi)",
     "build": "pnpm run build:packages && pnpm run build:zip",
     "build:variant": "node scripts/build-variant.mjs",
@@ -24,14 +28,17 @@
     "dev:background": "pnpm --filter ./src/background run dev",
     "dev:popup": "pnpm --filter ./src/popup run dev",
     "predev": "pnpm run clean && pnpm run copy-assets",
-    "dev": "DIST_DIR=dist/mv3 MV_TARGET=mv3 run-p dev:*",
-    "test": "run-p test:core test:background test:design-system test:popup",
+    "dev": "DIST_DIR=dist/mv3 MV_TARGET=mv3 pnpm --parallel --filter ./src/core --filter ./src/design-system --filter ./src/background --filter ./src/popup run dev",
+    "pretest": "pnpm run build:core && pnpm run build:design-system",
+    "test": "pnpm --parallel --filter ./src/core --filter ./src/background --filter ./src/design-system --filter ./src/popup run test",
+    "pretypecheck": "pnpm run build:core && pnpm run build:design-system",
+    "typecheck": "pnpm --parallel --filter ./src/core --filter ./src/background --filter ./src/design-system --filter ./src/popup run typecheck",
     "test:core": "pnpm --filter ./src/core run test",
     "test:background": "pnpm --filter ./src/background run test",
     "test:design-system": "pnpm --filter ./src/design-system run test",
     "test:popup": "pnpm --filter ./src/popup run test",
     "test:e2e:local": "node scripts/e2e-local-browser.mjs",
-    "test:coverage": "run-p test:core:coverage test:background:coverage test:design-system:coverage test:popup:coverage && pnpm coverage:report && pnpm coverage:badge",
+    "test:coverage": "pnpm --parallel --filter ./src/core --filter ./src/background --filter ./src/design-system --filter ./src/popup run test:coverage && pnpm coverage:report && pnpm coverage:badge",
     "test:core:coverage": "pnpm --filter ./src/core run test:coverage",
     "test:background:coverage": "pnpm --filter ./src/background run test:coverage",
     "test:design-system:coverage": "pnpm --filter ./src/design-system run test:coverage",
@@ -43,12 +50,11 @@
     "storybook:design-system": "pnpm --filter ./src/design-system run storybook"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.9",
+    "@vitest/coverage-v8": "4.1.10",
     "badge-maker": "6.0.0",
     "dotenv": "17.4.2",
-    "npm-run-all": "4.1.5",
-    "prettier": "3.9.0",
+    "prettier": "3.9.6",
     "rimraf": "6.1.3",
-    "web-ext": "10.4.0"
+    "web-ext": "10.5.0"
   }
 }

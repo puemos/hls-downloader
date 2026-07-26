@@ -12,26 +12,29 @@
   "scripts": {
     "dev": "vite build -w",
     "build": "vite build",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage --coverage.reporter=json-summary"
   },
   "devDependencies": {
+    "@typescript/native": "npm:typescript@7.0.2",
     "@types/webextension-polyfill": "0.12.5",
+    "@types/m3u8-parser": "7.2.6",
     "fake-indexeddb": "6.2.5",
     "idb": "8.0.3",
     "m3u8-parser": "7.2.0",
-    "prettier": "3.9.0",
-    "typescript": "6.0.3",
+    "prettier": "3.9.6",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "url-toolkit": "2.2.5",
     "uuid": "14.0.1",
-    "vite": "8.1.0",
-    "vitest": "4.1.9"
+    "vite": "8.1.5",
+    "vitest": "4.1.10"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "0.12.15",
     "@hls-downloader/core": "workspace:*",
     "filenamify": "7.0.2",
-    "redux": "4.2.1",
+    "redux": "5.0.1",
     "webext-redux": "4.0.0",
     "webextension-polyfill": "0.12.0"
   }

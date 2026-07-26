@@ -10,11 +10,12 @@ import type {
   IFS,
   PreparedDownload,
   PrepareDownloadOptions,
+  StorageEstimate,
   StorageSnapshot,
 } from "@hls-downloader/core/lib/services";
 import type { OutputContainer } from "@hls-downloader/core/lib/entities";
 import browser from "webextension-polyfill";
-import filenamify from "filenamify";
+import filenamify from "filenamify/browser";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import ffmpegClassWorkerPath from "@ffmpeg/ffmpeg/worker?worker&url";
 import {
@@ -360,7 +361,7 @@ async function estimateSubtitlesBytes(): Promise<number> {
   }
 }
 
-async function getStorageEstimate() {
+async function getStorageEstimate(): Promise<StorageEstimate> {
   const storage = globalThis.navigator?.storage;
   const persisted = await getStoragePersistenceStatus();
   const quotaExempt = hasUnlimitedStoragePermission() && !isFirefoxRuntime();

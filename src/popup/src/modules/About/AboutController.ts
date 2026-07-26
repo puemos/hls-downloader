@@ -12,7 +12,7 @@ const useAboutController = (): ReturnType => {
   return {
     version,
     name,
-    description,
+    description: description ?? "",
   };
 };
 

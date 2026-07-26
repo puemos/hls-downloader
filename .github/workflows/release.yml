@@ -20,9 +20,13 @@ jobs:
       - name: Enable corepack
         run: corepack enable
       - name: Prepare pnpm
-        run: corepack prepare pnpm@10.11.0 --activate
+        run: corepack prepare pnpm@10.34.4 --activate
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+      - name: Audit dependencies
+        run: pnpm run security:audit
+      - name: Typecheck
+        run: pnpm run typecheck
       - name: Build all variants
         run: pnpm run build:all-variants
       - name: Test

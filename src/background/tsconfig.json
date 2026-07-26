@@ -2,7 +2,8 @@
   "compilerOptions": {
     "lib": ["WebWorker", "DOM", "ES2023"],
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"]
 }

@@ -3,7 +3,7 @@
   "name": "HLS Downloader",
   "description": "HTTP Live Stream downloader",
   "version": "5.4.4",
-  "minimum_chrome_version": "109",
+  "minimum_chrome_version": "111",
   "action": {
     "default_popup": "popup.html",
     "default_title": "HLS Downloader"
