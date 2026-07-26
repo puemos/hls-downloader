@@ -47,16 +47,16 @@ interface ReturnType {
 const useJobController = ({ id }: { id: string }): ReturnType => {
   const dispatch = useDispatch();
   const status = useSelector<RootState, JobStatus | null>(
-    (state) => state.jobs.jobsStatus[id]
+    (state) => state.jobs.jobsStatus[id],
   );
   const job = useSelector<RootState, Job | null>(
-    (state) => state.jobs.jobs[id]
+    (state) => state.jobs.jobs[id],
   );
   const bucket = useSelector<RootState, StorageBucketStats | undefined>(
-    (state) => state.storage.buckets[id]
+    (state) => state.storage.buckets[id],
   );
-  const availableBytes = useSelector<RootState, number | undefined>(
-    (state) => state.storage.availableBytes
+  const availableBytes = useSelector<RootState, number | undefined>((state) =>
+    state.storage.quotaIsAdvisory ? undefined : state.storage.availableBytes,
   );
   const derived = buildJobViewDerived(status, bucket, availableBytes);
 
@@ -89,7 +89,7 @@ export default useJobController;
 export function buildJobViewDerived(
   status: JobStatus | null,
   bucket?: StorageBucketStats,
-  availableBytes?: number
+  availableBytes?: number,
 ): JobViewDerived {
   const isError = status?.status === "error";
   const isQueued = status?.status === "queued";
@@ -101,10 +101,10 @@ export function buildJobViewDerived(
     status?.status === "saving"
       ? Math.round((status.saveProgress ?? 0) * 100 || 0)
       : status?.total
-      ? Math.round(((status.done ?? 0) / status.total) * 100)
-      : isReady
-      ? 100
-      : 0;
+        ? Math.round(((status.done ?? 0) / status.total) * 100)
+        : isReady
+          ? 100
+          : 0;
 
   const statusMap: Record<
     string,
@@ -124,9 +124,10 @@ export function buildJobViewDerived(
   const headerStatusVariant =
     statusMap[status?.status ?? "queued"]?.variant ?? "outline";
 
-  const progressDone = status?.status === "downloading" ? status.done ?? 0 : 0;
+  const progressDone =
+    status?.status === "downloading" ? (status.done ?? 0) : 0;
   const progressTotal =
-    status?.status === "downloading" ? status.total ?? 0 : 0;
+    status?.status === "downloading" ? (status.total ?? 0) : 0;
   const progressPercent =
     progressTotal > 0
       ? Math.max(0, Math.min(100, (progressDone / progressTotal) * 100))
@@ -142,10 +143,10 @@ export function buildJobViewDerived(
   const statusKind: JobViewDerived["statusKind"] = isError
     ? "error"
     : isReady
-    ? "ready"
-    : isDownloading || isSaving
-    ? "active"
-    : "idle";
+      ? "ready"
+      : isDownloading || isSaving
+        ? "active"
+        : "idle";
 
   const expectedBytes = bucket?.expectedBytes;
   const storedBytes = bucket?.storedBytes;

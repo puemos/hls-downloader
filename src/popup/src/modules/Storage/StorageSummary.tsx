@@ -14,7 +14,9 @@ interface StorageSummaryProps {
   usedBytes: number;
   availableBytes?: number;
   quotaBytes?: number;
-  estimateSource?: string;
+  persisted?: boolean;
+  quotaExempt: boolean;
+  quotaIsAdvisory: boolean;
   nearQuota: boolean;
   loading: boolean;
   subtitlesBytes?: number;
@@ -28,7 +30,9 @@ const StorageSummary = ({
   usedBytes,
   availableBytes,
   quotaBytes,
-  estimateSource,
+  persisted,
+  quotaExempt,
+  quotaIsAdvisory,
   nearQuota,
   loading,
   subtitlesBytes,
@@ -38,7 +42,7 @@ const StorageSummary = ({
   compact = false,
 }: StorageSummaryProps) => {
   const percent =
-    quotaBytes && quotaBytes > 0
+    !quotaIsAdvisory && quotaBytes && quotaBytes > 0
       ? Math.min(100, Math.round((usedBytes / quotaBytes) * 100))
       : undefined;
 
@@ -50,7 +54,17 @@ const StorageSummary = ({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold">IndexedDB storage</p>
+            <p className="text-sm font-semibold">Browser storage</p>
+            {quotaExempt && (
+              <Badge variant="secondary" className="text-[11px]">
+                No fixed limit
+              </Badge>
+            )}
+            {persisted && (
+              <Badge variant="outline" className="text-[11px]">
+                Persistent
+              </Badge>
+            )}
             {nearQuota && (
               <Badge variant="destructive" className="text-[11px]">
                 Low space
@@ -63,14 +77,33 @@ const StorageSummary = ({
             )}
           </div>
           <p className="text-[11px] text-muted-foreground leading-tight">
-            Used {formatBytes(usedBytes)}{" "}
-            {availableBytes !== undefined && (
-              <>
-                • Available {formatBytes(availableBytes)}{" "}
-                {quotaBytes !== undefined && (
-                  <>of {formatBytes(quotaBytes, { precision: 1 })}</>
+            Stored {formatBytes(usedBytes)}{" "}
+            {quotaIsAdvisory
+              ? quotaBytes !== undefined && (
+                  <>
+                    • Browser estimate{" "}
+                    {formatBytes(quotaBytes, { precision: 1 })}
+                  </>
+                )
+              : availableBytes !== undefined && (
+                  <>
+                    • Available {formatBytes(availableBytes)}{" "}
+                    {quotaBytes !== undefined && (
+                      <>of {formatBytes(quotaBytes, { precision: 1 })}</>
+                    )}
+                  </>
                 )}
+          </p>
+          <p className="text-[11px] text-muted-foreground leading-tight">
+            {quotaIsAdvisory ? (
+              <>
+                The browser estimate is informational, not a fixed download
+                limit.
               </>
+            ) : persisted ? (
+              "Persistent storage is enabled."
+            ) : (
+              "Available storage is managed by your browser."
             )}
           </p>
           {subtitlesBytes !== undefined && subtitlesBytes > 0 && (
@@ -79,10 +112,7 @@ const StorageSummary = ({
             </p>
           )}
           <p className="text-[11px] text-muted-foreground leading-tight">
-            Source:{" "}
-            {estimateSource === "navigator"
-              ? "browser estimate"
-              : "saved metadata"}
+            Downloads are stored privately by your browser.
             {loading && " • updating..."}
           </p>
         </div>
@@ -111,7 +141,7 @@ const StorageSummary = ({
         <div className="space-y-2">
           <Progress value={percent} className="h-2 rounded-full" />
           <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-            <span>{percent}% of quota</span>
+            <span>{percent}% of browser allowance</span>
             {availableBytes !== undefined && (
               <span>Free {formatBytes(availableBytes)}</span>
             )}
@@ -122,7 +152,7 @@ const StorageSummary = ({
       {!compact && (
         <p className="text-[11px] text-muted-foreground">
           Cleaning stops active downloads and clears cached fragments for this
-          extension only.
+          extension from browser storage only.
         </p>
       )}
     </Card>

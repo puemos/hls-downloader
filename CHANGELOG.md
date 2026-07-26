@@ -1,21 +1,47 @@
 # HLS Downloader Changelog
 
+## Unreleased
+
+### Fixes
+
+- Replaced media-sized IndexedDB/JavaScript mux buffers for new jobs with an OPFS-backed fragment and export pipeline on Firefox MV2 and Chromium MV3.
+- Added a dedicated FFmpeg worker with WORKERFS inputs and a seekable OPFS output device, producing normal seekable MP4 or MKV files without fragmented-MP4 fallback.
+- Kept pre-existing IndexedDB jobs on an explicit legacy finalization path with actionable re-download errors instead of silently migrating them.
+- Kept download artifacts alive until the browser reports completion or interruption, including duplicate saves and MV3 service-worker wake-ups.
+- Added disk-space preflight checks, safe overwrite accounting, serialized muxing, coalesced repeated finalization, cancellation, and partial-output cleanup.
+- Declared Firefox 115 and Chromium 109 as the minimum supported versions.
+- Request persistent browser storage before creating new disk-backed downloads, increasing the available Firefox storage allowance and protecting temporary media from eviction.
+- Treat storage estimates as informational when the extension has unlimited storage permission, preventing Chromium's conservative 2 GiB report from blocking large-file finalization or triggering false low-space warnings.
+- Reword the storage UI around user-visible behavior, without exposing internal storage backend names.
+
+### Testing
+
+- Added OPFS fragment routing/overwrite/quota tests, seekable-output device tests, worker queue/coalescing/cancellation tests, and artifact lease tests.
+- Added persistence-policy and quota-exempt preflight coverage.
+- `pnpm test`
+- `pnpm run build:mv2`
+- `pnpm run build:mv3`
+
 ## 5.4.4
 
 ### Fixes
+
 - Fixed the Firefox Add-ons publish command argument handling so AMO receives the listed-channel submission and matching source archive.
 - Ensured failed AMO uploads still remove temporary source archives.
 
 ### Testing
+
 - GitHub release workflow
 
 ## 5.4.3
 
 ### Fixes
+
 - Made Firefox Add-ons source review reproducible by committing Firefox manifest metadata and removing post-build manifest mutation from the publish flow.
 - Hardened release packaging so Firefox builds and source archives are created from the same committed revision.
 
 ### Testing
+
 - `pnpm run build:mv2`
 - `pnpm exec web-ext lint --source-dir dist/mv2`
 - `pnpm test`
@@ -23,36 +49,44 @@
 ## 5.4.2
 
 ### Features
+
 - Added sniffer playlist removal from the popup UI.
 
 ### Chores
+
 - Hardened the dependency graph and removed stale package lock files.
 
 ### Testing
+
 - `pnpm test`
 - `pnpm run build:all-variants`
 
 ## 5.4.1
 
 ### Fixes
+
 - Reduced muxing memory usage and preserved HLS byte ranges for CMAF/fMP4 playlists, addressing 0-byte saves and large-output failures reported in #522 and #523.
 - Fixed release variant generation so no-blocklist MV2/MV3 archives are produced correctly.
 - Made no-blocklist manifest generation compatible with current Node JSON module requirements.
 
 ### Chores
+
 - Added automated Firefox AMO submission support.
 - Updated design-system dependency security patches.
 
 ### Testing
+
 - `pnpm test`
 - `pnpm run build:all-variants`
 
 ## 5.4.0
 
 ### Features
+
 - Added an auto-delete-after-save option for completed downloads.
 
 ### Fixes
+
 - Preserved embedded audio in muxed HLS streams.
 - Sanitized generated download filenames to remove illegal characters.
 - Improved native select colors in Firefox dark mode.
@@ -60,6 +94,7 @@
 ## 5.3.1
 
 ### Features
+
 - Added the download queue.
 - Added storage usage estimates and total storage reporting.
 - Added sniffer video previews.
@@ -67,49 +102,60 @@
 - Propagated fallback query parameters through playlist handling.
 
 ### Fixes
+
 - Hardened storage management reliability and added integration coverage.
 
 ### Chores
+
 - Updated dependency security patches and pnpm override ranges.
 
 ## 5.2.0
 
 ### Features
+
 - Subtitle downloads end-to-end: fetch VTT tracks, generate language-aware filenames, and mux into MKV when subtitles are present (`src/core/src/use-cases/download-subtitle-track.ts`, `src/background/src/services/ffmpeg-muxer.ts`).
 - Richer audio and subtitle selection: parse default/autoselect/forced flags and group IDs, honor a preferred audio language, and persist per-playlist audio/subtitle choices while blocking downloads on unsupported encryption (`src/background/src/services/m3u8-parser.ts`, `src/core/src/store/slices/playlist-preferences-slice.ts`, `src/popup/src/modules/Playlist/PlaylistModule.tsx`).
 - Sniffer gains direct URL entry and streamlined navigation (Direct tab removed); playlist UI shows metadata badges and quick copy buttons for track URLs (`src/popup/src/modules/Sniffer/SnifferView.tsx`, `src/popup/src/modules/Navbar/RouterView.tsx`, `src/popup/src/components/Metadata.tsx`).
 - Job cards and About/Settings views refreshed with clearer status, hover/copy affordances, and Storybook scenarios seeded with realistic store state (`src/popup/src/modules/Job/JobView.tsx`, `src/popup/.storybook/preview.tsx`).
 
 ### Fixes
+
 - More robust muxing pipeline with offscreen document fallback for MV3 and safer bucket cleanup when generating download blobs (`src/background/src/services/indexedb-fs.ts`, `src/background/src/offscreen.ts`).
 
 ### Chores
+
 - Vite/tooling upgrade (`vite@6.4.1`, `pnpm@10.11.0`) and Storybook now runs from the popup package (`package.json`, `src/popup/.storybook/main.ts`).
 - CI/release workflow tweaks: fixed permissions for publishing/coverage, added coverage badge workflow, removed CodeQL (`.github/workflows`).
 - Added feature overview doc and pruned planning docs (`FUNCTIONALITIES.md`, `plans/roadmap.md`).
 
 ### Known issues
+
 - Audio-only playlists are currently blocked from downloading because the playlist module requires a video level to mark media as available (`src/popup/src/modules/Playlist/PlaylistModule.tsx:174-177`).
 
 ### Testing
+
 - `pnpm test`
 
 ## 5.1.0
 
 ### Features
+
 - Manifest V3 support for Chromium browsers using an offscreen document to create blob URLs in the service-worker background.
 - Dual build pipeline with separate MV2 (Firefox/Chromium) and MV3 (Chromium) artifacts and clearer tester instructions.
 
 ### Fixes
+
 - Ensure MV2 background bundles emit as `background.js` and package popup/background files into the root of the ZIP/XPI for direct installs.
 
 ### Chores
+
 - CI builds both MV2 and MV3 targets; release uploads MV2 Firefox/Chromium and MV3 Chromium artifacts.
 - Added “For Dear Testers” guide for Firefox/Chromium reviewers and clarified MV3 Chromium-only caveat.
 
 ## 5.0.0
 
 ### Features
+
 - Merge audio and video streams for complete media exports (#430) – addresses long‑standing “No Audio” reports (e.g. issue #23)
 - Display toolbar icon immediately after playlist confirmation for quicker access (#431)
 - New theme and redesigned About page (#432, #435)
@@ -124,9 +170,11 @@
 - Automatically selects appropriate playlist levels (#447)
 
 ### Fixes
+
 - Security updates
 
 ### Chores
+
 - Added usage instructions and updated automation guidelines (#436)
 - Vitest setup with broad coverage for core, popup, controller, and hook logic (#446, #448, #449, #452–455)
 - Fetch-loader and crypto decryptor unit tests
@@ -137,41 +185,49 @@
 ## 4.1.2
 
 ### Fixes
+
 - Width for playlists and downloads cards
 - Security updates
 
 ## 4.1.1
 
 ### Fixes
+
 - Max width for playlists and downloads
 - Security updates
 
 ## 4.1.0
 
 ### Features
+
 - Direct downloads
 
 ### Fixes
+
 - .ts as a file type (UI only)
 
 ## 4.0.2
 
 ### Fixes
+
 - Security updates
 
 ## 4.0.1
 
 ### Fixes
+
 - Security updates
 
 ## 4.0.0
 
 ### Features
+
 - Videos are transformed to mp4 on the fly
 - Using https://github.com/puemos/browser-extension-template
 - Total new design
 
 ### Fixes
+
 - Security updates
 
 ## 3.3.0
@@ -179,6 +235,7 @@
 Big thanks to @mayfield!!
 
 ### Features
+
 - FPS info
 - Audio-only media support
 - Improve retry backoff
@@ -186,11 +243,13 @@ Big thanks to @mayfield!!
 ## 3.2.2
 
 ### Fixes
+
 - Security updates
 
 ## 3.2.1
 
 ### Fixes
+
 - Download fail on Firefox
 - Filter playlists
 - SaveAs dialog Switch
@@ -198,29 +257,35 @@ Big thanks to @mayfield!!
 ## 3.2.0
 
 ### Features
+
 - The extension will retry failed download attempts
 
 ## 3.1.2
 
 ### Chores
+
 - Yarn to NPM
 
 ## 3.1.1
 
 ### Chores
+
 - Paypal -> GitHub Sponsors
 
 ## 3.1.0
 
 ### Features
+
 - Direct download
 
 ### Fixes
+
 - Several UI fixes
 
 ## 3.0.0
 
 ### Features
+
 - Unlimited Storage permission
 - Use IndexedDB for storing chunks
 - Downloads are separated as Jobs
@@ -230,22 +295,26 @@ Big thanks to @mayfield!!
 ## 2.2.0
 
 ### Features
+
 - Cancel a download
 
 ## 1.7.2
 
 ### Fixes
+
 - [#51](https://github.com/puemos/hls-downloader-chrome-extension/issues/51) After deleting a download, the download page crashes
 
 ## 1.7.1
 
 ### Chores
+
 - Change copy button to use text
 - Refactor the GitHub action to use chrome-webstore-upload-cli
 
 ## 1.7.0
 
 ### Features
+
 - Auto save
 - Use page title for the file name
 - UI Enhancements
@@ -254,12 +323,14 @@ Big thanks to @mayfield!!
 ## 1.6.3
 
 ### Features
+
 - New UI
 - Updated to the latest create-react-app
 - Use parcel to pack the background app
 - Refactor the stories
 
 ### Fixes
+
 - URL resolve issues
 - [#45](https://github.com/puemos/hls-downloader-chrome-extension/issues/45)
 - [#43](https://github.com/puemos/hls-downloader-chrome-extension/issues/43)
@@ -268,54 +339,65 @@ Big thanks to @mayfield!!
 ## 1.5.0
 
 ### Features
+
 - Auto-download playlist
 
 ## 1.4.1
 
 ### Chores
+
 - Upgrade dependencies
 
 ## 1.4.0
 
 ### Features
+
 - AES decrypt
 
 ## 1.3.1
 
 ### Fixes
+
 - Badge indicator update on tab remove
 
 ## 1.3.0
 
 ### Features
+
 - Save as
 - Badge indicator
 
 ### Chores
+
 - Update dependencies
 
 ## 1.2.1
 
 ### Chores
+
 - Update dependencies
 
 ## 1.2.0
 
 ### Features
+
 - Rebranding
 - Copy playlist URL link
 - Storybook
 - Colors and styles
 
 ### Fixes
+
 - Wildcard for playlists
 
 ## 1.1.0
 
 ### Features
+
 - Timestamps for sniffer & downloads
 - Tabs style
 
 ### Fixes
+
 - Playlist relative URI
 - Scrollbars

@@ -102,7 +102,7 @@ describe("muxExec", () => {
     expect(args).toContain("video.ts");
     expect(args).toContain("audio.ts");
     expect(args).toContain("0:v:0");
-    expect(args).toContain("1:a:0");
+    expect(args).toContain("1:a:0?");
     expect(args).toContain("-bsf:a");
     expect(args).toContain("aac_adtstoasc");
   });

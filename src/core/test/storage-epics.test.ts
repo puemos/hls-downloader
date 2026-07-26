@@ -41,7 +41,7 @@ describe("fetchStorageStatsEpic", () => {
     const action$ = of(storageSlice.actions.refresh());
 
     const result = await firstValueFrom(
-      fetchStorageStatsEpic(action$, {} as any, deps)
+      fetchStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(fs.getStorageStats).toHaveBeenCalled();
@@ -50,6 +50,8 @@ describe("fetchStorageStatsEpic", () => {
     expect(payload.totalUsedBytes).toBe(5100);
     expect(payload.availableBytes).toBe(999_994_900);
     expect(payload.quotaBytes).toBe(1_000_000_000);
+    expect(payload.quotaExempt).toBe(false);
+    expect(payload.quotaIsAdvisory).toBe(false);
     expect(payload.estimateSource).toBe("navigator");
     expect(payload.nearQuota).toBe(false);
     expect(payload.subtitlesBytes).toBe(100);
@@ -66,7 +68,7 @@ describe("fetchStorageStatsEpic", () => {
     const action$ = of(storageSlice.actions.refresh());
 
     const result = await firstValueFrom(
-      fetchStorageStatsEpic(action$, {} as any, deps)
+      fetchStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result.type).toBe("storage/refreshFailure");
@@ -80,12 +82,12 @@ describe("fetchStorageStatsEpic", () => {
     const action$ = of(storageSlice.actions.refresh());
 
     const result = await firstValueFrom(
-      fetchStorageStatsEpic(action$, {} as any, deps)
+      fetchStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result.type).toBe("storage/refreshFailure");
     expect((result as any).payload.error).toBe(
-      "Failed to read storage information"
+      "Failed to read storage information",
     );
   });
 
@@ -95,7 +97,7 @@ describe("fetchStorageStatsEpic", () => {
     const action$ = of(jobsSlice.actions.clear() as any);
 
     const results = await firstValueFrom(
-      fetchStorageStatsEpic(action$, {} as any, deps).pipe(toArray())
+      fetchStorageStatsEpic(action$, {} as any, deps).pipe(toArray()),
     );
 
     expect(results).toEqual([]);
@@ -109,7 +111,7 @@ describe("autoRefreshStorageStatsEpic", () => {
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
@@ -117,12 +119,12 @@ describe("autoRefreshStorageStatsEpic", () => {
 
   it("emits storage/refresh on incDownloadStatus", async () => {
     const action$ = of(
-      jobsSlice.actions.incDownloadStatus({ jobId: "j1" }) as any
+      jobsSlice.actions.incDownloadStatus({ jobId: "j1" }) as any,
     );
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
@@ -130,12 +132,12 @@ describe("autoRefreshStorageStatsEpic", () => {
 
   it("emits storage/refresh on finishDownload", async () => {
     const action$ = of(
-      jobsSlice.actions.finishDownload({ jobId: "j1" }) as any
+      jobsSlice.actions.finishDownload({ jobId: "j1" }) as any,
     );
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
@@ -146,25 +148,23 @@ describe("autoRefreshStorageStatsEpic", () => {
       jobsSlice.actions.downloadFailed({
         jobId: "j1",
         message: "fail",
-      }) as any
+      }) as any,
     );
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
   });
 
   it("emits storage/refresh on deleteSuccess", async () => {
-    const action$ = of(
-      jobsSlice.actions.deleteSuccess({ jobId: "j1" }) as any
-    );
+    const action$ = of(jobsSlice.actions.deleteSuccess({ jobId: "j1" }) as any);
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
@@ -175,7 +175,7 @@ describe("autoRefreshStorageStatsEpic", () => {
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
@@ -186,7 +186,7 @@ describe("autoRefreshStorageStatsEpic", () => {
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
@@ -194,12 +194,12 @@ describe("autoRefreshStorageStatsEpic", () => {
 
   it("emits storage/refresh on cleanupFailure", async () => {
     const action$ = of(
-      storageSlice.actions.cleanupFailure({ error: "fail" }) as any
+      storageSlice.actions.cleanupFailure({ error: "fail" }) as any,
     );
     const deps = createMockDependencies();
 
     const result = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps)
+      autoRefreshStorageStatsEpic(action$, {} as any, deps),
     );
 
     expect(result).toEqual(storageSlice.actions.refresh());
@@ -210,7 +210,7 @@ describe("autoRefreshStorageStatsEpic", () => {
     const deps = createMockDependencies();
 
     const results = await firstValueFrom(
-      autoRefreshStorageStatsEpic(action$, {} as any, deps).pipe(toArray())
+      autoRefreshStorageStatsEpic(action$, {} as any, deps).pipe(toArray()),
     );
 
     expect(results).toEqual([]);
@@ -226,8 +226,8 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     expect(fs.cleanup).toHaveBeenCalled();
@@ -253,8 +253,8 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     expect(results[0]).toEqual(jobsSlice.actions.cancel({ jobId: "j1" }));
@@ -284,13 +284,11 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
-    const cancelActions = results.filter(
-      (a) => a.type === "jobs/cancel"
-    );
+    const cancelActions = results.filter((a) => a.type === "jobs/cancel");
     const cancelledIds = cancelActions.map((a: any) => a.payload.jobId).sort();
     expect(cancelledIds).toEqual(["j1", "j2", "j3"]);
     expect(fs.cleanup).toHaveBeenCalled();
@@ -306,15 +304,21 @@ describe("cleanupStorageEpic", () => {
       },
       jobsStatus: {
         j1: createTestJobStatus({ status: "done" }),
-        j2: { status: "error", total: 5, done: 0, saveProgress: 0, errorMessage: "fail" },
+        j2: {
+          status: "error",
+          total: 5,
+          done: 0,
+          saveProgress: 0,
+          errorMessage: "fail",
+        },
       },
     });
     const action$ = of(storageSlice.actions.startCleanup());
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     const cancelActions = results.filter((a) => a.type === "jobs/cancel");
@@ -335,8 +339,8 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     expect(results).toEqual([
@@ -353,13 +357,13 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     expect(results).toEqual([
       storageSlice.actions.cleanupFailure({
-        error: "Failed to clean IndexedDB storage",
+        error: "Failed to clean browser storage",
       }),
     ]);
   });
@@ -376,8 +380,8 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     const types = results.map((a) => a.type);
@@ -400,8 +404,8 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     expect(results).toEqual([
@@ -421,8 +425,8 @@ describe("cleanupStorageEpic", () => {
 
     const results = await firstValueFrom(
       cleanupStorageEpic(action$, { value: state } as any, deps).pipe(
-        toArray()
-      )
+        toArray(),
+      ),
     );
 
     const cancelActions = results.filter((a) => a.type === "jobs/cancel");
@@ -436,7 +440,7 @@ describe("cleanupStorageEpic", () => {
     const action$ = of(storageSlice.actions.refresh() as any);
 
     const results = await firstValueFrom(
-      cleanupStorageEpic(action$, {} as any, deps).pipe(toArray())
+      cleanupStorageEpic(action$, {} as any, deps).pipe(toArray()),
     );
 
     expect(results).toEqual([]);

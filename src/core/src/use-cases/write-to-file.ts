@@ -1,12 +1,12 @@
-import { IFS } from "../services";
+import type { IFS, PreparedDownload } from "../services";
 
 export const saveAsFactory = (fs: IFS) => {
   const run = async (
     path: string,
-    link: string,
-    options: { dialog: boolean }
-  ): Promise<void> => {
-    await fs.saveAs(path, link, options);
+    download: PreparedDownload,
+    options: { dialog: boolean },
+  ): Promise<number> => {
+    return await fs.saveAs(path, download, options);
   };
   return run;
 };

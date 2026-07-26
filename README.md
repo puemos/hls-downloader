@@ -37,8 +37,8 @@
   Detects HLS playlists on the page the moment you open it. No DevTools sniffing required.
 - **Fine-grained quality control**
   Pick any combination of video resolution (240p → 4K) and audio language/bit-rate _before_ you download, so you never waste bandwidth on the wrong track.
-- **100% local merge with `ffmpeg.wasm`**
-  A WebAssembly build of FFmpeg runs right inside your tab, muxing the chosen audio + video into a single MP4.
+- **100% local, disk-backed merge with `ffmpeg.wasm`**
+  A WebAssembly build of FFmpeg muxes the chosen audio + video into a standard MP4 or MKV while keeping media fragments and final output in browser-managed storage.
   * Nothing is uploaded, keeping your files private.
 - **Works everywhere you browse**
   Verified on Firefox, Edge, Chrome, Brave, Arc, and other Chromium-based browsers, on Windows, macOS, and Linux.
@@ -57,6 +57,8 @@
 | <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg" height="14" alt="Opera logo" />&nbsp;&nbsp;Opera                                        | [Use manual installation](#-opera)                                                                                                  |
 
 <sup>*For Brave/Arc/etc. download the ZIP from the [latest release](https://github.com/puemos/hls-downloader/releases) and follow the manual-install steps below.</sup>
+
+Current releases require Firefox 115 or newer, or Chromium 109 or newer.
 
 ---
 
@@ -123,6 +125,13 @@
 3. Choose **Select** next to a playlist.
 4. Pick your video & audio streams, then press **Download**.
 5. Grab a coffee ☕ – `ffmpeg.wasm` merges everything and your browser prompts you to save the MP4 when done.
+
+The extension needs enough free disk space for both the downloaded fragments
+and the finalized media file. Browser storage estimates can be conservative and
+are treated as informational when unlimited storage permission is active.
+Downloads started by an older extension version remain readable through the
+legacy IndexedDB path, but are not migrated; if a legacy finalization runs out
+of memory, delete it and download it again.
 
 ---
 

@@ -4,7 +4,7 @@ import { catchError, filter, map, mergeMap } from "rxjs/operators";
 import { RootAction, RootState } from "../store/root-reducer";
 import { jobsSlice } from "../store/slices";
 import { Dependencies } from "../services";
-import { getLinkBucketFactory, saveAsFactory } from "../use-cases";
+import { prepareDownloadBucketFactory, saveAsFactory } from "../use-cases";
 
 export const saveAsJobEpic: Epic<
   RootAction,
@@ -29,7 +29,7 @@ export const saveAsJobEpic: Epic<
                 text: job.subtitleText!,
                 language: job.subtitleLanguage,
                 name: job.subtitleName,
-              })
+              }),
             ).pipe(
               map(() => {
                 console.log("[subtitle] re-stored before save", {
@@ -38,14 +38,14 @@ export const saveAsJobEpic: Epic<
                   language: job.subtitleLanguage,
                 });
                 return null;
-              })
+              }),
             )
           : of(null);
 
       return ensureSubtitle$.pipe(
         mergeMap(() =>
           from(
-            getLinkBucketFactory(fs)(
+            prepareDownloadBucketFactory(fs)(
               jobId,
               (progress, message) =>
                 jobsSlice.actions.setSaveProgress({
@@ -53,17 +53,17 @@ export const saveAsJobEpic: Epic<
                   progress,
                   message,
                 }),
-              { container }
-            )
-          )
+              { container },
+            ),
+          ),
         ),
-        mergeMap((link) =>
+        mergeMap((download) =>
           from(
-            saveAsFactory(fs)(job.filename, link, {
+            saveAsFactory(fs)(job.filename, download, {
               dialog,
-            })
+            }),
           ).pipe(
-            map(() => jobsSlice.actions.saveAsSuccess({ jobId: job.id, link })),
+            map(() => jobsSlice.actions.saveAsSuccess({ jobId: job.id })),
             catchError((error: unknown) =>
               of(
                 jobsSlice.actions.downloadFailed({
@@ -71,10 +71,10 @@ export const saveAsJobEpic: Epic<
                   message:
                     (error as Error)?.message ||
                     "Failed to finalize download (mux or save)",
-                })
-              )
-            )
-          )
+                }),
+              ),
+            ),
+          ),
         ),
         catchError((error: unknown) =>
           of(
@@ -83,9 +83,9 @@ export const saveAsJobEpic: Epic<
               message:
                 (error as Error)?.message ||
                 "Failed to prepare download (mux or save)",
-            })
-          )
-        )
+            }),
+          ),
+        ),
       );
-    })
+    }),
   );

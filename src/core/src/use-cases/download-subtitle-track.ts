@@ -8,14 +8,14 @@ import { fetchWithFallback } from "../utils/fetch";
 export const downloadSubtitleTrackFactory = (
   loader: ILoader,
   parser: IParser,
-  fs: IFS
+  fs: IFS,
 ) => {
   const run = async (
     level: Level,
     playlist: Playlist,
     fetchAttempts: number,
     dialog: boolean,
-    options: { baseUri?: string } = {}
+    options: { baseUri?: string } = {},
   ): Promise<string> => {
     const baseUri = options.baseUri ?? playlist.uri;
     const fragments = await getFragmentsDetailsFactory(loader, parser)(
@@ -23,7 +23,7 @@ export const downloadSubtitleTrackFactory = (
       fetchAttempts,
       {
         baseUri,
-      }
+      },
     );
 
     const hasFragments = fragments.length > 0;
@@ -35,7 +35,7 @@ export const downloadSubtitleTrackFactory = (
           fragment.uri,
           fragment.fallbackUri,
           fetchAttempts,
-          loader.fetchText
+          loader.fetchText,
         );
         textParts.push(fragmentText.trim());
       }
@@ -45,21 +45,17 @@ export const downloadSubtitleTrackFactory = (
         levelUri,
         level.uri,
         fetchAttempts,
-        loader.fetchText
+        loader.fetchText,
       );
       textParts.push(subtitleText.trim());
     }
 
     const fileName = generateSubtitleFileName()(playlist, level);
-    const link = URL.createObjectURL(
-      new Blob([textParts.join("\n\n")], { type: "text/vtt" })
+    const download = await fs.prepareTextDownload(
+      textParts.join("\n\n"),
+      "text/vtt",
     );
-
-    try {
-      await fs.saveAs(fileName, link, { dialog });
-    } finally {
-      URL.revokeObjectURL(link);
-    }
+    await fs.saveAs(fileName, download, { dialog });
     return fileName;
   };
 

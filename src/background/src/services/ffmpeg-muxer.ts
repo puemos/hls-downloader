@@ -1,4 +1,4 @@
-import { FFmpeg } from "@ffmpeg/ffmpeg";
+import type { FFmpeg } from "@ffmpeg/ffmpeg";
 
 export type MuxRequest = {
   ffmpeg: FFmpeg;
@@ -11,16 +11,24 @@ export type MuxRequest = {
 
 export type MuxExecRequest = {
   ffmpeg: FFmpeg;
+  cleanupFileNames?: string[];
+} & MuxArgsRequest;
+
+export type MuxArgsRequest = {
   outputFileName: string;
   hasVideo: boolean;
   hasAudio: boolean;
   videoFileName?: string;
   audioFileName?: string;
+  videoContainer?: MediaContainer;
+  audioContainer?: MediaContainer;
   subtitleText?: string;
   subtitleLanguage?: string;
+  outputFormat?: "mp4" | "matroska";
 };
 
 export type MuxResult = { blob: Blob; mime: string };
+export type MediaContainer = "mp4" | "mpegts";
 
 export function detectFmp4(data: Uint8Array): boolean {
   if (data.length < 8) return false;
@@ -32,50 +40,55 @@ function isMp4ContainerFile(fileName: string): boolean {
   return /\.(m4a|m4v|mp4)$/i.test(fileName);
 }
 
-function getMimeForOutputFile(fileName: string): string {
+function isMp4Container(fileName: string, container?: MediaContainer): boolean {
+  return container ? container === "mp4" : isMp4ContainerFile(fileName);
+}
+
+export function getMimeForOutputFile(fileName: string): string {
   return /\.mkv$/i.test(fileName) ? "video/x-matroska" : "video/mp4";
 }
 
 export async function writeMediaToFFmpegFS(
   ffmpeg: FFmpeg,
   filename: string,
-  data: Uint8Array
+  data: Uint8Array,
 ): Promise<void> {
   await ffmpeg.writeFile(filename, data);
 }
 
 async function writeSubtitles(
   ffmpeg: FFmpeg,
-  subtitleText: string | undefined
+  subtitleText: string | undefined,
 ) {
   if (subtitleText === undefined) {
     return;
   }
   await ffmpeg.writeFile(
     "subtitles.vtt",
-    new TextEncoder().encode(subtitleText)
+    new TextEncoder().encode(subtitleText),
   );
 }
 
-export async function muxExec({
-  ffmpeg,
+export function buildMuxArgs({
   outputFileName,
   hasVideo,
   hasAudio,
   videoFileName = "video.ts",
   audioFileName = "audio.ts",
+  videoContainer,
+  audioContainer,
   subtitleText,
   subtitleLanguage,
-}: MuxExecRequest): Promise<MuxResult> {
+  outputFormat,
+}: MuxArgsRequest): string[] {
   const includeSubtitles = subtitleText !== undefined;
 
   if (!hasVideo && !hasAudio) {
     throw new Error("No media to mux");
   }
 
-  await writeSubtitles(ffmpeg, subtitleText);
-
-  const audioNeedsAdtsToAsc = hasAudio && !isMp4ContainerFile(audioFileName);
+  const audioNeedsAdtsToAsc =
+    hasAudio && !isMp4Container(audioFileName, audioContainer);
 
   const args: string[] = ["-y"];
 
@@ -90,7 +103,7 @@ export async function muxExec({
   }
 
   if (hasVideo && hasAudio) {
-    args.push("-map", "0:v:0", "-map", "1:a:0");
+    args.push("-map", "0:v:0", "-map", "1:a:0?");
     if (includeSubtitles) {
       args.push("-map", "2:s:0");
     }
@@ -113,7 +126,7 @@ export async function muxExec({
       "-b:a",
       "192k",
       "-af",
-      "aresample=async=1:first_pts=0"
+      "aresample=async=1:first_pts=0",
     );
     if (includeSubtitles) {
       args.push("-map", "1:s:0");
@@ -128,7 +141,30 @@ export async function muxExec({
   if (hasVideo && hasAudio) {
     args.push("-shortest");
   }
+  if (outputFormat) {
+    args.push("-f", outputFormat);
+  }
   args.push(outputFileName);
+  return args;
+}
+
+export async function muxExec({
+  ffmpeg,
+  cleanupFileNames = [],
+  ...request
+}: MuxExecRequest): Promise<MuxResult> {
+  const {
+    outputFileName,
+    hasVideo,
+    hasAudio,
+    videoFileName = "video.ts",
+    audioFileName = "audio.ts",
+    subtitleText,
+  } = request;
+  const includeSubtitles = subtitleText !== undefined;
+
+  await writeSubtitles(ffmpeg, subtitleText);
+  const args = buildMuxArgs(request);
 
   try {
     const exitCode = await ffmpeg.exec(args);
@@ -137,13 +173,18 @@ export async function muxExec({
     }
     const data = await ffmpeg.readFile(outputFileName);
     const mime = getMimeForOutputFile(outputFileName);
-    return { blob: new Blob([data], { type: mime }), mime };
+    const source =
+      typeof data === "string" ? new TextEncoder().encode(data) : data;
+    const bytes = new Uint8Array(source.byteLength);
+    bytes.set(source);
+    return { blob: new Blob([bytes.buffer], { type: mime }), mime };
   } finally {
     const cleanupFiles = [
       hasVideo ? videoFileName : null,
       hasAudio ? audioFileName : null,
       includeSubtitles ? "subtitles.vtt" : null,
       outputFileName,
+      ...cleanupFileNames,
     ].filter((fileName): fileName is string => fileName !== null);
 
     for (const fileName of cleanupFiles) {
@@ -183,6 +224,8 @@ export async function muxStreams({
     hasAudio: Boolean(audioData),
     videoFileName,
     audioFileName,
+    videoContainer: videoFileName.endsWith(".mp4") ? "mp4" : "mpegts",
+    audioContainer: audioFileName.endsWith(".mp4") ? "mp4" : "mpegts",
     subtitleText,
     subtitleLanguage,
   });

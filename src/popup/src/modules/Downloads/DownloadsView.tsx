@@ -95,9 +95,13 @@ const DownloadsView = ({
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-background/95 px-3 py-2 text-[12px] shadow-md backdrop-blur">
           <div className="flex flex-col leading-tight">
             <span className="font-semibold text-sm">
-              Storage: {formatBytes(storage.totalUsedBytes)} used{" "}
-              {storage.availableBytes !== undefined && (
+              Storage: {formatBytes(storage.totalUsedBytes)} stored{" "}
+              {storage.quotaIsAdvisory ? (
+                <>• flexible storage</>
+              ) : storage.availableBytes !== undefined ? (
                 <>/ {formatBytes(storage.availableBytes)} free</>
+              ) : (
+                <></>
               )}
             </span>
           </div>

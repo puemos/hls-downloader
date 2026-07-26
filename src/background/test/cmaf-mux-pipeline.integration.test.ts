@@ -76,7 +76,11 @@ Object.defineProperty(global, "window", {
 
 // ── Imports (after mocks) ──
 
-import { IndexedDBFS, IndexedDBBucket } from "../src/services/indexedb-fs";
+import {
+  IndexedDBFS,
+  IndexedDBBucket,
+  createLegacyBucketForTests,
+} from "../src/services/disk-backed-fs";
 
 // ── fMP4 helper ──
 
@@ -98,6 +102,15 @@ function buildFmp4Data(size: number, fillByte: number = 0): Uint8Array {
 
 // ── Tests ──
 
+function writesMatching(pattern: RegExp) {
+  return mock.getWrites().filter((write) => pattern.test(write.filename));
+}
+
+function decodedWrite(name: string) {
+  const write = mock.getWriteByFilename(name);
+  return write ? new TextDecoder().decode(write.data) : undefined;
+}
+
 describe("CMAF Mux Pipeline Integration", () => {
   beforeEach(() => {
     mock.reset();
@@ -110,7 +123,7 @@ describe("CMAF Mux Pipeline Integration", () => {
 
   it("fMP4 v+a: filenames are .mp4, no aac_adtstoasc, has copy codecs", async () => {
     const id = "fmp4-va-test";
-    await IndexedDBFS.createBucket(id, 1, 1);
+    await createLegacyBucketForTests(id, 1, 1);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     const videoData = buildFmp4Data(512, 0x10);
@@ -119,7 +132,7 @@ describe("CMAF Mux Pipeline Integration", () => {
     await bucket.write(0, videoData.buffer);
     await bucket.write(1, audioData.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrite = mock.getVideoWrite();
     const audioWrite = mock.getAudioWrite();
@@ -150,13 +163,13 @@ describe("CMAF Mux Pipeline Integration", () => {
 
   it("fMP4 video-only: filename is video.mp4, uses 0:v/0:a? mapping", async () => {
     const id = "fmp4-v-only-test";
-    await IndexedDBFS.createBucket(id, 1, 0);
+    await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     const videoData = buildFmp4Data(512, 0x30);
     await bucket.write(0, videoData.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrite = mock.getVideoWrite();
     expect(videoWrite).toBeDefined();
@@ -178,7 +191,7 @@ describe("CMAF Mux Pipeline Integration", () => {
 
   it("fMP4 with subtitles: MKV output, correct subtitle mapping", async () => {
     const id = "fmp4-subtitle-test";
-    await IndexedDBFS.createBucket(id, 1, 0);
+    await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     const videoData = buildFmp4Data(512, 0x40);
@@ -189,7 +202,7 @@ describe("CMAF Mux Pipeline Integration", () => {
       language: "en",
     });
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrite = mock.getVideoWrite();
     expect(videoWrite).toBeDefined();
@@ -215,7 +228,7 @@ describe("CMAF Mux Pipeline Integration", () => {
 
   it("backward compat: TS data still uses .ts filenames and aac_adtstoasc", async () => {
     const id = "ts-compat-test";
-    await IndexedDBFS.createBucket(id, 1, 1);
+    await createLegacyBucketForTests(id, 1, 1);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     // TS data starts with sync byte 0x47, NOT ftyp
@@ -227,7 +240,7 @@ describe("CMAF Mux Pipeline Integration", () => {
     await bucket.write(0, tsVideo.buffer);
     await bucket.write(1, tsAudio.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     const videoWrite = mock.getVideoWrite();
     const audioWrite = mock.getAudioWrite();
@@ -249,7 +262,7 @@ describe("CMAF Mux Pipeline Integration", () => {
 
   it("out-of-order fMP4 chunks: correct concatenation order and format detection", async () => {
     const id = "fmp4-ooo-test";
-    await IndexedDBFS.createBucket(id, 3, 0);
+    await createLegacyBucketForTests(id, 3, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     // Only the first chunk has ftyp header (like a real fMP4 init+media)
@@ -264,34 +277,30 @@ describe("CMAF Mux Pipeline Integration", () => {
     await bucket.write(0, chunk0.buffer);
     await bucket.write(1, chunk1.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
-    const videoWrite = mock.getVideoWrite();
-    expect(videoWrite).toBeDefined();
+    const videoWrites = writesMatching(/^video-\d{6}\.mp4$/);
+    expect(videoWrites.map((write) => write.filename)).toEqual([
+      "video-000000.mp4",
+      "video-000001.mp4",
+      "video-000002.mp4",
+    ]);
 
-    // Concatenated size should be all 3 chunks
-    const expectedSize =
-      chunk0.byteLength + chunk1.byteLength + chunk2.byteLength;
-    expect(videoWrite!.data.byteLength).toBe(expectedSize);
+    expect(videoWrites[0].data).toEqual(chunk0);
+    expect(videoWrites[1].data).toEqual(chunk1);
+    expect(videoWrites[2].data).toEqual(chunk2);
 
-    // Format detection: first chunk has ftyp → filename should be .mp4
-    expect(videoWrite!.filename).toBe("video.mp4");
-
-    // Verify ordering
-    const slice0 = videoWrite!.data.slice(0, 128);
-    const slice1 = videoWrite!.data.slice(128, 256);
-    const slice2 = videoWrite!.data.slice(256, 384);
-
-    expect(slice0).toEqual(chunk0);
-    expect(slice1).toEqual(chunk1);
-    expect(slice2).toEqual(chunk2);
+    expect(decodedWrite("video.concat.txt")).toBe(
+      "video-000000.mp4\nvideo-000001.mp4\nvideo-000002.mp4\n",
+    );
+    expect(mock.getExecArgs()[0]).toContain("concatf:video.concat.txt");
 
     await IndexedDBFS.deleteBucket(id);
   });
 
   it("cleanup: deleteFile called with .mp4 filenames for fMP4 data", async () => {
     const id = "fmp4-cleanup-test";
-    await IndexedDBFS.createBucket(id, 1, 1);
+    await createLegacyBucketForTests(id, 1, 1);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
 
     const videoData = buildFmp4Data(256, 0x60);
@@ -300,7 +309,7 @@ describe("CMAF Mux Pipeline Integration", () => {
     await bucket.write(0, videoData.buffer);
     await bucket.write(1, audioData.buffer);
 
-    await bucket.getLink();
+    await bucket.prepareDownload();
 
     // deleteFile should be called with .mp4 filenames
     expect(mock.getDeletedFiles()).toContain("video.mp4");
