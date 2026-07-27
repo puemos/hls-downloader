@@ -6,7 +6,7 @@ source archive.
 ## Environment
 
 - Ubuntu 24.04 LTS ARM64
-- Node.js 22.11.0
+- Node.js 22.12.0 or newer
 - npm 10.9.0
 - `zip` command available on `PATH`
 
@@ -14,7 +14,7 @@ source archive.
 
 ```bash
 corepack enable
-corepack prepare pnpm@10.11.0 --activate
+corepack prepare pnpm@10.34.4 --activate
 pnpm install --frozen-lockfile
 pnpm run build:mv2
 ```
@@ -34,7 +34,7 @@ uses that directory as its source package.
 - `dist/extension-mv2-firefox.xpi`
 
 `browser_specific_settings.gecko.id` and
-`browser_specific_settings.gecko.strict_min_version: "115.0"` and
+`browser_specific_settings.gecko.strict_min_version: "128.0"` and
 `data_collection_permissions.required: ["none"]` are committed in
 `src/assets/manifest.json`; no post-build manifest edits are required.
 

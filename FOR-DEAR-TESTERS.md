@@ -4,12 +4,12 @@ A short guide for Mozilla/Chromium QA to build and exercise the extension locall
 
 ## Prerequisites
 
-- Firefox 115+ or Chromium 109+
-- Node.js 20+ (ships with Corepack)
+- Firefox 128+ or Chromium 111+
+- Node.js 22.12+ (ships with Corepack)
 - Enable pnpm via Corepack:
   ```bash
   corepack enable
-  corepack prepare pnpm@10.11.0 --activate
+  corepack prepare pnpm@10.34.4 --activate
   ```
 - From repo root: `pnpm install --frozen-lockfile`
 

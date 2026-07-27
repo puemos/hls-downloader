@@ -2,25 +2,43 @@
 
 ## Unreleased
 
+## 5.5.0
+
+### Features
+
+- Added an output-format setting for MP4 or MKV; downloads containing subtitles continue to use MKV automatically.
+- Refreshed the popup with more consistent navigation, cards, controls, status presentation, storage information, and responsive scrolling.
+
 ### Fixes
 
-- Replaced media-sized IndexedDB/JavaScript mux buffers for new jobs with an OPFS-backed fragment and export pipeline on Firefox MV2 and Chromium MV3.
-- Added a dedicated FFmpeg worker with WORKERFS inputs and a seekable OPFS output device, producing normal seekable MP4 or MKV files without fragmented-MP4 fallback.
-- Kept pre-existing IndexedDB jobs on an explicit legacy finalization path with actionable re-download errors instead of silently migrating them.
-- Kept download artifacts alive until the browser reports completion or interruption, including duplicate saves and MV3 service-worker wake-ups.
+- Moved new downloads to a disk-backed processing pipeline on Firefox MV2 and Chromium MV3, preventing memory consumption from growing with the complete media size.
+- Added dedicated disk-backed muxing that produces normal seekable MP4 and MKV files.
+- Kept generated artifacts available until the browser confirms completion or interruption, including duplicate saves and MV3 service-worker restarts.
 - Added disk-space preflight checks, safe overwrite accounting, serialized muxing, coalesced repeated finalization, cancellation, and partial-output cleanup.
-- Declared Firefox 115 and Chromium 109 as the minimum supported versions.
-- Request persistent browser storage before creating new disk-backed downloads, increasing the available Firefox storage allowance and protecting temporary media from eviction.
-- Treat storage estimates as informational when the extension has unlimited storage permission, preventing Chromium's conservative 2 GiB report from blocking large-file finalization or triggering false low-space warnings.
-- Reword the storage UI around user-visible behavior, without exposing internal storage backend names.
+- Kept downloads started by older versions on the legacy IndexedDB finalization path instead of attempting an unsafe migration.
+- Treated conservative storage estimates as informational when unlimited storage permission makes the extension quota-exempt.
+
+### Security
+
+- Updated vulnerable and outdated dependencies and added a repeatable security gate combining `pnpm audit` with verification of locally patched compatibility dependencies.
+- Tightened the Firefox content security policy by removing `unsafe-eval`.
+
+### Compatibility
+
+- Requires Firefox 128 or newer and Chromium 111 or newer.
+- Preserves existing settings and uses MP4 when the new output-format setting is absent.
+- Keeps downloads started by an older extension version readable without migrating them. If legacy finalization runs out of memory, delete the job and download it again.
+- Adds no new extension permissions.
 
 ### Testing
 
-- Added OPFS fragment routing/overwrite/quota tests, seekable-output device tests, worker queue/coalescing/cancellation tests, and artifact lease tests.
-- Added persistence-policy and quota-exempt preflight coverage.
+- Added coverage for disk-backed fragment routing, overwrite and quota behavior, seekable mux output, worker queuing and cancellation, artifact lifetime, persistence policy, UI workflows, and local browser E2E.
+- `pnpm run security:audit`
+- `pnpm run typecheck`
 - `pnpm test`
-- `pnpm run build:mv2`
-- `pnpm run build:mv3`
+- `pnpm run build:all-variants`
+- `pnpm exec web-ext lint --source-dir dist/mv2`
+- `pnpm test:e2e:local`
 
 ## 5.4.4
 
