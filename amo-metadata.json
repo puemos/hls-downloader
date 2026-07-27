@@ -1,0 +1,5 @@
+{
+  "version": {
+    "approval_notes": "Reproduction instructions are in AMO_SOURCE_REVIEW.md at the source archive root. Use the exact pinned Node.js, npm, and pnpm versions documented there; pnpm is installed through npm to avoid the obsolete Corepack signing keys bundled with older Node.js releases. Functional test steps are in FOR-DEAR-TESTERS.md. All third-party packages are declared in the workspace package.json files, pinned by pnpm-lock.yaml, and downloaded only from the npm registry."
+  }
+}

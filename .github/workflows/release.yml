@@ -1,13 +1,14 @@
 name: "Release"
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*.*.*"
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: write
     steps:
@@ -16,11 +17,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-      - name: Enable corepack
-        run: corepack enable
-      - name: Prepare pnpm
-        run: corepack prepare pnpm@10.34.4 --activate
+          node-version: "22.12.0"
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
+          npm install --global pnpm@10.34.4
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Audit dependencies
@@ -32,8 +34,10 @@ jobs:
       - name: Test
         run: pnpm test
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
+          fail_on_unmatched_files: true
+          overwrite_files: true
           files: |
             dist/extension-mv2-chrome.zip
             dist/extension-mv2-firefox.xpi
@@ -41,5 +45,3 @@ jobs:
             dist/extension-mv2-no-blocklist-chrome.zip
             dist/extension-mv2-no-blocklist-firefox.xpi
             dist/extension-mv3-no-blocklist-chrome.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

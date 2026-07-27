@@ -11,6 +11,8 @@
 
 ### Fixes
 
+- Made Firefox Add-ons source builds reproducible on Mozilla's ARM64 reviewer environment by installing the pinned pnpm release through npm instead of the obsolete bundled Corepack.
+- Made Firefox publication return after AMO accepts a pending manual review instead of waiting indefinitely for approval.
 - Moved new downloads to a disk-backed processing pipeline on Firefox MV2 and Chromium MV3, preventing memory consumption from growing with the complete media size.
 - Added dedicated disk-backed muxing that produces normal seekable MP4 and MKV files.
 - Kept generated artifacts available until the browser confirms completion or interruption, including duplicate saves and MV3 service-worker restarts.

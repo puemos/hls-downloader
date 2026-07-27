@@ -139,15 +139,15 @@ of memory, delete it and download it again.
 
 ### Clone & Build
 
-Requires Node.js 22.12+ (includes [Corepack](https://nodejs.org/api/corepack.html)) and the `zip` command.
+Requires Node.js 22.12+ and the `zip` command. Firefox release builds use
+Node.js 22.12.0, npm 10.9.0, and pnpm 10.34.4 exactly.
 
 ```bash
 git clone https://github.com/puemos/hls-downloader.git
 cd hls-downloader
 
-# install the pinned pnpm version
-corepack enable
-corepack prepare pnpm@10.34.4 --activate
+# install the pinned pnpm version through npm
+npm install --global pnpm@10.34.4
 
 pnpm install --frozen-lockfile
 pnpm run build    # outputs → ./dist/, extension-chrome.zip, extension-firefox.xpi
@@ -178,7 +178,7 @@ For Firefox Add-ons source review, use the exact reproduction steps in
 `source-code.zip`; `pnpm run publish:firefox` creates a fresh source archive from
 the committed release revision.
 
-> Tip: If pnpm is missing, run `corepack enable && corepack prepare pnpm@10.34.4 --activate` to match the locked toolchain.
+> Tip: If pnpm is missing, run `npm install --global pnpm@10.34.4` to match the locked toolchain. Do not use the Corepack bundled with Node.js 22.12.0; its pnpm signing keys are obsolete.
 
 Run tests & generate coverage badge:
 

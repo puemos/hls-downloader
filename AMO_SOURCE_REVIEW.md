@@ -6,18 +6,30 @@ source archive.
 ## Environment
 
 - Ubuntu 24.04 LTS ARM64
-- Node.js 22.12.0 or newer
+- Node.js 22.12.0
 - npm 10.9.0
+- pnpm 10.34.4, installed through npm
 - `zip` command available on `PATH`
 
 ## Build
 
 ```bash
-corepack enable
-corepack prepare pnpm@10.34.4 --activate
+sudo apt-get update
+sudo apt-get install -y zip
+npm install --global pnpm@10.34.4
+
+node --version
+npm --version
+pnpm --version
+
 pnpm install --frozen-lockfile
 pnpm run build:mv2
+pnpm exec web-ext lint --source-dir dist/mv2
 ```
+
+The version commands must report Node.js `v22.12.0`, npm `10.9.0`, and pnpm
+`10.34.4`. Do not use the Corepack bundled with Node.js 22.12.0: it predates
+pnpm's current signing key and cannot install the pinned pnpm release.
 
 The Firefox extension files are written to `dist/mv2`. The signed submission
 uses that directory as its source package.
@@ -43,3 +55,5 @@ The two generated workers are local build artifacts. `worker-*.js` is the
 `disk-mux-worker-*.js` handles new OPFS-backed jobs. Its dynamic import URL is
 always built with the extension runtime API and points only to the committed
 `assets/ffmpeg/ffmpeg-core.js`; it does not load remote code.
+
+Functional test instructions are in `FOR-DEAR-TESTERS.md`.
