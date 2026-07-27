@@ -147,7 +147,7 @@ cd hls-downloader
 
 # install the pinned pnpm version
 corepack enable
-corepack prepare pnpm@10.11.0 --activate
+corepack prepare pnpm@10.34.4 --activate
 
 pnpm install --frozen-lockfile
 pnpm run build    # outputs → ./dist/, extension-chrome.zip, extension-firefox.xpi
@@ -178,7 +178,7 @@ For Firefox Add-ons source review, use the exact reproduction steps in
 `source-code.zip`; `pnpm run publish:firefox` creates a fresh source archive from
 the committed release revision.
 
-> Tip: If pnpm is missing, run `corepack enable && corepack prepare pnpm@10.11.0 --activate` to match the locked toolchain.
+> Tip: If pnpm is missing, run `corepack enable && corepack prepare pnpm@10.34.4 --activate` to match the locked toolchain.
 
 Run tests & generate coverage badge:
 
