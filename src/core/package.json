@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@typescript/native": "npm:typescript@7.0.2",
-    "@types/node": "26.1.1",
+    "@types/node": "26.1.2",
     "@types/redux-logger": "3.0.13",
     "prettier": "3.9.6",
     "typescript": "npm:@typescript/typescript6@6.0.2",
