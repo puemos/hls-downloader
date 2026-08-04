@@ -8,7 +8,7 @@
     "@hls-downloader/design-system": "workspace:*",
     "gsap": "3.15.0",
     "hls.js": "1.6.16",
-    "lucide-react": "1.27.0",
+    "lucide-react": "1.28.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-redux": "9.3.0",
