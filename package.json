@@ -50,7 +50,7 @@
     "storybook:design-system": "pnpm --filter ./src/design-system run storybook"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.11",
     "badge-maker": "6.0.0",
     "dotenv": "17.4.2",
     "prettier": "3.9.6",
