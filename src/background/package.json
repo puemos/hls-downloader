@@ -28,7 +28,7 @@
     "url-toolkit": "2.2.5",
     "uuid": "14.0.1",
     "vite": "8.1.5",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "0.12.15",

@@ -31,7 +31,7 @@
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vite": "8.1.5",
     "vite-plugin-dts": "5.0.3",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11"
   },
   "dependencies": {
     "@radix-ui/react-aspect-ratio": "1.1.15",
