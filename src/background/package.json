@@ -33,7 +33,7 @@
   "dependencies": {
     "@ffmpeg/ffmpeg": "0.12.15",
     "@hls-downloader/core": "workspace:*",
-    "filenamify": "7.0.2",
+    "filenamify": "7.0.3",
     "redux": "5.0.1",
     "webext-redux": "4.0.0",
     "webextension-polyfill": "0.12.0"
