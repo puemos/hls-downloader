@@ -18,11 +18,11 @@
   },
   "devDependencies": {
     "@typescript/native": "npm:typescript@7.0.2",
-    "@types/node": "26.5.1",
+    "@types/node": "26.6.4",
     "@types/redux-logger": "3.0.13",
-    "prettier": "3.9.6",
+    "prettier": "3.9.9",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "5.0.0"
+    "vitest": "5.0.3"
   },
   "dependencies": {
     "@reduxjs/toolkit": "2.12.0",
