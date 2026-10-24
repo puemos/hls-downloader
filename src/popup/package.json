@@ -31,7 +31,7 @@
     "@vitejs/plugin-react": "6.1.1",
     "postcss": "8.5.28",
     "prettier": "3.9.6",
-    "storybook": "10.6.0",
+    "storybook": "10.6.2",
     "tailwindcss": "4.3.3",
     "tailwindcss-animate": "1.0.7",
     "typescript": "npm:@typescript/typescript6@6.0.2",
