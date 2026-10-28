@@ -143,6 +143,33 @@ describe("use-cases", () => {
     expect(run(playlist, level)).toBe("Video _Test_ _2024_-stream.mp4");
   });
 
+  it("replaces invisible formatting characters in page title", () => {
+    // 🏳️‍⚧️ is joined with U+200D, which Firefox won't accept in a filename.
+    const playlist = new Playlist(
+      "1",
+      "https://a/b/stream.m3u8",
+      Date.now(),
+      "映画『トランジット・デイズ』🏳️‍⚧️#映画トラデイ",
+    );
+    const level = new Level("stream", "l", "1", "uri");
+    const run = generateFileName();
+    expect(run(playlist, level)).toBe(
+      "映画『トランジット・デイズ』🏳️_⚧️#映画トラデイ-stream.mp4",
+    );
+  });
+
+  it("drops control characters and leading dots from page title", () => {
+    const playlist = new Playlist(
+      "1",
+      "https://a/b/stream.m3u8",
+      Date.now(),
+      "..Line\u0000one\nline two end",
+    );
+    const level = new Level("stream", "l", "1", "uri");
+    const run = generateFileName();
+    expect(run(playlist, level)).toBe("Lineone line two end-stream.mp4");
+  });
+
   it("prepares standalone subtitles through the filesystem owner", async () => {
     const { fs, download } = createFsMock();
     const loader: ILoader = {
