@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
-const expectedNodeVersion = "v22.12.0";
+const expectedNodeVersion = "v22.22.2";
 const expectedPnpmVersion = "10.34.4";
 const amoMetadata = resolve(root, "amo-metadata.json");
 

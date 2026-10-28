@@ -5,19 +5,17 @@ import { resolve } from "node:path";
 
 const require = createRequire(import.meta.url);
 const pnpmStore = resolve("node_modules/.pnpm");
-const branches = ["1.1.16"];
+const branches = ["1.1.21"];
 const pattern = "{a,b}".repeat(50);
 const maxLength = 100_000;
 
 for (const version of branches) {
-  const prefix = `brace-expansion@${version}_patch_hash=`;
-  const matches = readdirSync(pnpmStore).filter((entry) =>
-    entry.startsWith(prefix),
-  );
+  const prefix = `brace-expansion@${version}`;
+  const matches = readdirSync(pnpmStore).filter((entry) => entry === prefix);
 
   if (matches.length !== 1) {
     throw new Error(
-      `Expected one patched brace-expansion@${version}, found ${matches.length}`,
+      `Expected one fixed brace-expansion@${version}, found ${matches.length}`,
     );
   }
 
@@ -30,11 +28,19 @@ for (const version of branches) {
   const output = expand(pattern, { max: 10_000, maxLength });
   const totalLength = output.reduce((total, item) => total + item.length, 0);
 
-  if (output.length !== 2_000 || totalLength !== maxLength) {
+  if (
+    output.length === 0 ||
+    output.length > 10_000 ||
+    totalLength > maxLength
+  ) {
     throw new Error(
       `brace-expansion@${version} produced an unexpected bounded result: ${output.length}/${totalLength}`,
     );
   }
+
+  if (JSON.stringify(expand("a{b,c}")) !== JSON.stringify(["ab", "ac"])) {
+    throw new Error(`brace-expansion@${version} broke the CommonJS API`);
+  }
 }
 
-console.log("Verified patched brace-expansion compatibility branches");
+console.log("Verified fixed brace-expansion compatibility branches");

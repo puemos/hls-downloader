@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 5.5.1
+
+### Fixes
+
+- Fixed exports failing before the Save As dialog opens when a video title contains emoji zero-width joiners or other browser-invalid characters (#290, #590).
+- Sanitize filenames again at the final export boundary, preserve Japanese text and ordinary emoji, and bound filename length while keeping the output extension.
+
+### Build tooling
+
+- Updated affected build and test dependencies to pass the release security audit, and replaced the brace-expansion compatibility patch with the fixed upstream release.
+- Updated the reproducible build environment to Node.js 22.22.2 and npm 10.9.7 to meet the build dependencies' supported runtime requirements.
+
+### Testing
+
+- Added regression coverage for the exact title reported in #590, Unicode formatting and control characters, reserved names, long filenames, and MP4/MKV/subtitle exports.
+- Reproduced the export failure before the fix and verified real stream downloads after the fix in Chromium and Firefox; decoded the saved MP4s with FFmpeg.
+
 ## 5.5.0
 
 ### Features

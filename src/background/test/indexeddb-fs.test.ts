@@ -483,7 +483,7 @@ describe("disk-backed filesystem", () => {
       url: artifact.url,
       saveAs: true,
       conflictAction: "uniquify",
-      filename: "unsafe!name.mp4",
+      filename: "unsafe_____name.mp4",
     });
     expect(
       testState.storageData.downloadArtifactLeases[String(downloadId)],
@@ -498,6 +498,48 @@ describe("disk-backed filesystem", () => {
     expect(revokeObjectURL).toHaveBeenCalledWith(artifact.url);
     await expectExportMissing(artifact.exportId);
   });
+
+  it.each([
+    ["映画 🏳️‍⚧️.mp4", "映画 🏳️⚧️.mp4", true],
+    [
+      "映画『トランジット・デイズ』🏳️‍⚧️#映画トラデイ-stream.mp4",
+      "映画『トランジット・デイズ』🏳️⚧️#映画トラデイ-stream.mp4",
+      true,
+    ],
+    ["Developer 👩‍💻.mkv", "Developer 👩💻.mkv", false],
+    ["映画 🏳️‍⚧️-ja.vtt", "映画 🏳️⚧️-ja.vtt", true],
+    ["\u200d\u202e", "stream.mp4", true],
+    ["  ...~ title.mp4", "title.mp4", true],
+    ["CON.mp4", "CON!.mp4", false],
+    ["日".repeat(100) + ".mp4", "日".repeat(76) + ".mp4", true],
+    ["😀".repeat(100) + ".mkv", "😀".repeat(38) + ".mkv", false],
+  ])(
+    "sanitizes the final export name %j to %j (dialog: %s)",
+    async (path, filename, dialog) => {
+      const artifact: PreparedDownload = {
+        url: "blob:unicode",
+        exportId: "unicode.mp4",
+        mime: "video/mp4",
+        size: 1,
+      };
+      await writeExport(artifact.exportId, [1]);
+
+      const downloadId = await IndexedDBFS.saveAs(path, artifact, { dialog });
+
+      const { downloads } = (await vi.importMock(
+        "webextension-polyfill",
+      )) as any;
+      expect(downloads.download).toHaveBeenCalledWith({
+        url: artifact.url,
+        saveAs: dialog,
+        conflictAction: "uniquify",
+        filename,
+      });
+
+      emitDownloadState(downloadId, "complete");
+      await vi.waitFor(() => expectExportMissing(artifact.exportId));
+    },
+  );
 
   it("keeps a shared export until the last duplicate save completes", async () => {
     const artifact: PreparedDownload = {

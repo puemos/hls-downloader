@@ -6,8 +6,8 @@ source archive.
 ## Environment
 
 - Ubuntu 24.04 LTS ARM64
-- Node.js 22.12.0
-- npm 10.9.0
+- Node.js 22.22.2
+- npm 10.9.7
 - pnpm 10.34.4, installed through npm
 - `zip` command available on `PATH`
 
@@ -27,9 +27,8 @@ pnpm run build:mv2
 pnpm exec web-ext lint --source-dir dist/mv2
 ```
 
-The version commands must report Node.js `v22.12.0`, npm `10.9.0`, and pnpm
-`10.34.4`. Do not use the Corepack bundled with Node.js 22.12.0: it predates
-pnpm's current signing key and cannot install the pinned pnpm release.
+The version commands must report Node.js `v22.22.2`, npm `10.9.7`, and pnpm
+`10.34.4`. Install pnpm through npm so reviewer builds use the pinned version.
 
 The Firefox extension files are written to `dist/mv2`. The signed submission
 uses that directory as its source package.

@@ -139,8 +139,8 @@ of memory, delete it and download it again.
 
 ### Clone & Build
 
-Requires Node.js 22.12+ and the `zip` command. Firefox release builds use
-Node.js 22.12.0, npm 10.9.0, and pnpm 10.34.4 exactly.
+Requires Node.js 22.22.2+ and the `zip` command. Firefox release builds use
+Node.js 22.22.2, npm 10.9.7, and pnpm 10.34.4 exactly.
 
 ```bash
 git clone https://github.com/puemos/hls-downloader.git
@@ -178,7 +178,7 @@ For Firefox Add-ons source review, use the exact reproduction steps in
 `source-code.zip`; `pnpm run publish:firefox` creates a fresh source archive from
 the committed release revision.
 
-> Tip: If pnpm is missing, run `npm install --global pnpm@10.34.4` to match the locked toolchain. Do not use the Corepack bundled with Node.js 22.12.0; its pnpm signing keys are obsolete.
+> Tip: If pnpm is missing, run `npm install --global pnpm@10.34.4` to match the locked toolchain.
 
 Run tests & generate coverage badge:
 

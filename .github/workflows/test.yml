@@ -35,7 +35,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22.12.0"
+          node-version: "22.22.2"
       - name: Install pnpm
         run: npm install --global pnpm@10.34.4
       - name: Install dependencies
@@ -62,7 +62,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22.12.0"
+          node-version: "22.22.2"
       - name: Install reviewer build tools
         run: |
           sudo apt-get update
