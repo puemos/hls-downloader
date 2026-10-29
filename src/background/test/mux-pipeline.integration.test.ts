@@ -186,7 +186,7 @@ describe("Mux Pipeline Integration", () => {
 
     // Check exec args map video and audio from separate inputs
     const args = mock.getExecArgs()[0];
-    expect(args).toContain("0:v:0");
+    expect(args).toContain("0:v:0?");
     expect(args).toContain("1:a:0?");
     expect(args).toContain("-bsf:a");
     expect(args).toContain("aac_adtstoasc");
@@ -210,7 +210,7 @@ describe("Mux Pipeline Integration", () => {
     await IndexedDBFS.deleteBucket(id);
   });
 
-  it("muxed with extra stream: maps 0:v and 0:a?, not bare 0", async () => {
+  it("muxed with extra stream: maps 0:v? and 0:a?, not bare 0", async () => {
     const id = "data-stream-test";
     await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
@@ -227,7 +227,7 @@ describe("Mux Pipeline Integration", () => {
     // The key assertion: args should use explicit stream selectors, not bare "0"
     // which would pull in the data/metadata stream (the #509 bug)
     const args = mock.getExecArgs()[0];
-    expect(args).toContain("0:v");
+    expect(args).toContain("0:v?");
     expect(args).toContain("0:a?");
     // Must NOT contain a bare "-map 0" which maps all streams
     const mapIndices = args

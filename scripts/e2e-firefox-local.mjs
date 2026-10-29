@@ -158,11 +158,11 @@ async function main() {
       const options = await evaluate(
         "return [...document.querySelectorAll('select option')].map(option => option.textContent)",
       );
-      return (
-        options.some((text) => text.includes("540")) &&
-        options.some((text) => text.includes("ENGLISH")) &&
-        options.some((text) => text.includes("Text"))
-      );
+      return process.env.E2E_PRIMARY_AUDIO === "1"
+        ? options.some((text) => text.includes("0.1 mbps"))
+        : options.some((text) => text.includes("540")) &&
+            options.some((text) => text.includes("ENGLISH")) &&
+            options.some((text) => text.includes("Text"));
     });
     if (process.env.E2E_SELECT_SUBTITLES !== "0")
       await evaluate(`const select = document.querySelectorAll('select')[2];

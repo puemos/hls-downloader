@@ -65,7 +65,7 @@ describe("muxExec", () => {
     const args = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(args).toContain("-i");
     expect(args).toContain("video.ts");
-    expect(args).toContain("0:v");
+    expect(args).toContain("0:v?");
     expect(args).toContain("0:a?");
     expect(args).toContain("-c");
     expect(args).toContain("copy");
@@ -101,7 +101,7 @@ describe("muxExec", () => {
     const args = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(args).toContain("video.ts");
     expect(args).toContain("audio.ts");
-    expect(args).toContain("0:v:0");
+    expect(args).toContain("0:v:0?");
     expect(args).toContain("1:a:0?");
     expect(args).toContain("-bsf:a");
     expect(args).toContain("aac_adtstoasc");

@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 5.5.5
+
+### Fixes
+
+- Save audio-only primary playlists without requiring a video stream (#579). Keep optional embedded audio and continue excluding data and metadata streams from exports.
+
+### Testing
+
+- Added two native FFmpeg regressions for audio-only primary playlists, with and without selected alternate audio. Both paths failed before the fix. All 319 automated tests pass.
+- Passed 20 real audio-only browser cases in Brave MV3 and Firefox MV2, including six reproductions of the old release's save failure. All fourteen fixed exports have complete audio matching the source hash. The alternate-audio case uses a different tone and verifies the selected track is saved.
+- Passed the 16-case encrypted video/audio browser matrix after the fix, retaining all source video frames and matching full decoded audio. Typechecking and the security gate pass.
+- All six release archives pass validation. Firefox lint reports zero errors and six existing warnings.
+
 ## 5.5.4
 
 ### Fixes

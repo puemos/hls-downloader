@@ -20,6 +20,7 @@ const skipBuild = process.env.E2E_SKIP_BUILD === "1";
 const keepArtifacts = process.env.E2E_KEEP_ARTIFACTS === "1";
 const cleanDownload = process.env.E2E_CLEAN_DOWNLOAD === "1";
 const selectSubtitles = process.env.E2E_SELECT_SUBTITLES !== "0";
+const primaryAudio = process.env.E2E_PRIMARY_AUDIO === "1";
 const defaultHlsUrl =
   "https://mtoczko.github.io/hls-test-streams/test-group/playlist.m3u8";
 const hlsUrl = process.env.E2E_HLS_URL ?? defaultHlsUrl;
@@ -564,11 +565,13 @@ async function parsedPlaylistDetail(cdp, sessionId) {
   if (
     textLower.includes("estimate") &&
     textLower.includes("video") &&
-    textLower.includes("audio") &&
-    textLower.includes("subtitles") &&
-    options.some((option) => String(option).includes("540")) &&
-    options.some((option) => String(option).includes("ENGLISH")) &&
-    options.some((option) => String(option).includes("Text"))
+    (primaryAudio
+      ? options.some((option) => String(option).includes("0.1 mbps"))
+      : textLower.includes("audio") &&
+        textLower.includes("subtitles") &&
+        options.some((option) => String(option).includes("540")) &&
+        options.some((option) => String(option).includes("ENGLISH")) &&
+        options.some((option) => String(option).includes("Text")))
   ) {
     return value;
   }
@@ -732,10 +735,11 @@ async function main() {
         String(value.body).includes("#EXTM3U"),
         "Fetched master playlist did not contain #EXTM3U",
       );
-      assert(
-        String(value.body).includes("TYPE=SUBTITLES"),
-        "Fetched master playlist did not advertise subtitles",
-      );
+      if (!primaryAudio)
+        assert(
+          String(value.body).includes("TYPE=SUBTITLES"),
+          "Fetched master playlist did not advertise subtitles",
+        );
       return value.status;
     });
 
@@ -782,7 +786,12 @@ async function main() {
       () => parsedPlaylistDetail(cdp, popupSession.sessionId),
       { timeoutMs: 20000, intervalMs: 250 },
     );
-    await selectOption(cdp, popupSession.sessionId, 0, "540");
+    await selectOption(
+      cdp,
+      popupSession.sessionId,
+      0,
+      primaryAudio ? "0.1 mbps" : "540",
+    );
     if (selectSubtitles)
       await selectOption(cdp, popupSession.sessionId, 2, "Text");
     await waitFor(
@@ -857,7 +866,12 @@ async function main() {
       () => parsedPlaylistDetail(cdp, popupSession.sessionId),
       { timeoutMs: 20000, intervalMs: 250 },
     );
-    await selectOption(cdp, popupSession.sessionId, 0, "540");
+    await selectOption(
+      cdp,
+      popupSession.sessionId,
+      0,
+      primaryAudio ? "0.1 mbps" : "540",
+    );
     if (selectSubtitles)
       await selectOption(cdp, popupSession.sessionId, 2, "Text");
     await waitFor(

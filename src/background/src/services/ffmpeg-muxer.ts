@@ -103,7 +103,7 @@ export function buildMuxArgs({
   }
 
   if (hasVideo && hasAudio) {
-    args.push("-map", "0:v:0", "-map", "1:a:0?");
+    args.push("-map", "0:v:0?", "-map", "1:a:0?");
     if (includeSubtitles) {
       args.push("-map", "2:s:0");
     }
@@ -112,8 +112,9 @@ export function buildMuxArgs({
       args.push("-bsf:a", "aac_adtstoasc");
     }
   } else if (hasVideo) {
-    // Map video + optional embedded audio, skip data/metadata streams
-    args.push("-map", "0:v", "-map", "0:a?", "-c", "copy");
+    // A primary playlist can contain video, embedded audio, or audio only.
+    // Keep both media mappings optional while excluding data/metadata streams.
+    args.push("-map", "0:v?", "-map", "0:a?", "-c", "copy");
     if (includeSubtitles) {
       args.push("-map", "1:s:0", "-c:s", "webvtt");
     }

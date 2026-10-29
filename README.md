@@ -245,6 +245,19 @@ same complete-file checks. This currently reproduces a separate muxing
 truncation bug even with unencrypted media; a "Completed" download with missing
 frames fails the test.
 
+Run the audio-only primary-playlist regression with the same real browser harness:
+
+```bash
+pnpm test:e2e:audio
+```
+
+This uses AAC-only TS and fMP4 primary playlists, including encrypted variants.
+It reproduces the save failure in v5.5.4, then requires the current extension
+to save complete audio with no unexpected streams. Decoded audio must match
+the source HLS stream exactly. An alternate-audio case uses a different tone
+and requires the selected track to be saved. It uses the same dependencies and browser
+selection options as `test:e2e:aes128`.
+
 ### Live Development
 
 ```bash

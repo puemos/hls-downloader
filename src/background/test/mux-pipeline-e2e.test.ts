@@ -198,6 +198,41 @@ describe.skipIf(!ffmpegAvailable)("Mux Pipeline E2E (host ffmpeg)", () => {
     expect(await ffprobe(out)).toMatchSnapshot();
   }, 30_000);
 
+  it.each([false, true])(
+    "saves an audio-only primary playlist with alternate audio=%s (#579)",
+    async (alternateAudio) => {
+      await writeMediaToFFmpegFS(
+        adapter as any,
+        "primary.ts",
+        loadFixture("audio-only.ts"),
+      );
+      if (alternateAudio)
+        await writeMediaToFFmpegFS(
+          adapter as any,
+          "audio.ts",
+          loadFixture("audio-only.ts"),
+        );
+      const result = await muxExec({
+        ffmpeg: adapter as any,
+        outputFileName: "output.mp4",
+        // Primary playlist fragments occupy the video slot, even for audio-only HLS.
+        hasVideo: true,
+        hasAudio: alternateAudio,
+        videoFileName: "primary.ts",
+      });
+      const out = await saveOutput(result.blob, "04b-primary-audio-only.mp4");
+      const probe = await ffprobe(out);
+      expect(probe.streams.map((stream) => stream.codec_type)).toEqual(["audio"]);
+      expect(probe.streams[0].codec_name).toBe("aac");
+      expect(probe.streams[0].sample_rate).toBe("48000");
+      const source = await ffprobe(path.join(FIXTURES_DIR, "audio-only.ts"));
+      expect(
+        Math.abs(Number(probe.duration) - Number(source.duration)),
+      ).toBeLessThan(0.05);
+    },
+    30_000,
+  );
+
   it("video + subtitles → MKV", async () => {
     await writeMediaToFFmpegFS(
       adapter as any,

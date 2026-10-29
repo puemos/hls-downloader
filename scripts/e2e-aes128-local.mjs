@@ -14,7 +14,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const browsers = (process.env.E2E_AES128_BROWSERS ?? "brave,firefox").split(
   ",",
 );
-const baselineVersion = "v5.5.3";
+const primaryAudio = process.env.E2E_PRIMARY_AUDIO === "1";
+const baselineVersion = primaryAudio ? "v5.5.4" : "v5.5.3";
 const selectSubtitles = process.env.E2E_AES128_SUBTITLES === "1";
 
 if (process.env.CI) {
@@ -278,7 +279,7 @@ async function validateDownload(result, referenceHashes, destination) {
     "-i",
     result.downloadedFile,
     "-map",
-    "0:v:0",
+    "0:v:0?",
     "-map",
     "0:a:0",
     "-f",
@@ -297,18 +298,24 @@ async function validateDownload(result, referenceHashes, destination) {
       result.downloadedFile,
     ]),
   );
-  assert(
-    probe.streams.some(
-      (stream) =>
-        stream.codec_type === "video" &&
-        stream.width === 960 &&
-        stream.height === 540,
-    ),
-  );
+  if (!primaryAudio)
+    assert(
+      probe.streams.some(
+        (stream) =>
+          stream.codec_type === "video" &&
+          stream.width === 960 &&
+          stream.height === 540,
+      ),
+    );
+  else
+    assert(
+      probe.streams.every((stream) => stream.codec_type === "audio"),
+      "Audio-only output contains unexpected streams",
+    );
   assert(probe.streams.some((stream) => stream.codec_type === "audio"));
   if (selectSubtitles)
     assert(probe.streams.some((stream) => stream.codec_type === "subtitle"));
-  for (const type of ["video", "audio"]) {
+  for (const type of primaryAudio ? ["audio"] : ["video", "audio"]) {
     const stream = probe.streams.find((stream) => stream.codec_type === type);
     // Matroska exposes per-track duration as a tag, whereas MP4 has duration.
     const taggedDuration = stream.tags?.DURATION?.split(":").reduce(
@@ -331,12 +338,13 @@ async function validateDownload(result, referenceHashes, destination) {
     Math.abs(Number(probe.format.duration) - 8) < 0.3,
     probe.format.duration,
   );
-  const hashes = await videoHashes(result.downloadedFile);
-  assert.deepEqual(
-    hashes,
-    referenceHashes,
-    "Saved video frames differ from the unencrypted reference",
-  );
+  const hashes = primaryAudio ? [] : await videoHashes(result.downloadedFile);
+  if (!primaryAudio)
+    assert.deepEqual(
+      hashes,
+      referenceHashes,
+      "Saved video frames differ from the unencrypted reference",
+    );
   const audioHash = (
     await checked("ffmpeg", [
       "-v",
@@ -357,6 +365,10 @@ async function validateDownload(result, referenceHashes, destination) {
   return {
     duration: probe.format.duration,
     frames: hashes.length,
+    audioFrames: Number(
+      probe.streams.find((stream) => stream.codec_type === "audio")
+        .nb_read_frames,
+    ),
     streams: probe.streams.map((stream) => stream.codec_type),
     audioHash,
     savedFile: destination,
@@ -374,9 +386,77 @@ async function main() {
   try {
     console.log("Generating real H.264/AAC streams and AES-128 segments");
     const { assets, reference } = await createMedia(work);
+    if (primaryAudio) {
+      for (const name of [
+        "clear",
+        "clear-cmaf",
+        "implicit",
+        "explicit",
+        "mixed",
+        "cmaf",
+      ]) {
+        await fs.writeFile(
+          path.join(assets, name, "master.m3u8"),
+          '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=128000,CODECS="mp4a.40.2"\naudio/playlist.m3u8\n',
+        );
+      }
+      const alternate = path.join(assets, "alternate");
+      await fs.cp(path.join(assets, "clear"), alternate, { recursive: true });
+      const selected = path.join(alternate, "selected");
+      await fs.mkdir(selected);
+      await checked("ffmpeg", [
+        "-v",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "sine=frequency=500:sample_rate=48000",
+        "-t",
+        "8",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-hls_time",
+        "2",
+        "-hls_playlist_type",
+        "vod",
+        "-hls_segment_filename",
+        path.join(selected, "segment%d.ts"),
+        path.join(selected, "playlist.m3u8"),
+      ]);
+      await fs.writeFile(
+        path.join(alternate, "master.m3u8"),
+        '#EXTM3U\n#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="SELECTED",LANGUAGE="en",DEFAULT=YES,URI="selected/playlist.m3u8"\n#EXT-X-STREAM-INF:BANDWIDTH=128000,CODECS="mp4a.40.2",AUDIO="audio"\naudio/playlist.m3u8\n',
+      );
+    }
     server = await serve(assets, requests);
     const base = `http://127.0.0.1:${server.address().port}`;
     const referenceHashes = await videoHashes(reference);
+    const expectedPrimaryAudio = {};
+    if (primaryAudio) {
+      for (const [kind, name] of [
+        ["ts", "clear"],
+        ["cmaf", "clear-cmaf"],
+        ["alternate", "alternate"],
+      ]) {
+        expectedPrimaryAudio[kind] = (
+          await checked("ffmpeg", [
+            "-v",
+            "error",
+            "-i",
+            `${base}/${name}/${kind === "alternate" ? "selected" : "audio"}/playlist.m3u8`,
+            "-map",
+            "0:a:0",
+            "-f",
+            "hash",
+            "-hash",
+            "sha256",
+            "-",
+          ])
+        ).trim();
+      }
+    }
 
     for (const name of [
       "clear",
@@ -385,6 +465,7 @@ async function main() {
       "explicit",
       "mixed",
       "cmaf",
+      ...(primaryAudio ? ["alternate"] : []),
     ]) {
       await checked("ffmpeg", [
         "-v",
@@ -395,7 +476,7 @@ async function main() {
         "-i",
         `${base}/${name}/master.m3u8`,
         "-map",
-        "0:v:0",
+        "0:v:0?",
         "-map",
         "0:a:0",
         "-f",
@@ -462,14 +543,16 @@ async function main() {
       );
       const audioControls = {};
       for (const [build, name, shouldFail] of [
-        ["baseline", "implicit", true],
-        ["baseline", "mixed", true],
+        ["baseline", primaryAudio ? "clear" : "implicit", true],
+        ["baseline", primaryAudio ? "clear-cmaf" : "mixed", true],
+        ...(primaryAudio ? [["baseline", "alternate", true]] : []),
         ["fixed", "clear", false],
         ["fixed", "clear-cmaf", false],
         ["fixed", "explicit", false],
         ["fixed", "implicit", false],
         ["fixed", "mixed", false],
         ["fixed", "cmaf", false],
+        ...(primaryAudio ? [["fixed", "alternate", false]] : []),
       ]) {
         console.log(`${browser}: ${build} build, ${name} stream`);
         const before = requests.length;
@@ -550,10 +633,21 @@ async function main() {
               `${browser}-${name}.${selectSubtitles ? "mkv" : "mp4"}`,
             ),
           );
-          const kind = name.includes("cmaf") ? "cmaf" : "ts";
+          const kind =
+            name === "alternate"
+              ? "alternate"
+              : name.includes("cmaf")
+                ? "cmaf"
+                : "ts";
+          if (primaryAudio)
+            assert.equal(
+              verified.audioHash,
+              expectedPrimaryAudio[kind],
+              "Saved audio differs from the source HLS stream",
+            );
           if (name.startsWith("clear"))
             audioControls[kind] = verified.audioHash;
-          else
+          else if (!primaryAudio)
             assert.equal(
               verified.audioHash,
               audioControls[kind],
@@ -563,12 +657,13 @@ async function main() {
             requests
               .slice(before)
               .some((request) => request.endsWith("key.bin")) ||
-              name.startsWith("clear"),
+              name.startsWith("clear") ||
+              name === "alternate",
             "No real key request was observed",
           );
           results.push({ browser, build, name, ...verified });
           console.log(
-            `  Verified ${verified.frames} matching video frames, complete audio, ${verified.duration}s`,
+            `  Verified ${verified.frames} matching video frames, ${verified.audioFrames} complete audio frames, ${verified.duration}s`,
           );
         }
       }
@@ -584,7 +679,14 @@ async function main() {
     await fs.writeFile(
       path.join(work, "results.json"),
       JSON.stringify(
-        { baselineVersion, selectSubtitles, complete, failure, results },
+        {
+          baselineVersion,
+          primaryAudio,
+          selectSubtitles,
+          complete,
+          failure,
+          results,
+        },
         null,
         2,
       ),

@@ -161,7 +161,7 @@ describe("CMAF Mux Pipeline Integration", () => {
     await IndexedDBFS.deleteBucket(id);
   });
 
-  it("fMP4 video-only: filename is video.mp4, uses 0:v/0:a? mapping", async () => {
+  it("fMP4 primary media: filename is video.mp4, uses 0:v?/0:a? mapping", async () => {
     const id = "fmp4-v-only-test";
     await createLegacyBucketForTests(id, 1, 0);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
@@ -181,7 +181,7 @@ describe("CMAF Mux Pipeline Integration", () => {
 
     // Check mapping args
     const args = mock.getExecArgs()[0];
-    expect(args).toContain("0:v");
+    expect(args).toContain("0:v?");
     expect(args).toContain("0:a?");
     expect(args).toContain("-c");
     expect(args).toContain("copy");
