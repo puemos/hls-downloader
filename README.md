@@ -218,6 +218,33 @@ custom Brave binary path, `E2E_HLS_URL=https://.../playlist.m3u8` to override
 the stream, or `E2E_CLEAN_DOWNLOAD=1` to delete the downloaded file after the
 run.
 
+Run the local AES-128 browser regression with generated media:
+
+```bash
+pnpm test:e2e:aes128
+```
+
+This macOS test needs Brave, Firefox, `ffmpeg` with H.264/AAC encoders,
+`ffprobe`, `gh`, `unzip`, and `tar`. It downloads the known failing v5.5.3
+release and Mozilla's GeckoDriver, builds the current extensions, and uses
+temporary browser profiles to download real encrypted HLS through the UI.
+It covers encrypted TS, a clear lead-in followed by encrypted segments, and
+encrypted fMP4 with a separate initialization key. It requires the old release
+to fail, decodes each saved file, compares every video frame with the source,
+checks the full audio/video duration, and matches decoded audio against the
+unencrypted browser control. CMAF cases exercise downloading without the
+separate hls.js preview. Evidence
+and saved media stay in the printed temporary directory; extension build
+artifacts are removed. It skips in CI. Use `E2E_AES128_BROWSERS=brave` or
+`E2E_AES128_BROWSERS=firefox` to run one browser, and `E2E_GECKODRIVER=/path/to/geckodriver`
+to use an existing driver.
+
+The AES-128 matrix downloads video and separate audio. Set
+`E2E_AES128_SUBTITLES=1` to additionally select WebVTT subtitles and apply the
+same complete-file checks. This currently reproduces a separate muxing
+truncation bug even with unencrypted media; a "Completed" download with missing
+frames fails the test.
+
 ### Live Development
 
 ```bash

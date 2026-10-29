@@ -6,7 +6,13 @@ export async function saveState(state: RootState) {
   if (!state) {
     return;
   }
-  await storage.local.set({ state });
+  // Only these settings are restored by getState. Runtime fragments contain
+  // binary IVs that Chromium's JSON-backed extension storage cannot persist.
+  const persistedState: Partial<RootState> = { config: state.config };
+  if (state.playlistPreferences) {
+    persistedState.playlistPreferences = state.playlistPreferences;
+  }
+  await storage.local.set({ state: persistedState });
 }
 
 export async function getState(): Promise<Partial<RootState> | undefined> {

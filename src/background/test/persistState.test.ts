@@ -10,6 +10,7 @@ vi.mock("webextension-polyfill", () => ({
 }));
 
 import { saveState, getState } from "../src/persistState";
+import { M3u8Parser } from "../src/services/m3u8-parser";
 
 describe("persistState", () => {
   let mockSet: ReturnType<typeof vi.fn>;
@@ -26,6 +27,38 @@ describe("persistState", () => {
   });
 
   describe("saveState", () => {
+    it("persists settings and track choices without encrypted runtime fragments", async () => {
+      const fragments = M3u8Parser.parseLevelPlaylist(
+        '#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="key.bin"\n#EXTINF:2,\nsegment.ts\n',
+        "https://example.com/playlist.m3u8",
+      );
+      const state = {
+        config: { outputContainer: "mp4" },
+        playlistPreferences: {
+          audioSelections: { playlist: "english" },
+          subtitleSelections: { playlist: "none" },
+        },
+        jobs: { jobs: { encrypted: { videoFragments: fragments } } },
+      } as any;
+      expect(fragments[0].key.iv).toBeInstanceOf(Uint8Array);
+
+      await saveState(state);
+
+      const saved = mockSet.mock.calls[0][0];
+      expect(saved).toEqual({
+        state: {
+          config: state.config,
+          playlistPreferences: state.playlistPreferences,
+        },
+      });
+      mockGet.mockResolvedValue(saved);
+      const restored = await getState();
+      expect(restored?.config?.outputContainer).toBe("mp4");
+      expect(restored?.playlistPreferences).toEqual(state.playlistPreferences);
+      expect(restored).not.toHaveProperty("jobs");
+      expect(state.jobs.jobs.encrypted.videoFragments).toBe(fragments);
+    });
+
     it("writes state to storage", async () => {
       const state = { config: { foo: "bar" } } as any;
       await saveState(state);

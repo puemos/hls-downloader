@@ -12,9 +12,14 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
-const extensionDir = path.join(repoRoot, "dist", "mv3");
+const extensionDir = path.resolve(
+  repoRoot,
+  process.env.E2E_EXTENSION_DIR ?? "dist/mv3",
+);
+const skipBuild = process.env.E2E_SKIP_BUILD === "1";
 const keepArtifacts = process.env.E2E_KEEP_ARTIFACTS === "1";
 const cleanDownload = process.env.E2E_CLEAN_DOWNLOAD === "1";
+const selectSubtitles = process.env.E2E_SELECT_SUBTITLES !== "0";
 const defaultHlsUrl =
   "https://mtoczko.github.io/hls-test-streams/test-group/playlist.m3u8";
 const hlsUrl = process.env.E2E_HLS_URL ?? defaultHlsUrl;
@@ -37,7 +42,7 @@ function delay(ms) {
 async function waitFor(
   label,
   fn,
-  { timeoutMs = 15000, intervalMs = 150 } = {},
+  { timeoutMs = 15000, intervalMs = 150, stopOnError = false } = {},
 ) {
   const start = Date.now();
   let lastError;
@@ -48,6 +53,7 @@ async function waitFor(
         return value;
       }
     } catch (error) {
+      if (stopOnError) throw error;
       lastError = error;
     }
     await delay(intervalMs);
@@ -94,7 +100,7 @@ function runBuild() {
 }
 
 async function cleanupBuildArtifacts() {
-  if (keepArtifacts) {
+  if (keepArtifacts || skipBuild) {
     return;
   }
   await fs.rm(path.join(repoRoot, "extension-mv3-chrome.zip"), { force: true });
@@ -459,11 +465,17 @@ async function stopChild(child) {
 }
 
 function sessionExceptions(cdp, sessionId) {
-  return cdp.events.filter(
-    (event) =>
-      event.sessionId === sessionId &&
-      event.method === "Runtime.exceptionThrown",
-  );
+  return cdp.events
+    .filter(
+      (event) =>
+        event.sessionId === sessionId &&
+        event.method === "Runtime.exceptionThrown",
+    )
+    .map(({ params: { exceptionDetails: details } }) => ({
+      description: details.exception?.description ?? details.text,
+      url: details.url,
+      line: details.lineNumber + 1,
+    }));
 }
 
 function withQuery(url, value) {
@@ -486,7 +498,7 @@ async function waitForDownloadedFile(downloadDir) {
       for (const entry of entries) {
         const filePath = path.join(downloadDir, entry);
         const stats = await fs.stat(filePath);
-        if (!stats.isFile() || stats.size <= 100_000) {
+        if (!stats.isFile() || stats.size < 12) {
           continue;
         }
         const handle = await fs.open(filePath, "r");
@@ -589,7 +601,7 @@ async function main() {
   const browserPath = getBravePath();
   console.log(`Using Brave: ${browserPath}`);
   console.log(`Using HLS stream: ${hlsUrl}`);
-  runBuild();
+  if (!skipBuild) runBuild();
 
   let browserProcess;
   let triggerServer;
@@ -771,39 +783,46 @@ async function main() {
       { timeoutMs: 20000, intervalMs: 250 },
     );
     await selectOption(cdp, popupSession.sessionId, 0, "540");
-    await selectOption(cdp, popupSession.sessionId, 2, "Text");
+    if (selectSubtitles)
+      await selectOption(cdp, popupSession.sessionId, 2, "Text");
     await waitFor(
       "Start download enabled for sniffed playlist",
       () => assertStartDownloadEnabled(cdp, popupSession.sessionId),
       { timeoutMs: 20000, intervalMs: 250 },
     );
-    await clickButtonByAriaLabel(
-      cdp,
-      popupSession.sessionId,
-      "Open stream preview",
-    );
-    await waitFor(
-      "HLS preview to become ready",
-      async () => {
-        const value = await evaluate(
-          cdp,
-          popupSession.sessionId,
-          `(() => ({
+    if (process.env.E2E_SKIP_PREVIEW !== "1") {
+      await clickButtonByAriaLabel(
+        cdp,
+        popupSession.sessionId,
+        "Open stream preview",
+      );
+      await waitFor(
+        "HLS preview to become ready",
+        async () => {
+          const value = await evaluate(
+            cdp,
+            popupSession.sessionId,
+            `(() => ({
             text: document.body.innerText,
             ready: Boolean(document.querySelector(
               'button[aria-label="Reload preview"]'
             ))
           }))()`,
-        );
-        if (String(value?.text).includes("Preview unavailable")) {
-          throw new Error("Preview reported unavailable");
-        }
-        return value?.ready ? value : null;
-      },
-      { timeoutMs: 30000, intervalMs: 250 },
-    );
+          );
+          if (String(value?.text).includes("Preview unavailable")) {
+            throw new Error("Preview reported unavailable");
+          }
+          return value?.ready ? value : null;
+        },
+        { timeoutMs: 30000, intervalMs: 250 },
+      );
 
-    await clickButtonByAriaLabel(cdp, popupSession.sessionId, "Close preview");
+      await clickButtonByAriaLabel(
+        cdp,
+        popupSession.sessionId,
+        "Close preview",
+      );
+    }
     await clickButtonByAriaLabel(cdp, popupSession.sessionId, "All streams");
     await waitForText(
       cdp,
@@ -839,7 +858,8 @@ async function main() {
       { timeoutMs: 20000, intervalMs: 250 },
     );
     await selectOption(cdp, popupSession.sessionId, 0, "540");
-    await selectOption(cdp, popupSession.sessionId, 2, "Text");
+    if (selectSubtitles)
+      await selectOption(cdp, popupSession.sessionId, 2, "Text");
     await waitFor(
       "Start download enabled for direct playlist",
       () => assertStartDownloadEnabled(cdp, popupSession.sessionId),
@@ -855,11 +875,39 @@ async function main() {
     const downloadStatusText = await waitFor(
       "Download job completed",
       async () => {
+        const failure = await evaluate(
+          cdp,
+          backgroundSession.sessionId,
+          `chrome.storage.local.get("state").then(({ state }) =>
+            Object.values(state?.jobs?.jobsStatus ?? {}).find(
+              (status) => status?.status === "error"
+            )?.errorMessage ?? null
+          )`,
+          { awaitPromise: true },
+        );
+        if (failure) throw new Error(`Download failed: ${failure}`);
         const text = await evaluate(
           cdp,
           popupSession.sessionId,
           "document.body.innerText",
         );
+        if (/\bError\b/.test(String(text))) {
+          await clickButtonByAriaLabel(
+            cdp,
+            popupSession.sessionId,
+            await evaluate(
+              cdp,
+              popupSession.sessionId,
+              `document.querySelector('button[aria-label^="Open details for "]')?.getAttribute("aria-label")`,
+            ),
+          );
+          const details = await evaluate(
+            cdp,
+            popupSession.sessionId,
+            "document.body.innerText",
+          );
+          throw new Error(`Download failed: ${details}`);
+        }
         if (String(text).includes("Completed")) {
           return "Completed";
         }
@@ -868,7 +916,7 @@ async function main() {
         }
         return null;
       },
-      { timeoutMs: 240000, intervalMs: 1000 },
+      { timeoutMs: 240000, intervalMs: 1000, stopOnError: true },
     );
     const downloaded = await waitForDownloadedFile(downloadDir);
 
@@ -889,15 +937,15 @@ async function main() {
     };
     assert(
       exceptions.background.length === 0,
-      `Background runtime exceptions: ${exceptions.background.length}`,
+      `Background runtime exceptions: ${JSON.stringify(exceptions.background)}`,
     );
     assert(
       exceptions.popup.length === 0,
-      `Popup runtime exceptions: ${exceptions.popup.length}`,
+      `Popup runtime exceptions: ${JSON.stringify(exceptions.popup)}`,
     );
     assert(
       exceptions.page.length === 0,
-      `Page runtime exceptions: ${exceptions.page.length}`,
+      `Page runtime exceptions: ${JSON.stringify(exceptions.page)}`,
     );
 
     console.log(
@@ -932,6 +980,7 @@ async function main() {
         {
           ok: false,
           error: error instanceof Error ? error.message : String(error),
+          downloadDirectory: downloadDir,
           browserStderr: browserStderr
             .join("")
             .split("\n")

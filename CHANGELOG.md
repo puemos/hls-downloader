@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 5.5.4
+
+### Fixes
+
+- Derive missing AES-128 IVs from each segment's media sequence number, preserving full 64-bit precision (#244). Keep explicit IVs and initialization-map keys separate from sequence-derived media IVs.
+- Persist settings and saved track choices without runtime fragment IVs, which Chromium's extension storage rejects.
+
+### Testing
+
+- Added 13 regression tests covering implicit and explicit IVs, full 64-bit sequence numbers, clear lead-ins, discontinuities, initialization maps, key rotation, and settings persistence. All 317 tests pass.
+- Added local tests that generate actual H.264/AAC HLS and exercise the installed extension UI in Brave MV3 and Firefox MV2. All 16 browser cases pass: four reproduce the old release's failures and twelve verify complete downloads, every video frame, decoded audio hashes, and full duration.
+- Workspace typechecking, the security gate, and all six MV2/MV3 archive checks pass. Firefox lint reports zero errors and six existing warnings.
+
+### Known issues
+
+- The local full-media checks also expose an existing truncation bug when separate video and audio are muxed with WebVTT subtitles. It reproduces with unencrypted media and is not fixed by the AES-128 change. The encrypted CMAF download cases do not test the separate hls.js preview path.
+
 ## 5.5.3
 
 ### Fixes

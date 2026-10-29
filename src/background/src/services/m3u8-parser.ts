@@ -1,6 +1,9 @@
 import { Fragment, Level } from "@hls-downloader/core/lib/entities";
 import { IParser, ParsedEncryption } from "@hls-downloader/core/lib/services";
-import { generateTrackId } from "@hls-downloader/core/lib/use-cases";
+import {
+  generateSequenceIv,
+  generateTrackId,
+} from "@hls-downloader/core/lib/use-cases";
 import { Parser } from "m3u8-parser";
 import { buildAbsoluteURL } from "url-toolkit";
 import { v4 } from "uuid";
@@ -26,13 +29,20 @@ export const M3u8Parser: IParser = {
 
     const segments = parser.manifest.segments;
     const fragments: Fragment[] = [];
+    // Read the decimal text directly to preserve the full 64-bit sequence number.
+    const sequence = string.match(/^#EXT-X-MEDIA-SEQUENCE:(\d+)\r?$/m)?.[1] ?? "0";
+    const mediaSequence = BigInt(sequence);
 
     let index = 0;
     let currentMapUri: string | null = null;
     let currentMapByteRange: string | null = null;
 
-    segments.forEach((segment) => {
+    segments.forEach((segment, segmentIndex) => {
       if (segment.map && segment.map.uri) {
+        // The parser captures the map's key separately; its typings omit this field.
+        const mapKey = (
+          segment.map as { uri: string; key?: typeof segment.key }
+        ).key;
         const mapUri = buildAbsoluteURL(baseurl, segment.map.uri);
         const mapByteRange = segment.map.byterange
           ? `${segment.map.byterange.offset}:${segment.map.byterange.length}`
@@ -42,10 +52,11 @@ export const M3u8Parser: IParser = {
           fragments.push({
             index,
             key:
-              segment.key && segment.key.uri
+              mapKey && mapKey.uri
                 ? {
-                    iv: toIvBytes(segment.key.iv),
-                    uri: buildAbsoluteURL(baseurl, segment.key.uri),
+                    // Initialization maps require an explicit IV (RFC 8216 §4.3.2.5).
+                    iv: toIvBytes(mapKey.iv),
+                    uri: buildAbsoluteURL(baseurl, mapKey.uri),
                   }
                 : { iv: null, uri: null },
             uri: mapUri,
@@ -67,7 +78,11 @@ export const M3u8Parser: IParser = {
         key:
           segment.key && segment.key.uri
             ? {
-                iv: toIvBytes(segment.key.iv),
+                iv:
+                  toIvBytes(segment.key.iv) ??
+                  (segment.key.method === "AES-128"
+                    ? generateSequenceIv(mediaSequence + BigInt(segmentIndex))
+                    : null),
                 uri: buildAbsoluteURL(baseurl, segment.key.uri),
               }
             : { iv: null, uri: null },
