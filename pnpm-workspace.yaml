@@ -3,8 +3,8 @@ packages:
   - src/core
   - src/design-system
   - src/popup
-ignoredBuiltDependencies:
-  - esbuild
+allowBuilds:
+  esbuild: false
 overrides:
   "@babel/core@<=7.29.0": "7.29.7"
   adm-zip@<0.6.0: "0.6.0"
@@ -21,3 +21,5 @@ overrides:
   undici@>=7.0.0 <7.30.1: "7.30.1"
   undici@>=8.0.0 <8.12.2: "8.12.2"
   ws@>=8.0.0 <8.21.0: "8.21.0"
+patchedDependencies:
+  deepmerge@4.3.1: patches/deepmerge@4.3.1.patch

@@ -5,10 +5,10 @@ A short guide for Mozilla/Chromium QA to build and exercise the extension locall
 ## Prerequisites
 
 - Firefox 128+ or Chromium 111+
-- Node.js 22.22.2 with npm 10.9.7
+- Node.js 22.23.4 with npm 10.9.9
 - Install the pinned pnpm release through npm:
   ```bash
-  npm install --global pnpm@10.34.4
+  npm install --global pnpm@12.16.1
   ```
 - From repo root: `pnpm install --frozen-lockfile`
 

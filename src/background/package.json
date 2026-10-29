@@ -17,18 +17,18 @@
     "test:coverage": "vitest run --coverage --coverage.reporter=json-summary"
   },
   "devDependencies": {
-    "@typescript/native": "npm:typescript@7.0.2",
-    "@types/webextension-polyfill": "0.12.6",
     "@types/m3u8-parser": "7.2.6",
-    "fake-indexeddb": "6.2.5",
-    "idb": "8.0.3",
+    "@types/webextension-polyfill": "0.12.6",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "fake-indexeddb": "6.2.6",
+    "idb": "8.0.4",
     "m3u8-parser": "7.2.0",
-    "prettier": "3.9.6",
+    "prettier": "3.9.10",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "url-toolkit": "2.2.5",
-    "uuid": "14.0.2",
-    "vite": "8.3.3",
-    "vitest": "5.0.3"
+    "uuid": "14.0.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "0.12.15",

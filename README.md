@@ -139,15 +139,15 @@ of memory, delete it and download it again.
 
 ### Clone & Build
 
-Requires Node.js 22.22.2+ and the `zip` command. Firefox release builds use
-Node.js 22.22.2, npm 10.9.7, and pnpm 10.34.4 exactly.
+Requires Node.js 22.23.4+ and the `zip` command. Firefox release builds use
+Node.js 22.23.4, npm 10.9.9, and pnpm 12.16.1 exactly.
 
 ```bash
 git clone https://github.com/puemos/hls-downloader.git
 cd hls-downloader
 
 # install the pinned pnpm version through npm
-npm install --global pnpm@10.34.4
+npm install --global pnpm@12.16.1
 
 pnpm install --frozen-lockfile
 pnpm run build    # outputs → ./dist/, extension-chrome.zip, extension-firefox.xpi
@@ -178,7 +178,7 @@ For Firefox Add-ons source review, use the exact reproduction steps in
 `source-code.zip`; `pnpm run publish:firefox` creates a fresh source archive from
 the committed release revision.
 
-> Tip: If pnpm is missing, run `npm install --global pnpm@10.34.4` to match the locked toolchain.
+> Tip: If pnpm is missing, run `npm install --global pnpm@12.16.1` to match the locked toolchain.
 
 Run tests & generate coverage badge:
 
@@ -186,6 +186,20 @@ Run tests & generate coverage badge:
 pnpm test          # unit tests
 pnpm test:coverage # combined coverage + badge
 ```
+
+Check dependency advisories and the installed security fixes:
+
+```bash
+pnpm run security:audit
+```
+
+The workspace uses pnpm's default release-age protections and explicitly disables
+esbuild's install script. The Firefox lint tool's `deepmerge@4.3.1` dependency has
+a committed patch for [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4).
+The audit still reports this low-severity advisory because upstream has not
+published a fixed version. The security check exercises the installed patch
+against prototype-poisoning regressions and verifies merge compatibility; it
+also rejects all moderate, high, and critical dependency advisories.
 
 Run the local browser e2e smoke test:
 

@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 5.5.2
+
+### Dependencies and security
+
+- Updated runtime and development dependencies throughout the workspace, including React 19.3, Redux Toolkit 2.13, Radix UI, HLS playback, Vite, Vitest, Storybook, and TypeScript definitions. Refreshed transitive dependencies in the lockfile.
+- Updated the reproducible build environment to Node.js 22.23.4, npm 10.9.9, and pnpm 12.16.1. Migrated the install-script policy to pnpm's `allowBuilds` setting while retaining its default release-age protections.
+- Updated GitHub Actions for checkout, Node setup, and release publication, and pinned them to immutable commit revisions.
+- Patched the Firefox lint tool's `deepmerge@4.3.1` dependency against GHSA-gcqx-w48m-w2h4. Added security checks for null-prototype targets, target-side keys, nested placeholders, and array cloning, plus merge compatibility checks. The low-severity advisory remains visible in audit output until an upstream fix is published.
+
+### Validation
+
+- Passed 293 unit, integration, and component tests, workspace typechecking, security checks, and the Storybook build.
+- Built and inspected all six MV2/MV3 release archives, including the variants without the blocklist. Firefox lint reported no errors and six existing warnings.
+- Verified real stream discovery, preview, quality selection, and a video/audio/subtitle download in Chromium. The resulting MKV decoded successfully with FFmpeg.
+
 ## 5.5.1
 
 ### Fixes
