@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 5.5.6
+
+### Fixes
+
+- Preserve complete audio and video when exporting WebVTT subtitles with separate media tracks. Short, sparse, or empty captions no longer cause FFmpeg to end the whole export early.
+
+### Testing
+
+- Added four native FFmpeg regressions that failed before the fix. They compare full decoded audio/video hashes with the source, including media tracks of different lengths. All 323 automated tests pass.
+- Passed 20 real browser cases in Brave MV3 and Firefox MV2. Four reproduce v5.5.5's saved-but-truncated files; sixteen fixed exports preserve all 200 video frames, all 376 audio frames, source audio hashes, and subtitle cue text/timing across clear and encrypted TS/fMP4 streams.
+- Workspace typechecking and the security gate pass.
+- Passed the 16-case video/audio browser matrix without subtitles. All six release archives pass validation. Firefox lint reports zero errors and six existing warnings.
+
 ## 5.5.5
 
 ### Fixes

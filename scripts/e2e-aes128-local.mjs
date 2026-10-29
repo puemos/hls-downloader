@@ -15,8 +15,19 @@ const browsers = (process.env.E2E_AES128_BROWSERS ?? "brave,firefox").split(
   ",",
 );
 const primaryAudio = process.env.E2E_PRIMARY_AUDIO === "1";
-const baselineVersion = primaryAudio ? "v5.5.4" : "v5.5.3";
-const selectSubtitles = process.env.E2E_AES128_SUBTITLES === "1";
+const subtitleRegression = process.env.E2E_SUBTITLE_TRUNCATION === "1";
+const baselineOnly = process.env.E2E_BASELINE_ONLY === "1";
+const baselineVersion = subtitleRegression
+  ? "v5.5.5"
+  : primaryAudio
+    ? "v5.5.4"
+    : "v5.5.3";
+const selectSubtitles =
+  subtitleRegression || process.env.E2E_AES128_SUBTITLES === "1";
+assert(
+  !(subtitleRegression && primaryAudio),
+  "Run subtitle and primary-audio regressions separately",
+);
 
 if (process.env.CI) {
   console.log("Skipping local encrypted-stream browser tests in CI.");
@@ -271,7 +282,40 @@ async function videoHashes(file) {
     .map((line) => line.split(",").at(-1).trim());
 }
 
-async function validateDownload(result, referenceHashes, destination) {
+function subtitleCues(text) {
+  const milliseconds = (timestamp) =>
+    Math.round(
+      timestamp
+        .split(":")
+        .reduce((total, part) => total * 60 + Number(part), 0) * 1000,
+    );
+  return text
+    .replaceAll("\r\n", "\n")
+    .split(/\n\s*\n/)
+    .flatMap((block) => {
+      const lines = block.split("\n");
+      const index = lines.findIndex((line) => line.includes(" --> "));
+      if (index < 0) return [];
+      const [start, end] = lines[index].split(" --> ");
+      return [
+        {
+          start: milliseconds(start),
+          end: milliseconds(end.split(/\s/)[0]),
+          text: lines
+            .slice(index + 1)
+            .join("\n")
+            .trim(),
+        },
+      ];
+    });
+}
+
+async function validateDownload(
+  result,
+  referenceHashes,
+  destination,
+  expectedSubtitles,
+) {
   await checked("ffmpeg", [
     "-v",
     "error",
@@ -323,8 +367,8 @@ async function validateDownload(result, referenceHashes, destination) {
       0,
     );
     assert(
-      Number(stream.duration ?? taggedDuration) >= 7.95,
-      `${type} was truncated: ${stream.duration ?? taggedDuration}`,
+      Number(taggedDuration ?? stream.duration) >= 7.95,
+      `${type} was truncated: ${taggedDuration ?? stream.duration}`,
     );
   }
   assert(
@@ -360,6 +404,26 @@ async function validateDownload(result, referenceHashes, destination) {
       "-",
     ])
   ).trim();
+  let cues;
+  if (expectedSubtitles !== undefined) {
+    const extracted = await checked("ffmpeg", [
+      "-v",
+      "error",
+      "-i",
+      result.downloadedFile,
+      "-map",
+      "0:s:0",
+      "-f",
+      "webvtt",
+      "-",
+    ]);
+    cues = subtitleCues(extracted);
+    assert.deepEqual(
+      cues,
+      subtitleCues(expectedSubtitles),
+      "Saved subtitle cues or timing differ from the source",
+    );
+  }
   await fs.copyFile(result.downloadedFile, destination);
   await fs.rm(result.downloadDirectory, { recursive: true, force: true });
   return {
@@ -371,6 +435,7 @@ async function validateDownload(result, referenceHashes, destination) {
     ),
     streams: probe.streams.map((stream) => stream.codec_type),
     audioHash,
+    ...(cues ? { subtitleCues: cues } : {}),
     savedFile: destination,
   };
 }
@@ -386,6 +451,34 @@ async function main() {
   try {
     console.log("Generating real H.264/AAC streams and AES-128 segments");
     const { assets, reference } = await createMedia(work);
+    const captionTexts = {};
+    if (subtitleRegression) {
+      const short =
+        "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nShort caption before the end of the media\n";
+      const sparse =
+        "WEBVTT\n\n00:00:00.250 --> 00:00:01.000\nFirst sparse caption\n\n00:00:06.000 --> 00:00:06.500\nLast sparse caption\n";
+      for (const name of ["sparse", "empty"])
+        await fs.cp(path.join(assets, "clear"), path.join(assets, name), {
+          recursive: true,
+        });
+      for (const name of [
+        "clear",
+        "clear-cmaf",
+        "implicit",
+        "explicit",
+        "mixed",
+        "cmaf",
+        "sparse",
+        "empty",
+      ]) {
+        captionTexts[name] =
+          name === "sparse" ? sparse : name === "empty" ? "WEBVTT\n\n" : short;
+        await fs.writeFile(
+          path.join(assets, name, "captions.vtt"),
+          captionTexts[name],
+        );
+      }
+    }
     if (primaryAudio) {
       for (const name of [
         "clear",
@@ -434,11 +527,11 @@ async function main() {
     const base = `http://127.0.0.1:${server.address().port}`;
     const referenceHashes = await videoHashes(reference);
     const expectedPrimaryAudio = {};
-    if (primaryAudio) {
+    if (primaryAudio || subtitleRegression) {
       for (const [kind, name] of [
         ["ts", "clear"],
         ["cmaf", "clear-cmaf"],
-        ["alternate", "alternate"],
+        ...(primaryAudio ? [["alternate", "alternate"]] : []),
       ]) {
         expectedPrimaryAudio[kind] = (
           await checked("ffmpeg", [
@@ -466,6 +559,7 @@ async function main() {
       "mixed",
       "cmaf",
       ...(primaryAudio ? ["alternate"] : []),
+      ...(subtitleRegression ? ["sparse", "empty"] : []),
     ]) {
       await checked("ffmpeg", [
         "-v",
@@ -508,8 +602,10 @@ async function main() {
       "-d",
       baselineMv3,
     ]);
-    console.log("Building current MV2 and MV3 extensions");
-    await checked("pnpm", ["run", "build:all"]);
+    if (!baselineOnly) {
+      console.log("Building current MV2 and MV3 extensions");
+      await checked("pnpm", ["run", "build:all"]);
+    }
 
     let geckodriver = process.env.E2E_GECKODRIVER;
     if (browsers.includes("firefox") && !geckodriver) {
@@ -543,8 +639,16 @@ async function main() {
       );
       const audioControls = {};
       for (const [build, name, shouldFail] of [
-        ["baseline", primaryAudio ? "clear" : "implicit", true],
-        ["baseline", primaryAudio ? "clear-cmaf" : "mixed", true],
+        [
+          "baseline",
+          primaryAudio || subtitleRegression ? "clear" : "implicit",
+          true,
+        ],
+        [
+          "baseline",
+          primaryAudio || subtitleRegression ? "clear-cmaf" : "mixed",
+          true,
+        ],
         ...(primaryAudio ? [["baseline", "alternate", true]] : []),
         ["fixed", "clear", false],
         ["fixed", "clear-cmaf", false],
@@ -553,7 +657,13 @@ async function main() {
         ["fixed", "mixed", false],
         ["fixed", "cmaf", false],
         ...(primaryAudio ? [["fixed", "alternate", false]] : []),
-      ]) {
+        ...(subtitleRegression
+          ? [
+              ["fixed", "sparse", false],
+              ["fixed", "empty", false],
+            ]
+          : []),
+      ].filter(([build]) => !baselineOnly || build === "baseline")) {
         console.log(`${browser}: ${build} build, ${name} stream`);
         const before = requests.length;
         const firefox = browser === "firefox";
@@ -592,20 +702,34 @@ async function main() {
           JSON.stringify(result, null, 2),
         );
         if (shouldFail) {
+          if (subtitleRegression)
+            assert.equal(
+              child.code,
+              0,
+              "The old release must reproduce a saved-but-truncated file: " +
+                JSON.stringify(result),
+            );
           let failure = result.error;
           if (child.code === 0) {
             // A partial clear lead-in may be saved as "Completed". It still
             // must fail the same full-media validation used for fixed builds.
             await fs.copyFile(
               result.downloadedFile,
-              path.join(work, `${browser}-baseline-${name}.mp4`),
+              path.join(
+                work,
+                `${browser}-baseline-${name}.${selectSubtitles ? "mkv" : "mp4"}`,
+              ),
             );
             await assert.rejects(async () => {
               try {
                 await validateDownload(
                   result,
                   referenceHashes,
-                  path.join(work, `${browser}-baseline-${name}.mp4`),
+                  path.join(
+                    work,
+                    `${browser}-baseline-${name}.${selectSubtitles ? "mkv" : "mp4"}`,
+                  ),
+                  captionTexts[name],
                 );
               } catch (error) {
                 failure = error.message;
@@ -632,6 +756,7 @@ async function main() {
               work,
               `${browser}-${name}.${selectSubtitles ? "mkv" : "mp4"}`,
             ),
+            captionTexts[name],
           );
           const kind =
             name === "alternate"
@@ -639,7 +764,7 @@ async function main() {
               : name.includes("cmaf")
                 ? "cmaf"
                 : "ts";
-          if (primaryAudio)
+          if (primaryAudio || subtitleRegression)
             assert.equal(
               verified.audioHash,
               expectedPrimaryAudio[kind],
@@ -647,20 +772,19 @@ async function main() {
             );
           if (name.startsWith("clear"))
             audioControls[kind] = verified.audioHash;
-          else if (!primaryAudio)
+          else if (!primaryAudio && !subtitleRegression)
             assert.equal(
               verified.audioHash,
               audioControls[kind],
               "Decoded audio differs from the unencrypted browser control",
             );
-          assert(
-            requests
-              .slice(before)
-              .some((request) => request.endsWith("key.bin")) ||
-              name.startsWith("clear") ||
-              name === "alternate",
-            "No real key request was observed",
-          );
+          if (["implicit", "explicit", "mixed", "cmaf"].includes(name))
+            assert(
+              requests
+                .slice(before)
+                .some((request) => request.endsWith("key.bin")),
+              "No real key request was observed",
+            );
           results.push({ browser, build, name, ...verified });
           console.log(
             `  Verified ${verified.frames} matching video frames, ${verified.audioFrames} complete audio frames, ${verified.duration}s`,
@@ -682,6 +806,8 @@ async function main() {
         {
           baselineVersion,
           primaryAudio,
+          subtitleRegression,
+          baselineOnly,
           selectSubtitles,
           complete,
           failure,

@@ -241,9 +241,24 @@ to use an existing driver.
 
 The AES-128 matrix downloads video and separate audio. Set
 `E2E_AES128_SUBTITLES=1` to additionally select WebVTT subtitles and apply the
-same complete-file checks. This currently reproduces a separate muxing
-truncation bug even with unencrypted media; a "Completed" download with missing
-frames fails the test.
+same complete-file checks. A "Completed" download with missing frames fails
+the test.
+
+Run the WebVTT truncation regression:
+
+```bash
+pnpm test:e2e:subtitles
+```
+
+This reproduces saved-but-truncated files in v5.5.5 and checks the current
+extension with short, sparse, and empty captions in Brave MV3 and Firefox MV2.
+It covers clear and encrypted TS/fMP4 streams. Every saved video frame must
+match the source, full decoded audio must match the source HLS hash, and
+extracted subtitle cues and timing must match the input. It uses the same
+dependencies and browser selection options as `test:e2e:aes128`. Use
+`E2E_BASELINE_ONLY=1 pnpm test:e2e:subtitles` to reproduce only the old release's
+failures without building the current extension. Saved media and JSON results
+remain in the printed temporary evidence directory.
 
 Run the audio-only primary-playlist regression with the same real browser harness:
 

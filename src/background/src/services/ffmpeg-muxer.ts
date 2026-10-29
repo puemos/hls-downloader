@@ -139,7 +139,8 @@ export function buildMuxArgs({
     args.push("-metadata:s:s:0", `language=${subtitleLanguage || "und"}`);
   }
 
-  if (hasVideo && hasAudio) {
+  // Subtitle EOF (including an empty track) must not end audio/video muxing.
+  if (hasVideo && hasAudio && !includeSubtitles) {
     args.push("-shortest");
   }
   if (outputFormat) {
