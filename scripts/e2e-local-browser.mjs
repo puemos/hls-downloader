@@ -21,6 +21,7 @@ const keepArtifacts = process.env.E2E_KEEP_ARTIFACTS === "1";
 const cleanDownload = process.env.E2E_CLEAN_DOWNLOAD === "1";
 const selectSubtitles = process.env.E2E_SELECT_SUBTITLES !== "0";
 const primaryAudio = process.env.E2E_PRIMARY_AUDIO === "1";
+const remoteBrowser = process.env.E2E_CDP_URL;
 const defaultHlsUrl =
   "https://mtoczko.github.io/hls-test-streams/test-group/playlist.m3u8";
 const hlsUrl = process.env.E2E_HLS_URL ?? defaultHlsUrl;
@@ -448,7 +449,7 @@ async function createTriggerServer(targetUrl) {
 
   await new Promise((resolve, reject) => {
     server.once("error", reject);
-    server.listen(0, "127.0.0.1", resolve);
+    server.listen(0, remoteBrowser ? "0.0.0.0" : "127.0.0.1", resolve);
   });
   return server;
 }
@@ -601,8 +602,8 @@ async function assertStartDownloadEnabled(cdp, sessionId) {
 }
 
 async function main() {
-  const browserPath = getBravePath();
-  console.log(`Using Brave: ${browserPath}`);
+  const browserPath = remoteBrowser ? undefined : getBravePath();
+  console.log(`Using browser: ${remoteBrowser ?? browserPath}`);
   console.log(`Using HLS stream: ${hlsUrl}`);
   if (!skipBuild) runBuild();
 
@@ -622,45 +623,56 @@ async function main() {
     const directUrl = withQuery(hlsUrl, "direct");
     triggerServer = await createTriggerServer(sniffUrl);
     const triggerPort = triggerServer.address().port;
-    const testUrl = `http://127.0.0.1:${triggerPort}/`;
+    const testUrl = `http://${process.env.E2E_PAGE_HOST ?? "127.0.0.1"}:${triggerPort}/`;
     const debugPort = await reservePort();
     userDataDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "hls-downloader-e2e-profile-"),
     );
-    downloadDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "hls-downloader-e2e-downloads-"),
-    );
+    downloadDir =
+      process.env.E2E_DOWNLOAD_DIR ??
+      (await fs.mkdtemp(
+        path.join(
+          process.env.E2E_DOWNLOAD_ROOT ?? os.tmpdir(),
+          "hls-downloader-e2e-downloads-",
+        ),
+      ));
     await writeDownloadPreferences(userDataDir, downloadDir);
 
-    browserProcess = spawn(
-      browserPath,
-      [
-        `--user-data-dir=${userDataDir}`,
-        `--remote-debugging-port=${debugPort}`,
-        `--load-extension=${extensionDir}`,
-        "--enable-unsafe-extension-debugging",
-        "--no-first-run",
-        "--no-default-browser-check",
-        "--disable-default-apps",
-        "--disable-popup-blocking",
-        "about:blank",
-      ],
-      { stdio: ["ignore", "ignore", "pipe"] },
-    );
-    browserProcess.stderr.setEncoding("utf8");
-    browserProcess.stderr.on("data", (chunk) => browserStderr.push(chunk));
+    if (!remoteBrowser) {
+      browserProcess = spawn(
+        browserPath,
+        [
+          `--user-data-dir=${userDataDir}`,
+          `--remote-debugging-port=${debugPort}`,
+          `--load-extension=${extensionDir}`,
+          "--enable-unsafe-extension-debugging",
+          "--no-first-run",
+          "--no-default-browser-check",
+          "--disable-default-apps",
+          "--disable-popup-blocking",
+          "about:blank",
+        ],
+        { stdio: ["ignore", "ignore", "pipe"] },
+      );
+      browserProcess.stderr.setEncoding("utf8");
+      browserProcess.stderr.on("data", (chunk) => browserStderr.push(chunk));
+    }
 
     const version = await waitFor(
       "browser remote debugging endpoint",
-      () => httpJson(`http://127.0.0.1:${debugPort}/json/version`),
+      () =>
+        httpJson(
+          `${remoteBrowser ?? `http://127.0.0.1:${debugPort}`}/json/version`,
+        ),
       { timeoutMs: 20000 },
     );
     cdp = await CdpClient.connect(version.webSocketDebuggerUrl);
     await cdp.send("Target.setDiscoverTargets", { discover: true });
-    await cdp.send("Browser.setDownloadBehavior", {
-      behavior: "allow",
-      downloadPath: downloadDir,
-    });
+    if (process.env.E2E_NATIVE_DOWNLOADS !== "1")
+      await cdp.send("Browser.setDownloadBehavior", {
+        behavior: "allow",
+        downloadPath: downloadDir,
+      });
 
     const extensionInfo = await waitFor(
       "extension background service worker",
@@ -752,6 +764,30 @@ async function main() {
     });
     await cdp.send("Page.enable", {}, popupSession.sessionId);
     await cdp.send("Runtime.enable", {}, popupSession.sessionId);
+
+    if (process.env.E2E_OUTPUT_CONTAINER) {
+      await waitFor("Settings tab ready", () =>
+        evaluate(
+          cdp,
+          popupSession.sessionId,
+          `[...document.querySelectorAll('[role="tab"]')].some(tab => tab.innerText.trim() === "Settings")`,
+        ),
+      );
+      await clickTab(cdp, popupSession.sessionId, "Settings");
+      await waitForText(
+        cdp,
+        popupSession.sessionId,
+        "output format setting",
+        "Output format",
+      );
+      await selectOption(
+        cdp,
+        popupSession.sessionId,
+        0,
+        process.env.E2E_OUTPUT_CONTAINER.toUpperCase(),
+      );
+      await clickTab(cdp, popupSession.sessionId, "Capture");
+    }
 
     const sniffedRow = await waitFor(
       "Sniffer popup row for the page-detected playlist",
@@ -933,6 +969,12 @@ async function main() {
       { timeoutMs: 240000, intervalMs: 1000, stopOnError: true },
     );
     const downloaded = await waitForDownloadedFile(downloadDir);
+    const browserDownload = await evaluate(
+      cdp,
+      backgroundSession.sessionId,
+      `chrome.downloads.search({}).then(items => items.filter(item => item.state === "complete").map(({filename, mime, fileSize, state}) => ({filename, mime, fileSize, state})).at(-1))`,
+      { awaitPromise: true },
+    );
 
     await clickTab(cdp, popupSession.sessionId, "Settings");
     await waitForText(
@@ -978,6 +1020,7 @@ async function main() {
           downloadDirectory: downloadDir,
           downloadedBytes: downloaded.size,
           downloadedContainer: downloaded.container,
+          browserDownload,
           runtimeExceptions: {
             background: exceptions.background.length,
             popup: exceptions.popup.length,

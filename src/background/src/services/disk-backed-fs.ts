@@ -453,7 +453,18 @@ function createObjectURLArtifact(
   if (typeof URL?.createObjectURL !== "function") {
     throw new Error("Object URLs are unavailable in this browser context");
   }
-  const url = URL.createObjectURL(data);
+  // Filesystem MIME guesses can turn MKV exports into TXT downloads. Retag a
+  // Blob view with the muxer's declared type without reading media into JS.
+  const typedData =
+    data.type === mime
+      ? data
+      : data instanceof File
+        ? new File([data], data.name, {
+            type: mime,
+            lastModified: data.lastModified,
+          })
+        : data.slice(0, data.size, mime);
+  const url = URL.createObjectURL(typedData);
   artifactUrls.set(exportId, url);
   return { url, exportId, mime, size: data.size };
 }

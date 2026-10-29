@@ -41,6 +41,7 @@
     "test:e2e:aes128": "node scripts/e2e-aes128-local.mjs",
     "test:e2e:audio": "E2E_PRIMARY_AUDIO=1 node scripts/e2e-aes128-local.mjs",
     "test:e2e:subtitles": "E2E_SUBTITLE_TRUNCATION=1 node scripts/e2e-aes128-local.mjs",
+    "test:e2e:mkv": "node scripts/e2e-mkv-local.mjs",
     "test:coverage": "pnpm --parallel --filter ./src/core --filter ./src/background --filter ./src/design-system --filter ./src/popup run test:coverage && pnpm coverage:report && pnpm coverage:badge",
     "test:core:coverage": "pnpm --filter ./src/core run test:coverage",
     "test:background:coverage": "pnpm --filter ./src/background run test:coverage",

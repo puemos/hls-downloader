@@ -273,6 +273,30 @@ the source HLS stream exactly. An alternate-audio case uses a different tone
 and requires the selected track to be saved. It uses the same dependencies and browser
 selection options as `test:e2e:aes128`.
 
+Run the MKV filename and MIME regression:
+
+```bash
+pnpm test:e2e:mkv
+```
+
+This also requires Docker. It builds an isolated Linux x64 Chrome 128 image
+from Google's pinned Chrome for Testing archive; ARM hosts need Docker's x64
+emulation. That supported older browser reproduces MKV downloads becoming TXT,
+which current browsers' built-in Matroska mappings can mask. The test downloads
+the original v5.5.0 and v5.5.6 no-blocklist releases, checks the current standard
+and no-blocklist variants, and includes MP4 and subtitle controls. On macOS it
+also runs the installed Brave and Firefox. Use `E2E_MKV_BROWSERS=chrome128` to
+run only the Docker cases.
+
+The test uses the browser's normal download handling and verifies the actual
+saved filename, reported MIME type, container header, complete decoded video
+and audio, and selected subtitles. Generated extension artifacts are removed;
+saved media and JSON evidence remain in the printed temporary directory.
+Containers and their test profiles are removed after each case. The reusable
+Docker image is named `hls-downloader-e2e:chrome128`; set `E2E_CHROME128_IMAGE`
+to use a prebuilt equivalent image. Like the other local browser tests, this
+command skips in CI.
+
 ### Live Development
 
 ```bash

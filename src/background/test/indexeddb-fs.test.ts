@@ -406,12 +406,63 @@ describe("disk-backed filesystem", () => {
       }),
       progress,
     );
-    expect(createObjectURL).toHaveBeenCalledWith(expect.any(File));
+    expect(createObjectURL).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "video/mp4", size: 3 }),
+    );
     expect(createObjectURL).toHaveBeenCalledTimes(1);
 
     await releaseArtifactInCurrentContext(artifact);
     await expectExportMissing("prepared.mp4");
   });
+
+  it.each([
+    ["mkv", "video/x-matroska", ""],
+    ["mkv", "video/x-matroska", "text/plain"],
+    ["mp4", "video/mp4", ""],
+    ["mkv", "video/x-matroska", "video/x-matroska"],
+  ] as const)(
+    "exports %s with its declared MIME %s when the filesystem reports '%s' (#582)",
+    async (container, mime, fileType) => {
+      const id = `mime-${container}-${fileType.replaceAll("/", "-") || "empty"}`;
+      await IndexedDBFS.createBucket(id, 1, 0);
+      const bucket = (await IndexedDBFS.getBucket(id)) as OPFSBucket;
+      await bucket.write(0, new Uint8Array([1]).buffer);
+      const exportId = `${id}.${container}`;
+      const bytes = [0x1a, 0x45, 0xdf, 0xa3, 9, 8, 7];
+      await writeExport(exportId, bytes);
+      const handle = await getExportHandle(exportId);
+      const file = new File([new Uint8Array(bytes)], exportId, {
+        type: fileType,
+      });
+      vi.spyOn(handle, "getFile").mockResolvedValue(file);
+      const read = vi.spyOn(file, "arrayBuffer");
+      testState.mux.mockResolvedValue({
+        type: "success",
+        requestId: id,
+        exportId,
+        mime,
+        size: bytes.length,
+        wasmMemoryBytes: 32 * 1024 * 1024,
+      });
+
+      const artifact = await bucket.prepareDownload(undefined, { container });
+      const blob = createObjectURL.mock.calls[0][0] as Blob;
+      expect(read).not.toHaveBeenCalled();
+      expect(blob.type).toBe(mime);
+      expect(blob).toBeInstanceOf(File);
+      expect((blob as File).name).toBe(file.name);
+      expect((blob as File).lastModified).toBe(file.lastModified);
+      expect(blob.size).toBe(bytes.length);
+      expect(new Uint8Array(await blob.arrayBuffer())).toEqual(
+        new Uint8Array(bytes),
+      );
+      expect(artifact.mime).toBe(mime);
+      expect(artifact.size).toBe(bytes.length);
+      if (fileType === mime) expect(blob).toBe(file);
+      await releaseArtifactInCurrentContext(artifact);
+      await expectExportMissing(exportId);
+    },
+  );
 
   it("keeps legacy IndexedDB jobs readable without migrating them", async () => {
     const bucket = await createLegacyBucketForTests("legacy", 1, 0);

@@ -141,6 +141,27 @@ async function main() {
     await waitFor("extension Capture view", async () =>
       (await evaluate("return document.body.innerText")).includes("Capture"),
     );
+    if (process.env.E2E_OUTPUT_CONTAINER) {
+      for (const label of ["Settings", "Capture"]) {
+        const tab = await evaluate(
+          "return [...document.querySelectorAll('[role=tab]')].find(tab => tab.innerText.trim() === arguments[0])",
+          [label],
+        );
+        assert(tab, `Missing ${label} tab`);
+        await command("POST", `/element/${tab[elementKey]}/click`, {});
+        if (label === "Settings") {
+          await waitFor("output format setting", async () =>
+            (await evaluate("return document.body.innerText")).includes(
+              "Output format",
+            ),
+          );
+          await evaluate(
+            "const select = document.querySelector('select'); select.value = arguments[0]; select.dispatchEvent(new Event('change', {bubbles:true}));",
+            [process.env.E2E_OUTPUT_CONTAINER],
+          );
+        }
+      }
+    }
     await clickText("Add URL");
     const input = await command("POST", "/element", {
       using: "css selector",
@@ -214,6 +235,11 @@ async function main() {
       return null;
     });
     await screenshot();
+    const browserDownload = await command("POST", "/execute/async", {
+      script:
+        "const done = arguments[arguments.length-1]; browser.downloads.search({}).then(items => done(items.filter(item => item.state === 'complete').map(({filename, mime, fileSize, state}) => ({filename, mime, fileSize, state})).at(-1)), error => done({error: error.message}));",
+      args: [],
+    });
     console.log(
       JSON.stringify(
         {
@@ -224,6 +250,7 @@ async function main() {
           downloadedBytes: downloaded.bytes,
           downloadedContainer: downloaded.container,
           downloadDirectory,
+          browserDownload,
         },
         null,
         2,

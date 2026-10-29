@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 5.5.7
+
+### Fixes
+
+- Keep MKV downloads as Matroska rather than TXT when the browser cannot infer the export file's MIME type (#582). Apply the muxer's declared MIME to a Blob view without reading the media into JavaScript memory.
+
+### Testing
+
+- Added four regression cases for missing, incorrect, and already correct file MIME types, preserving bytes, filenames, timestamps, and disk-backed preparation. All 327 automated tests pass.
+- Reproduced v5.5.0 and v5.5.6 no-blocklist builds saving genuine Matroska as `master.txt` with `text/plain` in Chrome 128 on Linux. The repaired standard and no-blocklist builds save `master.mkv` with a Matroska MIME type.
+- Passed ten actual-file browser cases across Chrome 128, current Brave, and Firefox, including MP4 and subtitle controls. Verified every saved video frame, source-matching decoded audio, filenames, MIME types, container headers, and caption cues.
+- Typechecking, the security gate, and all six release archive checks pass. Firefox lint reports zero errors and six existing warnings.
+
 ## 5.5.6
 
 ### Fixes

@@ -11,6 +11,8 @@ import { promisify } from "node:util";
 
 const exec = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const isMain =
+  path.resolve(process.argv[1] ?? "") === fileURLToPath(import.meta.url);
 const browsers = (process.env.E2E_AES128_BROWSERS ?? "brave,firefox").split(
   ",",
 );
@@ -29,7 +31,7 @@ assert(
   "Run subtitle and primary-audio regressions separately",
 );
 
-if (process.env.CI) {
+if (isMain && process.env.CI) {
   console.log("Skipping local encrypted-stream browser tests in CI.");
   process.exit(0);
 }
@@ -220,7 +222,7 @@ async function createMedia(work) {
   return { reference, assets };
 }
 
-async function serve(assets, requests) {
+async function serve(assets, requests, host = "127.0.0.1") {
   const types = {
     ".m3u8": "application/vnd.apple.mpegurl",
     ".ts": "video/mp2t",
@@ -246,7 +248,7 @@ async function serve(assets, requests) {
       response.end("not found");
     }
   });
-  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  await new Promise((resolve) => server.listen(0, host, resolve));
   return server;
 }
 
@@ -315,7 +317,10 @@ async function validateDownload(
   referenceHashes,
   destination,
   expectedSubtitles,
+  options = {},
 ) {
+  const audioOnly = options.audioOnly ?? primaryAudio;
+  const includeSubtitles = options.includeSubtitles ?? selectSubtitles;
   await checked("ffmpeg", [
     "-v",
     "error",
@@ -342,7 +347,7 @@ async function validateDownload(
       result.downloadedFile,
     ]),
   );
-  if (!primaryAudio)
+  if (!audioOnly)
     assert(
       probe.streams.some(
         (stream) =>
@@ -357,9 +362,9 @@ async function validateDownload(
       "Audio-only output contains unexpected streams",
     );
   assert(probe.streams.some((stream) => stream.codec_type === "audio"));
-  if (selectSubtitles)
+  if (includeSubtitles)
     assert(probe.streams.some((stream) => stream.codec_type === "subtitle"));
-  for (const type of primaryAudio ? ["audio"] : ["video", "audio"]) {
+  for (const type of audioOnly ? ["audio"] : ["video", "audio"]) {
     const stream = probe.streams.find((stream) => stream.codec_type === type);
     // Matroska exposes per-track duration as a tag, whereas MP4 has duration.
     const taggedDuration = stream.tags?.DURATION?.split(":").reduce(
@@ -382,8 +387,8 @@ async function validateDownload(
     Math.abs(Number(probe.format.duration) - 8) < 0.3,
     probe.format.duration,
   );
-  const hashes = primaryAudio ? [] : await videoHashes(result.downloadedFile);
-  if (!primaryAudio)
+  const hashes = audioOnly ? [] : await videoHashes(result.downloadedFile);
+  if (!audioOnly)
     assert.deepEqual(
       hashes,
       referenceHashes,
@@ -828,4 +833,13 @@ async function main() {
   }
 }
 
-await main();
+export {
+  run,
+  checked,
+  createMedia,
+  serve,
+  browserResult,
+  videoHashes,
+  validateDownload,
+};
+if (isMain) await main();
