@@ -1,5 +1,6 @@
 import { Fragment, Level } from "@hls-downloader/core/lib/entities";
 import { IParser, ParsedEncryption } from "@hls-downloader/core/lib/services";
+import { generateTrackId } from "@hls-downloader/core/lib/use-cases";
 import { Parser } from "m3u8-parser";
 import { buildAbsoluteURL } from "url-toolkit";
 import { v4 } from "uuid";
@@ -168,7 +169,7 @@ export const M3u8Parser: IParser = {
           return [
             {
               type: "audio",
-              id: `${label}-${key}`,
+              id: generateTrackId(baseurl, "audio", key, label),
               playlistID: baseurl,
               uri: buildAbsoluteURL(baseurl, entry.uri),
               bitrate: undefined,
@@ -199,7 +200,7 @@ export const M3u8Parser: IParser = {
           return [
             {
               type: "subtitle",
-              id: `${label}-${groupId}`,
+              id: generateTrackId(baseurl, "subtitle", groupId, label),
               playlistID: baseurl,
               uri: buildAbsoluteURL(baseurl, entry.uri),
               language: entry.language,
@@ -227,7 +228,7 @@ export const M3u8Parser: IParser = {
           return [
             {
               type: "subtitle",
-              id: `${label}-${groupId}-cc`,
+              id: generateTrackId(baseurl, "closed-caption", groupId, label),
               playlistID: baseurl,
               uri: buildAbsoluteURL(baseurl, entry.uri),
               language: entry.language,

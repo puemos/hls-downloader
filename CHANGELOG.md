@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 5.5.3
+
+### Fixes
+
+- Prevent audio and subtitle tracks with matching names and groups from overwriting each other across playlists (#472). Keep track IDs stable when reloading a playlist and update matching saved selections from older versions.
+
+### Testing
+
+- Added 11 regression tests covering playlist identity, track types, query strings, ambiguous names, rescans, and saved selections. All 304 tests pass.
+- Workspace typechecking and production builds pass.
+- The security gate and all six MV2/MV3 archive checks pass. Firefox lint reports zero errors and six existing warnings.
+
 ## 5.5.2
 
 ### Dependencies and security

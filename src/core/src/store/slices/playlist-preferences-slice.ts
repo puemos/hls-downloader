@@ -4,6 +4,8 @@ import {
   PayloadAction,
   Slice,
 } from "@reduxjs/toolkit";
+import type { Level } from "../../entities";
+import { levelsSlice } from "./levels-slice";
 
 export interface ISetAudioSelectionPayload {
   playlistID: string;
@@ -77,5 +79,37 @@ export const playlistPreferencesSlice: Slice<
       delete state.audioSelections[playlistID];
       delete state.subtitleSelections[playlistID];
     },
+  },
+  extraReducers(builder) {
+    builder.addCase(levelsSlice.actions.add, (state, action) => {
+      // Upgrade saved choices once their playlist's new track IDs are available.
+      for (const type of ["audio", "subtitle"] as const) {
+        const selections =
+          type === "audio" ? state.audioSelections : state.subtitleSelections;
+        const matches = new Map<string, Level | null>();
+        for (const level of action.payload.levels) {
+          if (
+            level.type !== type ||
+            level.name === undefined ||
+            level.groupId === undefined
+          ) {
+            continue;
+          }
+          const suffix = type === "subtitle" && level.instreamId ? "-cc" : "";
+          const legacyId = `${level.name}-${level.groupId}${suffix}`;
+          if (selections[level.playlistID] === legacyId) {
+            matches.set(
+              level.playlistID,
+              matches.has(level.playlistID) ? null : level,
+            );
+          }
+        }
+        for (const [playlistId, level] of matches) {
+          if (level) {
+            selections[playlistId] = level.id;
+          }
+        }
+      }
+    });
   },
 });

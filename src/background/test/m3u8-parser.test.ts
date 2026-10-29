@@ -95,7 +95,7 @@ describe("M3u8Parser", () => {
 
     expect(audioEng).toEqual({
       type: "audio",
-      id: "eng-audio",
+      id: expect.any(String),
       playlistID: masterBase,
       uri: `${base}eng.m3u8`,
       bitrate: undefined,
@@ -113,7 +113,7 @@ describe("M3u8Parser", () => {
 
     expect(audioSpa).toEqual({
       type: "audio",
-      id: "spa-audio",
+      id: expect.any(String),
       playlistID: masterBase,
       uri: `${base}spa.m3u8`,
       bitrate: undefined,

@@ -8,6 +8,7 @@ export * from "./write-to-bucket";
 export * from "./write-to-file";
 export * from "./generate-file-name";
 export * from "./generate-subtitle-file-name";
+export * from "./generate-track-id";
 export * from "./sanitize-filename";
 export * from "./delete-bucket";
 export * from "./fs-cleanup";
