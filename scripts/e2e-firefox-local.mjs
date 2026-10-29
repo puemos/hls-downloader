@@ -6,6 +6,7 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
+import { installStorageFailure, jobDirectories } from "./e2e-job-faults.mjs";
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const elementKey = "element-6066-11e4-a52e-4f735466cecf";
@@ -195,7 +196,106 @@ async function main() {
         "return [...document.querySelectorAll('button')].some(button => button.innerText.includes('Start download') && !button.disabled)",
       ),
     );
+    const background = (fn) =>
+      command("POST", "/execute/async", {
+        script: `const done = arguments[arguments.length - 1]; browser.runtime.getBackgroundPage().then(async bg => done(await (${fn.toString()})(bg)), error => done({error: error.message}));`,
+        args: [],
+      });
+    if (process.env.E2E_JOB_FLOW === "storage-retry")
+      assert.equal(await background(installStorageFailure), true);
     await clickText("Start download");
+    let flowEvidence;
+    if (process.env.E2E_JOB_FLOW) {
+      const openDetails = async () => {
+        const button = await evaluate(
+          "return document.querySelector('button[aria-label^=\"Open details for \"]')",
+        );
+        if (button)
+          await command("POST", `/element/${button[elementKey]}/click`, {});
+      };
+      if (process.env.E2E_JOB_FLOW === "storage-retry") {
+        try {
+          await waitFor(
+            "recoverable storage error",
+            async () =>
+              /\bError\b/.test(
+                await evaluate("return document.body.innerText"),
+              ),
+            7000,
+          );
+        } catch {
+          const injected = await background((bg) => bg.__e2eStorageFaults);
+          throw new Error(
+            `Storage initialization failed without a recoverable job error (injected=${injected})`,
+          );
+        }
+        const folders = await background(jobDirectories);
+        assert.deepEqual(
+          folders,
+          [],
+          `Failed initialization left partial folders: ${folders}`,
+        );
+        await openDetails();
+        await clickText("Retry");
+        flowEvidence = {
+          retriedAfterStorageFailure: true,
+          partialDirectories: folders.length,
+        };
+      } else if (process.env.E2E_JOB_FLOW === "cancel-retry") {
+        assert(
+          process.env.E2E_CONTROL_URL,
+          "Cancellation control URL required",
+        );
+        const status = async () =>
+          (await fetch(process.env.E2E_CONTROL_URL)).json();
+        const cancellationTimes = [];
+        for (let round = 0; round < 6; round++) {
+          await waitFor(
+            "stalled media response",
+            async () => (await status()).stalled,
+            10000,
+          );
+          await openDetails();
+          const cancelledAt = Date.now();
+          await clickText("Cancel");
+          try {
+            await waitFor(
+              "cancelled request closed",
+              async () => (await status()).closedAt,
+              5000,
+            );
+          } catch {
+            throw new Error(
+              "Cancelled request remained open after the job was removed",
+            );
+          }
+          cancellationTimes.push(Date.now() - cancelledAt);
+          const capture = await evaluate(
+            "return [...document.querySelectorAll('[role=tab]')].find(tab => tab.innerText.trim() === 'Capture')",
+          );
+          await command("POST", `/element/${capture[elementKey]}/click`, {});
+          const row = await evaluate(
+            "return document.querySelector('[data-playlist-row] button[aria-label^=\"Choose quality\"]')",
+          );
+          if (row)
+            await command("POST", `/element/${row[elementKey]}/click`, {});
+          await waitFor("enabled Start download after cancellation", () =>
+            evaluate(
+              "return [...document.querySelectorAll('button')].some(button => button.innerText.includes('Start download') && !button.disabled)",
+            ),
+          );
+          if (round < 5)
+            await fetch(new URL("arm", process.env.E2E_CONTROL_URL), {
+              method: "POST",
+            });
+          await clickText("Start download");
+        }
+        flowEvidence = {
+          cancelledRequests: cancellationTimes.length,
+          cancelledRequestClosedMs: Math.max(...cancellationTimes),
+        };
+      }
+    }
     await waitFor(
       "download completion",
       async () => {
@@ -213,7 +313,7 @@ async function main() {
         }
         return /\b(Completed|Done)\b/.test(text);
       },
-      120_000,
+      Number(process.env.E2E_JOB_TIMEOUT_MS ?? 120_000),
     );
     const downloaded = await waitFor("saved media file", async () => {
       for (const entry of await fs.readdir(downloadDirectory)) {
@@ -251,6 +351,7 @@ async function main() {
           downloadedContainer: downloaded.container,
           downloadDirectory,
           browserDownload,
+          ...(flowEvidence ? { flowEvidence } : {}),
         },
         null,
         2,

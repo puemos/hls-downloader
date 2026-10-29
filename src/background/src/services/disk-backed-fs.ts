@@ -967,8 +967,8 @@ const createBucket: IFS["createBucket"] = async (
   }
 
   const storageKey = randomId();
-  await initializeJobStorage(storageKey);
   try {
+    await initializeJobStorage(storageKey);
     await setBucketMeta(id, {
       backend: OPFS_BACKEND,
       storageKey,

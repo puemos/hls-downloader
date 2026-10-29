@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 5.5.8
+
+### Fixes
+
+- Retry temporary network and HTTP failures with bounded backoff, honor short `Retry-After` delays, and retry requests that stop delivering data for 30 seconds (#267). Active transfers can continue longer while bytes keep arriving.
+- Abort outstanding media/key requests and retry waits when cancelling, deleting, or clearing downloads. Prevent late writes after cancellation (#410).
+- Keep storage initialization errors inside the failed job so Retry and subsequent downloads continue working (#410).
+- Remove partial storage after failed initialization or cancellation during bucket creation, including delayed parallel directory operations.
+
+### Testing
+
+- Added 24 regression and guard cases for transient and permanent HTTP errors, backoff, inactivity timeouts, slow active transfers, cancellation, job isolation, and partial storage cleanup.
+- Added `pnpm test:e2e:network` to reproduce failures in the published v5.5.7 builds and verify actual saved media after network, cancellation, and storage recovery in Brave MV3 and Firefox MV2.
+- Passed 26 browser cases: eight reproduce the old failures and eighteen verify complete fixed MP4/MKV files, every source video frame, decoded audio hashes, filenames, MIME types, and subtitle cues. The checks include real byte-range responses, 36-second active transfers, and six cancellation cycles per browser followed by a successful download.
+- All 351 automated tests, workspace typechecking, the security gate, and six release archive checks pass. Firefox lint reports zero errors and six existing warnings.
+
 ## 5.5.7
 
 ### Fixes

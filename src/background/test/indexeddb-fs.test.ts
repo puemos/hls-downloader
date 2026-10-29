@@ -9,7 +9,7 @@ import {
   it,
   vi,
 } from "vitest";
-import { createFakeOpfs } from "./helpers/fake-opfs";
+import { createFakeOpfs, FakeDirectoryHandle } from "./helpers/fake-opfs";
 
 const testState = vi.hoisted(() => ({
   downloadId: 40,
@@ -101,6 +101,7 @@ import {
   getExportHandle,
   getFragmentFile,
   getTrackDirectory,
+  getJobsDirectory,
 } from "../src/services/opfs-storage";
 import type { PreparedDownload } from "@hls-downloader/core/lib/services";
 
@@ -125,6 +126,39 @@ function emitDownloadState(downloadId: number, state: string): void {
 }
 
 describe("disk-backed filesystem", () => {
+  it("removes partial directories after bucket initialization fails", async () => {
+    const original = FakeDirectoryHandle.prototype.getDirectoryHandle;
+    const fault = vi
+      .spyOn(FakeDirectoryHandle.prototype, "getDirectoryHandle")
+      .mockImplementation(async function (name, options) {
+        if (name === "video")
+          throw new DOMException(
+            "Storage temporarily unavailable",
+            "UnknownError",
+          );
+        if (name === "audio")
+          await new Promise((resolve) => setTimeout(resolve, 5));
+        return original.call(this, name, options);
+      });
+    try {
+      await expect(
+        IndexedDBFS.createBucket("failed-init", 1, 1),
+      ).rejects.toThrow("Storage temporarily unavailable");
+      const jobs = await getJobsDirectory(false);
+      const entries = [];
+      for await (const [name] of (jobs as any).entries()) entries.push(name);
+      expect(entries).toEqual([]);
+      expect(await IndexedDBFS.getBucket("failed-init")).toBeUndefined();
+    } finally {
+      fault.mockRestore();
+    }
+    await IndexedDBFS.createBucket("retry-init", 1, 1);
+    expect(await IndexedDBFS.getBucket("retry-init")).toBeInstanceOf(
+      OPFSBucket,
+    );
+    await IndexedDBFS.deleteBucket("retry-init");
+  });
+
   let createObjectURL: ReturnType<typeof vi.spyOn>;
   let revokeObjectURL: ReturnType<typeof vi.spyOn>;
 

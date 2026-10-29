@@ -7,6 +7,7 @@ import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { installStorageFailure, jobDirectories } from "./e2e-job-faults.mjs";
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -915,6 +916,16 @@ async function main() {
       () => assertStartDownloadEnabled(cdp, popupSession.sessionId),
       { timeoutMs: 20000, intervalMs: 250 },
     );
+    if (process.env.E2E_JOB_FLOW === "storage-retry") {
+      assert(
+        await evaluate(
+          cdp,
+          backgroundSession.sessionId,
+          `(${installStorageFailure.toString()})()`,
+        ),
+        "Storage fault was not installed",
+      );
+    }
     await clickButton(cdp, popupSession.sessionId, "Start download");
     await waitForText(
       cdp,
@@ -922,6 +933,113 @@ async function main() {
       "Downloads tab after starting download",
       "Downloads",
     );
+    let flowEvidence;
+    if (process.env.E2E_JOB_FLOW) {
+      const openDetails = async () => {
+        const label = await evaluate(
+          cdp,
+          popupSession.sessionId,
+          `document.querySelector('button[aria-label^="Open details for "]')?.getAttribute("aria-label")`,
+        );
+        if (label)
+          await clickButtonByAriaLabel(cdp, popupSession.sessionId, label);
+      };
+      if (process.env.E2E_JOB_FLOW === "storage-retry") {
+        try {
+          await waitForText(
+            cdp,
+            popupSession.sessionId,
+            "recoverable storage error",
+            "Error",
+            { timeoutMs: 7000 },
+          );
+        } catch {
+          const injected = await evaluate(
+            cdp,
+            backgroundSession.sessionId,
+            "globalThis.__e2eStorageFaults",
+          );
+          throw new Error(
+            `Storage initialization failed without a recoverable job error (injected=${injected})`,
+          );
+        }
+        const folders = await evaluate(
+          cdp,
+          backgroundSession.sessionId,
+          `(${jobDirectories.toString()})()`,
+          { awaitPromise: true },
+        );
+        assert(
+          folders.length === 0,
+          `Failed storage initialization left partial folders: ${folders}`,
+        );
+        await openDetails();
+        await clickButton(cdp, popupSession.sessionId, "Retry");
+        flowEvidence = {
+          retriedAfterStorageFailure: true,
+          partialDirectories: folders.length,
+        };
+      } else if (process.env.E2E_JOB_FLOW === "cancel-retry") {
+        assert(
+          process.env.E2E_CONTROL_URL,
+          "Cancellation control URL required",
+        );
+        const status = async () =>
+          (await fetch(process.env.E2E_CONTROL_URL)).json();
+        const cancellationTimes = [];
+        for (let round = 0; round < 6; round++) {
+          await waitFor(
+            "stalled media response",
+            async () => (await status()).stalled,
+            { timeoutMs: 10000 },
+          );
+          await openDetails();
+          const cancelledAt = Date.now();
+          await clickButton(cdp, popupSession.sessionId, "Cancel");
+          try {
+            await waitFor(
+              "cancelled request closed",
+              async () => (await status()).closedAt,
+              { timeoutMs: 5000 },
+            );
+          } catch {
+            throw new Error(
+              "Cancelled request remained open after the job was removed",
+            );
+          }
+          cancellationTimes.push(Date.now() - cancelledAt);
+          await clickTab(cdp, popupSession.sessionId, "Capture");
+          await waitFor("captured stream to restart", async () => {
+            const button = await evaluate(
+              cdp,
+              popupSession.sessionId,
+              `document.querySelector('[data-playlist-row] button[aria-label^="Choose quality"]')?.getAttribute('aria-label')`,
+            );
+            if (button) {
+              await clickButtonByAriaLabel(cdp, popupSession.sessionId, button);
+              return true;
+            }
+            const enabled = await assertStartDownloadEnabled(
+              cdp,
+              popupSession.sessionId,
+            ).catch(() => false);
+            return enabled ? true : null;
+          });
+          if (round < 5)
+            await fetch(new URL("arm", process.env.E2E_CONTROL_URL), {
+              method: "POST",
+            });
+          await waitFor("Start download enabled after cancellation", () =>
+            assertStartDownloadEnabled(cdp, popupSession.sessionId),
+          );
+          await clickButton(cdp, popupSession.sessionId, "Start download");
+        }
+        flowEvidence = {
+          cancelledRequests: cancellationTimes.length,
+          cancelledRequestClosedMs: Math.max(...cancellationTimes),
+        };
+      }
+    }
     const downloadStatusText = await waitFor(
       "Download job completed",
       async () => {
@@ -966,7 +1084,11 @@ async function main() {
         }
         return null;
       },
-      { timeoutMs: 240000, intervalMs: 1000, stopOnError: true },
+      {
+        timeoutMs: Number(process.env.E2E_JOB_TIMEOUT_MS ?? 240000),
+        intervalMs: 1000,
+        stopOnError: true,
+      },
     );
     const downloaded = await waitForDownloadedFile(downloadDir);
     const browserDownload = await evaluate(
@@ -1021,6 +1143,7 @@ async function main() {
           downloadedBytes: downloaded.size,
           downloadedContainer: downloaded.container,
           browserDownload,
+          ...(flowEvidence ? { flowEvidence } : {}),
           runtimeExceptions: {
             background: exceptions.background.length,
             popup: exceptions.popup.length,

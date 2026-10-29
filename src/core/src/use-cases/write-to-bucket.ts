@@ -5,8 +5,11 @@ export const writeToBucketFactory = (fs: IFS) => {
     bucketID: string,
     index: number,
     data: ArrayBuffer,
+    signal?: AbortSignal,
   ): Promise<void> => {
+    signal?.throwIfAborted();
     const bucket = await fs.getBucket(bucketID);
+    signal?.throwIfAborted();
     if (!bucket) {
       throw new Error(`Download data for ${bucketID} was not found`);
     }

@@ -218,6 +218,31 @@ custom Brave binary path, `E2E_HLS_URL=https://.../playlist.m3u8` to override
 the stream, or `E2E_CLEAN_DOWNLOAD=1` to delete the downloaded file after the
 run.
 
+Run the local network and job recovery regression:
+
+```bash
+pnpm test:e2e:network
+```
+
+This generates real H.264/AAC HLS streams, installs the published v5.5.7 build
+and the candidate in isolated Brave MV3 and Firefox MV2 profiles, and exercises
+temporary HTTP errors, interrupted connections, stalled response bodies,
+encryption-key recovery, cancellation, and storage initialization failures.
+Controls cover real byte-range media and active transfers lasting more than
+30 seconds without timing out.
+Each cancellation case cancels six stalled jobs before completing a new download.
+Every successful saved file is fully decoded and checked against source video
+frames, audio hashes, and subtitle cues. Logs, request timestamps, JSON results,
+and saved media remain in the printed temporary directory.
+
+Requires macOS with Brave, Firefox, FFmpeg, FFprobe, and GitHub CLI available.
+The script downloads the pinned geckodriver automatically, or accepts
+`E2E_GECKODRIVER=/path/to/geckodriver`. Use `E2E_NETWORK_BROWSERS=brave` or
+`firefox` to select one browser, `E2E_BASELINE_ONLY=1` to reproduce the released
+bugs, and `E2E_NETWORK_CASES=503,stall,cancel,storage` to select fault cases.
+Build outputs remain available for subsequent packaging checks and should be
+removed after verification. Browser profiles and processes are cleaned up.
+
 Run the local AES-128 browser regression with generated media:
 
 ```bash

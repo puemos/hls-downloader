@@ -61,10 +61,14 @@ export async function getTrackDirectory(
 }
 
 export async function initializeJobStorage(storageKey: string): Promise<void> {
-  await Promise.all([
+  const results = await Promise.allSettled([
     getTrackDirectory(storageKey, "video", true),
     getTrackDirectory(storageKey, "audio", true),
   ]);
+  // Both operations must settle before the caller removes a failed job's
+  // directories, otherwise a late operation can recreate data after cleanup.
+  const failure = results.find((result) => result.status === "rejected");
+  if (failure?.status === "rejected") throw failure.reason;
 }
 
 async function getExistingFileSize(
