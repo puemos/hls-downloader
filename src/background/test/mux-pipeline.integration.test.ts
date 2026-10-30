@@ -188,8 +188,8 @@ describe("Mux Pipeline Integration", () => {
     const args = mock.getExecArgs()[0];
     expect(args).toContain("0:v:0?");
     expect(args).toContain("1:a:0?");
-    expect(args).toContain("-bsf:a");
-    expect(args).toContain("aac_adtstoasc");
+    expect(args).not.toContain("-bsf:a");
+    expect(args).not.toContain("aac_adtstoasc");
 
     await IndexedDBFS.deleteBucket(id);
   });
@@ -385,8 +385,8 @@ describe("Mux Pipeline Integration", () => {
     await IndexedDBFS.deleteBucket(id);
   });
 
-  it("-shortest only present with both video and audio", async () => {
-    // video+audio: should have -shortest
+  it("never truncates video or audio with -shortest", async () => {
+    // video+audio: preserve both complete inputs
     const id1 = "shortest-va";
     await createLegacyBucketForTests(id1, 1, 1);
     const bucket1 = (await IndexedDBFS.getBucket(id1)) as IndexedDBBucket;
@@ -394,7 +394,7 @@ describe("Mux Pipeline Integration", () => {
     await bucket1.write(1, audioOnly.buffer);
     await bucket1.prepareDownload();
 
-    expect(mock.getExecArgs()[0]).toContain("-shortest");
+    expect(mock.getExecArgs()[0]).not.toContain("-shortest");
 
     mock.reset();
 

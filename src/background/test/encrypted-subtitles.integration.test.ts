@@ -114,6 +114,10 @@ beforeAll(async () => {
     let status = body ? 200 : 404;
     if (body && request.headers.range) {
       const match = /^bytes=(\d+)-(\d+)$/.exec(request.headers.range)!;
+      response.setHeader(
+        "Content-Range",
+        `bytes ${match[1]}-${match[2]}/${body.length}`,
+      );
       body = body.subarray(Number(match[1]), Number(match[2]) + 1);
       status = 206;
     }

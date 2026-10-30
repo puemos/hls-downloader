@@ -385,10 +385,15 @@ async function main() {
         );
         assert.equal(
           verified.audioHash,
-          expectedAudio[test.subtitles ? "subtitles" : "plain"],
+          expectedAudio[
+            test.build === "fixed" || test.subtitles ? "subtitles" : "plain"
+          ],
           "Decoded audio differs from source",
         );
-        assert.equal(verified.audioFrames, test.subtitles ? 376 : 375);
+        assert.equal(
+          verified.audioFrames,
+          test.build === "fixed" || test.subtitles ? 376 : 375,
+        );
         results.push({
           ...test,
           browserVersion: result.browser,

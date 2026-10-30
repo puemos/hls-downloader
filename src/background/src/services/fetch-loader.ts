@@ -15,6 +15,41 @@ class HttpError extends Error {
   }
 }
 
+function readRange(
+  buffer: ArrayBuffer,
+  response: Response,
+  range: { offset: number; length: number },
+): ArrayBuffer {
+  const end = range.offset + range.length - 1;
+  if (response.status === 206) {
+    const header = response.headers?.get("Content-Range")?.trim() ?? "";
+    const match = /^bytes (\d+)-(\d+)\/(\d+|\*)$/i.exec(header);
+    if (
+      !match ||
+      Number(match[1]) !== range.offset ||
+      Number(match[2]) !== end ||
+      (match[3] !== "*" &&
+        (!Number.isSafeInteger(Number(match[3])) || Number(match[3]) <= end)) ||
+      buffer.byteLength !== range.length
+    ) {
+      throw new Error(
+        `Invalid byte-range response: expected bytes ${range.offset}-${end}`,
+      );
+    }
+    return buffer;
+  }
+  // Retain the legacy exact-length 200 response compatibility. Otherwise a
+  // server ignoring Range must return enough of the full file for this slice.
+  if (response.status === 200) {
+    if (buffer.byteLength === range.length) return buffer;
+    if (buffer.byteLength >= range.offset + range.length)
+      return buffer.slice(range.offset, range.offset + range.length);
+  }
+  throw new Error(
+    `Incomplete byte-range response: expected bytes ${range.offset}-${end}`,
+  );
+}
+
 function isHttpError(error: unknown): error is HttpError {
   return error instanceof HttpError;
 }
@@ -154,6 +189,16 @@ export async function fetchArrayBuffer(
   byteRange?: { offset: number; length: number } | null,
   signal?: AbortSignal,
 ) {
+  if (
+    byteRange &&
+    (!Number.isSafeInteger(byteRange.offset) ||
+      byteRange.offset < 0 ||
+      !Number.isSafeInteger(byteRange.length) ||
+      byteRange.length <= 0 ||
+      !Number.isSafeInteger(byteRange.offset + byteRange.length))
+  ) {
+    throw new Error("Invalid byte-range offset or length");
+  }
   const fetchFn: FetchFn<ArrayBuffer> = () => {
     const request = byteRange
       ? {
@@ -169,17 +214,7 @@ export async function fetchArrayBuffer(
       request,
       async (res) => {
         const buffer = await res.arrayBuffer();
-        if (
-          byteRange &&
-          res.status !== 206 &&
-          buffer.byteLength !== byteRange.length
-        ) {
-          return buffer.slice(
-            byteRange.offset,
-            byteRange.offset + byteRange.length,
-          );
-        }
-        return buffer;
+        return byteRange ? readRange(buffer, res, byteRange) : buffer;
       },
       signal,
     );

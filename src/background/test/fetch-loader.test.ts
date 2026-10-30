@@ -480,11 +480,12 @@ describe("FetchLoader", () => {
     });
 
     it("sends Range header when byteRange is provided", async () => {
-      const mockBuffer = new ArrayBuffer(100);
+      const mockBuffer = new ArrayBuffer(50000);
       const mockResponse = {
         arrayBuffer: () => Promise.resolve(mockBuffer),
         ok: true,
         status: 206,
+        headers: new Headers({ "Content-Range": "bytes 833-50832/60000" }),
       };
       const fetchMock = vi.fn().mockResolvedValue(mockResponse);
       globalThis.fetch = fetchMock;

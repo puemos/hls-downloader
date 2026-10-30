@@ -74,9 +74,9 @@ exports[`Mux Pipeline E2E (host ffmpeg) > muxed-with-data-stream → MP4, no dat
 
 exports[`Mux Pipeline E2E (host ffmpeg) > separate video + audio → MP4 1`] = `
 {
-  "duration": "3.000000",
-  "sha256": "12032a2dc38e4df2e65a0e611add8f7e9981488f38754efdd339c0e59869a85a",
-  "sizeBytes": 84240,
+  "duration": "4.010667",
+  "sha256": "489f661f0fc7f72bd51ed66daf36ad6f9bad03461d56ca3952965c415a7495b1",
+  "sizeBytes": 92643,
   "streams": [
     {
       "codec_name": "h264",
@@ -89,7 +89,7 @@ exports[`Mux Pipeline E2E (host ffmpeg) > separate video + audio → MP4 1`] = `
       "channels": 2,
       "codec_name": "aac",
       "codec_type": "audio",
-      "nb_frames": "140",
+      "nb_frames": "188",
       "sample_rate": "48000",
     },
   ],

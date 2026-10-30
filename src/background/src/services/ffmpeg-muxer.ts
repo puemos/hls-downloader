@@ -36,14 +36,6 @@ export function detectFmp4(data: Uint8Array): boolean {
   return boxType === "ftyp";
 }
 
-function isMp4ContainerFile(fileName: string): boolean {
-  return /\.(m4a|m4v|mp4)$/i.test(fileName);
-}
-
-function isMp4Container(fileName: string, container?: MediaContainer): boolean {
-  return container ? container === "mp4" : isMp4ContainerFile(fileName);
-}
-
 export function getMimeForOutputFile(fileName: string): string {
   return /\.mkv$/i.test(fileName) ? "video/x-matroska" : "video/mp4";
 }
@@ -75,8 +67,6 @@ export function buildMuxArgs({
   hasAudio,
   videoFileName = "video.ts",
   audioFileName = "audio.ts",
-  videoContainer,
-  audioContainer,
   subtitleText,
   subtitleLanguage,
   outputFormat,
@@ -86,9 +76,6 @@ export function buildMuxArgs({
   if (!hasVideo && !hasAudio) {
     throw new Error("No media to mux");
   }
-
-  const audioNeedsAdtsToAsc =
-    hasAudio && !isMp4Container(audioFileName, audioContainer);
 
   const args: string[] = ["-y"];
 
@@ -108,9 +95,8 @@ export function buildMuxArgs({
       args.push("-map", "2:s:0");
     }
     args.push("-c:v", "copy", "-c:a", "copy");
-    if (audioNeedsAdtsToAsc) {
-      args.push("-bsf:a", "aac_adtstoasc");
-    }
+    // Let the output muxer select codec-specific bitstream conversions. Forcing
+    // AAC's ADTS filter here rejects valid AC-3, E-AC-3, and MP3 audio streams.
   } else if (hasVideo) {
     // A primary playlist can contain video, embedded audio, or audio only.
     // Keep both media mappings optional while excluding data/metadata streams.
@@ -139,10 +125,8 @@ export function buildMuxArgs({
     args.push("-metadata:s:s:0", `language=${subtitleLanguage || "und"}`);
   }
 
-  // Subtitle EOF (including an empty track) must not end audio/video muxing.
-  if (hasVideo && hasAudio && !includeSubtitles) {
-    args.push("-shortest");
-  }
+  // Preserve every input packet even when alternate tracks have different
+  // lengths. The shorter audio, video, or subtitle track must not end the rest.
   if (outputFormat) {
     args.push("-f", outputFormat);
   }

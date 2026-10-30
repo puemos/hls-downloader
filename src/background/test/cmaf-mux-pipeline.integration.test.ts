@@ -226,7 +226,7 @@ describe("CMAF Mux Pipeline Integration", () => {
     await IndexedDBFS.deleteBucket(id);
   });
 
-  it("backward compat: TS data still uses .ts filenames and aac_adtstoasc", async () => {
+  it("TS data keeps .ts filenames without forcing an AAC-only filter", async () => {
     const id = "ts-compat-test";
     await createLegacyBucketForTests(id, 1, 1);
     const bucket = (await IndexedDBFS.getBucket(id)) as IndexedDBBucket;
@@ -252,10 +252,10 @@ describe("CMAF Mux Pipeline Integration", () => {
     expect(videoWrite!.filename).toBe("video.ts");
     expect(audioWrite!.filename).toBe("audio.ts");
 
-    // Should have aac_adtstoasc for TS
+    // Must not force an AAC-only filter for arbitrary TS audio
     const args = mock.getExecArgs()[0];
-    expect(args).toContain("-bsf:a");
-    expect(args).toContain("aac_adtstoasc");
+    expect(args).not.toContain("-bsf:a");
+    expect(args).not.toContain("aac_adtstoasc");
 
     await IndexedDBFS.deleteBucket(id);
   });

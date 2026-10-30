@@ -50,7 +50,7 @@ describe("muxExec", () => {
         outputFileName: "output.mp4",
         hasVideo: false,
         hasAudio: false,
-      })
+      }),
     ).rejects.toThrow("No media to mux");
   });
 
@@ -103,8 +103,8 @@ describe("muxExec", () => {
     expect(args).toContain("audio.ts");
     expect(args).toContain("0:v:0?");
     expect(args).toContain("1:a:0?");
-    expect(args).toContain("-bsf:a");
-    expect(args).toContain("aac_adtstoasc");
+    expect(args).not.toContain("-bsf:a");
+    expect(args).not.toContain("aac_adtstoasc");
   });
 
   it("video+audio+subtitles: writes subtitles.vtt, correct map indices", async () => {
@@ -119,7 +119,7 @@ describe("muxExec", () => {
 
     expect(ffmpeg.writeFile).toHaveBeenCalledWith(
       "subtitles.vtt",
-      expect.any(Uint8Array)
+      expect.any(Uint8Array),
     );
 
     const args = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
@@ -230,11 +230,11 @@ describe("muxExec", () => {
         outputFileName: "output.mp4",
         hasVideo: true,
         hasAudio: false,
-      })
+      }),
     ).rejects.toThrow("FFmpeg exited with code 1");
   });
 
-  it("includes -shortest only when both video and audio", async () => {
+  it("does not truncate any track with -shortest", async () => {
     await muxExec({
       ffmpeg,
       outputFileName: "output.mp4",
@@ -242,7 +242,7 @@ describe("muxExec", () => {
       hasAudio: true,
     });
     const argsVA = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(argsVA).toContain("-shortest");
+    expect(argsVA).not.toContain("-shortest");
 
     const ffmpeg2 = createMockFFmpeg();
     await muxExec({
@@ -267,7 +267,7 @@ describe("muxExec", () => {
 
   it("cleanup on exec error: deleteFile still called", async () => {
     (ffmpeg.exec as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-      new Error("exec failed")
+      new Error("exec failed"),
     );
 
     await expect(
@@ -276,7 +276,7 @@ describe("muxExec", () => {
         outputFileName: "output.mp4",
         hasVideo: true,
         hasAudio: true,
-      })
+      }),
     ).rejects.toThrow("exec failed");
 
     expect(ffmpeg.deleteFile).toHaveBeenCalledWith("video.ts");
@@ -290,7 +290,7 @@ describe("muxExec", () => {
         if (fileName === "video.ts") {
           throw new Error("delete failed");
         }
-      }
+      },
     );
 
     const result = await muxExec({
@@ -325,7 +325,7 @@ describe("muxExec", () => {
     expect(args).toContain("-c:a");
   });
 
-  it("fMP4 video with TS audio still applies aac_adtstoasc", async () => {
+  it("fMP4 video with TS audio leaves codec-specific filtering to the muxer", async () => {
     await muxExec({
       ffmpeg,
       outputFileName: "output.mp4",
@@ -338,8 +338,8 @@ describe("muxExec", () => {
     const args = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(args).toContain("video.mp4");
     expect(args).toContain("audio.ts");
-    expect(args).toContain("-bsf:a");
-    expect(args).toContain("aac_adtstoasc");
+    expect(args).not.toContain("-bsf:a");
+    expect(args).not.toContain("aac_adtstoasc");
   });
 
   it("fMP4 cleanup: deleteFile uses .mp4 filenames", async () => {
@@ -368,8 +368,8 @@ describe("muxExec", () => {
     const args = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(args).toContain("video.ts");
     expect(args).toContain("audio.ts");
-    expect(args).toContain("-bsf:a");
-    expect(args).toContain("aac_adtstoasc");
+    expect(args).not.toContain("-bsf:a");
+    expect(args).not.toContain("aac_adtstoasc");
   });
 });
 
@@ -481,7 +481,7 @@ describe("muxStreams", () => {
     expect(ffmpeg.writeFile).toHaveBeenCalledWith("audio.ts", tsAudio);
 
     const args = (ffmpeg.exec as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(args).toContain("aac_adtstoasc");
+    expect(args).not.toContain("aac_adtstoasc");
   });
 
   it("handles video-only without audioData", async () => {
@@ -497,7 +497,7 @@ describe("muxStreams", () => {
     expect(ffmpeg.writeFile).toHaveBeenCalledWith("video.ts", videoData);
     expect(ffmpeg.writeFile).not.toHaveBeenCalledWith(
       "audio.ts",
-      expect.anything()
+      expect.anything(),
     );
   });
 });

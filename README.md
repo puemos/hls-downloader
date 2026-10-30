@@ -218,6 +218,28 @@ custom Brave binary path, `E2E_HLS_URL=https://.../playlist.m3u8` to override
 the stream, or `E2E_CLEAN_DOWNLOAD=1` to delete the downloaded file after the
 run.
 
+Run the local saved-media integrity regression:
+
+```bash
+pnpm test:e2e:integrity
+```
+
+This generates real H.264 streams with unequal video/audio durations, separate
+AAC/AC-3/E-AC-3/MP3 audio, and byte-range fMP4 media. It compares published
+v5.5.9 against the candidate in fresh Brave MV3 and Firefox MV2 profiles.
+The HTTP server injects truncated or wrongly positioned range responses.
+Every fixed saved file is fully decoded and compared with all source video
+frames and the complete decoded audio hash. Controls cover AAC, ignored Range
+headers, MKV output, and WebVTT captions.
+
+Requires macOS, Brave, Firefox, FFmpeg/FFprobe, and GitHub CLI. The script
+downloads its pinned geckodriver or accepts `E2E_GECKODRIVER`. Use
+`E2E_INTEGRITY_BROWSERS=brave` or `firefox`, `E2E_BASELINE_ONLY=1`,
+`E2E_SKIP_BASELINE=1`, or `E2E_INTEGRITY_CASES=short-audio,ac3,range-short`
+to narrow a run. Logs, request records, JSON results, and actual saved files
+remain in the printed temporary directory. Remove build outputs after checking
+packaging; browser profiles and processes are cleaned up automatically.
+
 Run the local playlist and encrypted-caption regression:
 
 ```bash

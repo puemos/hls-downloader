@@ -414,7 +414,6 @@ async function main() {
                 "error",
                 "-i",
                 sourceAudio,
-                ...(!test.direct && !test.subtitles ? ["-t", "8"] : []),
                 "-map",
                 "0:a:0",
                 "-f",

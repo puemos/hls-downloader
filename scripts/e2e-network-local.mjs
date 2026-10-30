@@ -425,7 +425,6 @@ async function main() {
             "error",
             "-i",
             path.join(assets, "clear/audio/playlist.m3u8"),
-            ...(!test.subtitles ? ["-t", "8"] : []),
             "-map",
             "0:a:0",
             "-f",

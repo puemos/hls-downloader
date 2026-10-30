@@ -2,9 +2,9 @@
 
 exports[`CMAF Mux Pipeline E2E (host ffmpeg) > fMP4 video + fMP4 audio → valid MP4 output 1`] = `
 {
-  "duration": "3.000000",
-  "sha256": "4f7b94a5ae9b3435abaf3fb6b76ea4b57b2c87f0f401286f38db87ae0f649547",
-  "sizeBytes": 84233,
+  "duration": "4.010667",
+  "sha256": "d18e8adb5c8a55a2a410b903c4816ff60f84de64d9b95ec6a8eb0267664f04c2",
+  "sizeBytes": 92636,
   "streams": [
     {
       "codec_name": "h264",
@@ -17,7 +17,7 @@ exports[`CMAF Mux Pipeline E2E (host ffmpeg) > fMP4 video + fMP4 audio → valid
       "channels": 2,
       "codec_name": "aac",
       "codec_type": "audio",
-      "nb_frames": "140",
+      "nb_frames": "188",
       "sample_rate": "48000",
     },
   ],
