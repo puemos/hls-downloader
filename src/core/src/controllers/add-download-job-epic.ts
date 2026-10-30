@@ -18,7 +18,7 @@ export const addDownloadJobEpic: Epic<
   RootAction,
   RootState,
   Dependencies
-> = (action$, store$, { loader, parser, fs }) =>
+> = (action$, store$, { loader, parser, fs, decryptor }) =>
   action$.pipe(
     filter(levelsSlice.actions.download.match),
     map((action) => action.payload),
@@ -42,7 +42,7 @@ export const addDownloadJobEpic: Epic<
           jobsSlice.actions.downloadFailed({
             jobId,
             message: "Unable to start download: playlist not found",
-          })
+          }),
         );
       }
 
@@ -58,7 +58,7 @@ export const addDownloadJobEpic: Epic<
                 fetchAttempts,
                 {
                   baseUri,
-                }
+                },
               ),
               audioLevel
                 ? getFragmentsDetailsFactory(loader, parser)(
@@ -66,16 +66,16 @@ export const addDownloadJobEpic: Epic<
                     fetchAttempts,
                     {
                       baseUri,
-                    }
+                    },
                   )
                 : Promise.resolve([]),
               subtitleLevel
-                ? getSubtitleTextFactory(loader, parser)(
+                ? getSubtitleTextFactory(loader, parser, decryptor)(
                     subtitleLevel,
                     fetchAttempts,
                     {
                       baseUri,
-                    }
+                    },
                   )
                 : Promise.resolve(null),
             ]);
@@ -125,12 +125,12 @@ export const addDownloadJobEpic: Epic<
               jobId,
               subtitleLevel,
               playlist,
-              subtitleText
+              subtitleText,
             );
           }
 
           return actions;
-        })()
+        })(),
       ).pipe(
         mergeMap((acts) => of(...acts)),
         catchError((error: unknown) =>
@@ -139,9 +139,9 @@ export const addDownloadJobEpic: Epic<
               jobId,
               message:
                 (error as Error)?.message ?? "Failed to prepare download",
-            })
-          )
-        )
+            }),
+          ),
+        ),
       );
-    })
+    }),
   );

@@ -142,6 +142,23 @@ async function main() {
     await waitFor("extension Capture view", async () =>
       (await evaluate("return document.body.innerText")).includes("Capture"),
     );
+    if (process.env.E2E_CAPTURE_PAGE) {
+      await command("POST", "/url", { url: process.env.E2E_CAPTURE_PAGE });
+      await waitFor("test page HLS response", async () =>
+        evaluate("return window.hlsFetchDone === true"),
+      );
+      await command("POST", "/url", {
+        url: `moz-extension://${uuid}/popup.html`,
+      });
+      await waitFor(
+        "captured HLS playlist",
+        async () =>
+          (await evaluate(
+            "return document.querySelectorAll('[data-playlist-row]').length",
+          )) > 0,
+        Number(process.env.E2E_CAPTURE_TIMEOUT_MS ?? 30000),
+      );
+    }
     if (process.env.E2E_OUTPUT_CONTAINER) {
       for (const label of ["Settings", "Capture"]) {
         const tab = await evaluate(
@@ -169,23 +186,29 @@ async function main() {
       value: 'input[placeholder="https://example.com/stream.m3u8"]',
     });
     await command("POST", `/element/${input[elementKey]}/value`, {
-      text: process.env.E2E_HLS_URL,
+      text: process.env.E2E_DIRECT_HLS_URL ?? process.env.E2E_HLS_URL,
     });
     const add = await command("POST", "/element", {
       using: "css selector",
       value: 'button[aria-label="Add playlist"]',
     });
     await command("POST", `/element/${add[elementKey]}/click`, {});
-    await waitFor("parsed video, audio, and subtitles", async () => {
-      const options = await evaluate(
-        "return [...document.querySelectorAll('select option')].map(option => option.textContent)",
-      );
-      return process.env.E2E_PRIMARY_AUDIO === "1"
-        ? options.some((text) => text.includes("0.1 mbps"))
-        : options.some((text) => text.includes("540")) &&
-            options.some((text) => text.includes("ENGLISH")) &&
-            options.some((text) => text.includes("Text"));
-    });
+    await waitFor(
+      "parsed video, audio, and subtitles",
+      async () => {
+        const options = await evaluate(
+          "return [...document.querySelectorAll('select option')].map(option => option.textContent)",
+        );
+        return process.env.E2E_DIRECT_MEDIA_PLAYLIST === "1"
+          ? options.includes("Original stream")
+          : process.env.E2E_PRIMARY_AUDIO === "1"
+            ? options.some((text) => text.includes("0.1 mbps"))
+            : options.some((text) => text.includes("540")) &&
+              options.some((text) => text.includes("ENGLISH")) &&
+              options.some((text) => text.includes("Text"));
+      },
+      Number(process.env.E2E_PARSE_TIMEOUT_MS ?? 30000),
+    );
     if (process.env.E2E_SELECT_SUBTITLES !== "0")
       await evaluate(`const select = document.querySelectorAll('select')[2];
       const option = [...select.options].find(option => option.textContent.includes('Text') && option.value);

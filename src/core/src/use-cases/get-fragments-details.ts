@@ -5,16 +5,17 @@ import { appendQueryParams } from "../utils/url";
 
 export interface GetFragmentsDetailsOptions {
   baseUri?: string;
+  supportedEncryptionMethods?: readonly string[];
 }
 
 export const getFragmentsDetailsFactory = (
   loader: ILoader,
-  parser: IParser
+  parser: IParser,
 ) => {
   const run = async (
     playlist: Level,
     fetchAttempts: number,
-    options: GetFragmentsDetailsOptions = {}
+    options: GetFragmentsDetailsOptions = {},
   ): Promise<Fragment[]> => {
     const baseUri = options.baseUri ?? playlist.playlistID ?? playlist.uri;
     const primaryPlaylistUri = appendQueryParams(baseUri, playlist.uri);
@@ -26,11 +27,24 @@ export const getFragmentsDetailsFactory = (
         primaryPlaylistUri,
         fallbackPlaylistUri,
         fetchAttempts,
-        loader.fetchText
+        loader.fetchText,
       );
+    if (options.supportedEncryptionMethods) {
+      const { methods } = parser.inspectLevelEncryption(
+        levelPlaylistText,
+        usedPlaylistUri,
+      );
+      const unsupported = methods.find(
+        (method) => !options.supportedEncryptionMethods!.includes(method),
+      );
+      if (unsupported)
+        throw new Error(
+          `Unsupported subtitle encryption method: ${unsupported}`,
+        );
+    }
     const fragments = parser.parseLevelPlaylist(
       levelPlaylistText,
-      usedPlaylistUri
+      usedPlaylistUri,
     );
 
     return fragments.map((fragment) => {
@@ -49,7 +63,7 @@ export const getFragmentsDetailsFactory = (
         primaryUri,
         fragment.index,
         fallbackUri,
-        fragment.byteRange
+        fragment.byteRange,
       );
     });
   };

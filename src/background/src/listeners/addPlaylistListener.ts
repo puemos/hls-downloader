@@ -1,5 +1,6 @@
 import { createStore } from "@hls-downloader/core/lib/store/configure-store";
 import { playlistsSlice } from "@hls-downloader/core/lib/store/slices";
+import { isHlsResponse } from "@hls-downloader/core/lib/use-cases";
 import {
   webRequest,
   tabs,
@@ -21,15 +22,12 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
       }
 
       const contentTypeHeader = details.responseHeaders?.find(
-        (h) => h.name.toLowerCase() === "content-type"
+        (h) => h.name.toLowerCase() === "content-type",
       );
 
       const contentType = contentTypeHeader?.value?.toLowerCase() || "";
 
-      if (
-        !contentType.includes("application/vnd.apple.mpegurl") &&
-        !contentType.includes("application/x-mpegurl")
-      ) {
+      if (!isHlsResponse(details.url, contentType)) {
         return;
       }
 
@@ -46,7 +44,8 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
       if (playlistExists) {
         return;
       }
-      const tab = await tabs.get(details.tabId);
+      const tab = await tabs.get(details.tabId).catch(() => null);
+      if (!tab) return;
 
       store.dispatch(
         playlistsSlice.actions.addPlaylist({
@@ -55,7 +54,7 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
           initiator: tab.url,
           pageTitle: tab.title,
           createdAt: Date.now(),
-        })
+        }),
       );
 
       const unsubscribe = store.subscribe(() => {
@@ -79,14 +78,9 @@ export function addPlaylistListener(store: ReturnType<typeof createStore>) {
       });
     },
     {
-      types: ["xmlhttprequest"],
-      urls: [
-        "http://*/*.m3u8",
-        "https://*/*.m3u8",
-        "http://*/*.m3u8?*",
-        "https://*/*.m3u8?*",
-      ],
+      types: ["xmlhttprequest", "media"],
+      urls: ["http://*/*", "https://*/*"],
     },
-    ["responseHeaders"]
+    ["responseHeaders"],
   );
 }

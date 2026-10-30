@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 5.5.9
+
+### Fixes
+
+- Accept direct media-playlist URLs without requiring a master playlist, preserving authentication parameters and stable stream identity (#245). Display an understandable quality label when resolution and bitrate metadata are absent.
+- Detect HLS by its `.m3u8`/`.m3u` path or recognized MIME type, including extensionless endpoints, `audio/mpegurl`, and servers using generic content types. Ignore unrelated responses and tabs that have already closed.
+- Decrypt AES-128 WebVTT captions before saving or muxing them. Preserve implicit/explicit IVs, key rotation, clear lead-ins, and byte ranges. Reject invalid keys and unsupported encryption instead of producing garbled captions, and keep a parent master playlist from being substituted for unavailable subtitle text.
+
+### Testing
+
+- Added 35 regressions and guard cases for direct media playlists, capture filtering, real HTTP caption retrieval, AES decryption, standalone text preparation, byte ranges, invalid keys, unsupported encryption, and failed subtitle fallbacks. All 386 automated tests pass.
+- Reproduced ten old-build failure cases in Brave MV3 and Firefox MV2. Two old MKVs report completion and retain full audio/video while containing no expected caption cues; those files are retained as evidence.
+- Verified 26 fixed saved files, including two audio-only outputs, against source video frames, decoded audio hashes, filenames, containers, and subtitle text/timing. Added `pnpm test:e2e:playlists` for repeatable local verification.
+- Workspace typechecking, the security gate, and all six archive checks pass. Firefox lint reports zero errors and six existing warnings.
+
 ## 5.5.8
 
 ### Fixes

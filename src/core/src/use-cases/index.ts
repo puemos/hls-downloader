@@ -3,6 +3,7 @@ export * from "./decrypt-single-fragment";
 export * from "./download-single-fragment";
 export * from "./get-fragments-details";
 export * from "./get-levels";
+export * from "./is-hls-response";
 export * from "./prepare-download-bucket";
 export * from "./write-to-bucket";
 export * from "./write-to-file";

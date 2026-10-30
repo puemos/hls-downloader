@@ -549,7 +549,7 @@ async function writeDownloadPreferences(userDataDir, downloadDir) {
   );
 }
 
-async function parsedPlaylistDetail(cdp, sessionId) {
+async function parsedPlaylistDetail(cdp, sessionId, directMedia = false) {
   const value = await evaluate(
     cdp,
     sessionId,
@@ -564,6 +564,7 @@ async function parsedPlaylistDetail(cdp, sessionId) {
   const text = String(value?.text ?? "");
   const textLower = text.toLocaleLowerCase();
   const options = value?.videoOptions ?? [];
+  if (directMedia && options.includes("Original stream")) return value;
   if (
     textLower.includes("estimate") &&
     textLower.includes("video") &&
@@ -621,7 +622,8 @@ async function main() {
       `Missing extension build at ${extensionDir}`,
     );
     const sniffUrl = withQuery(hlsUrl, "sniff");
-    const directUrl = withQuery(hlsUrl, "direct");
+    const directUrl =
+      process.env.E2E_DIRECT_HLS_URL ?? withQuery(hlsUrl, "direct");
     triggerServer = await createTriggerServer(sniffUrl);
     const triggerPort = triggerServer.address().port;
     const testUrl = `http://${process.env.E2E_PAGE_HOST ?? "127.0.0.1"}:${triggerPort}/`;
@@ -741,7 +743,9 @@ async function main() {
         throw new Error(value.error);
       }
       assert(
-        String(value.status).startsWith("200:application/vnd.apple.mpegurl"),
+        String(value.status).startsWith(
+          `200:${process.env.E2E_HLS_MIME ?? "application/vnd.apple.mpegurl"}`,
+        ),
         `Unexpected HLS XHR status ${value.status}`,
       );
       assert(
@@ -809,7 +813,10 @@ async function main() {
         }
         return null;
       },
-      { timeoutMs: 30000, intervalMs: 250 },
+      {
+        timeoutMs: Number(process.env.E2E_CAPTURE_TIMEOUT_MS ?? 30000),
+        intervalMs: 250,
+      },
     );
 
     await clickButtonByAriaLabel(
@@ -900,15 +907,24 @@ async function main() {
     await clickButtonByAriaLabel(cdp, popupSession.sessionId, "Add playlist");
     const directDetail = await waitFor(
       "parsed direct playlist detail with subtitles",
-      () => parsedPlaylistDetail(cdp, popupSession.sessionId),
-      { timeoutMs: 20000, intervalMs: 250 },
+      () =>
+        parsedPlaylistDetail(
+          cdp,
+          popupSession.sessionId,
+          process.env.E2E_DIRECT_MEDIA_PLAYLIST === "1",
+        ),
+      {
+        timeoutMs: Number(process.env.E2E_PARSE_TIMEOUT_MS ?? 20000),
+        intervalMs: 250,
+      },
     );
-    await selectOption(
-      cdp,
-      popupSession.sessionId,
-      0,
-      primaryAudio ? "0.1 mbps" : "540",
-    );
+    if (process.env.E2E_DIRECT_MEDIA_PLAYLIST !== "1")
+      await selectOption(
+        cdp,
+        popupSession.sessionId,
+        0,
+        primaryAudio ? "0.1 mbps" : "540",
+      );
     if (selectSubtitles)
       await selectOption(cdp, popupSession.sessionId, 2, "Text");
     await waitFor(

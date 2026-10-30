@@ -11,7 +11,7 @@ export const downloadSubtitleEpic: Epic<
   RootAction,
   RootState,
   Dependencies
-> = (action$, store$, { loader, parser, fs }) =>
+> = (action$, store$, { loader, parser, fs, decryptor }) =>
   action$.pipe(
     filter(subtitlesSlice.actions.download.match),
     mergeMap(({ payload: { levelID, playlistID } }) => {
@@ -22,37 +22,37 @@ export const downloadSubtitleEpic: Epic<
           subtitlesSlice.actions.downloadFailed({
             levelID,
             message: "Subtitle track not found",
-          })
+          }),
         );
       }
       const baseUri = level.playlistID;
       return from(
-        downloadSubtitleTrackFactory(loader, parser, fs)(
+        downloadSubtitleTrackFactory(loader, parser, fs, decryptor)(
           level,
           playlist,
           store$.value.config.fetchAttempts,
           store$.value.config.saveDialog,
           {
             baseUri,
-          }
-        )
+          },
+        ),
       ).pipe(
         mergeMap((filename) =>
           of(
             subtitlesSlice.actions.downloadSuccess({
               levelID,
               filename,
-            })
-          )
+            }),
+          ),
         ),
         catchError((error: unknown) =>
           of(
             subtitlesSlice.actions.downloadFailed({
               levelID,
               message: (error as Error)?.message ?? "Subtitle download failed",
-            })
-          )
-        )
+            }),
+          ),
+        ),
       );
-    })
+    }),
   );

@@ -269,7 +269,7 @@ const PlaylistView = ({
                         const details = getVideoDetails(item);
                         return (
                           <option key={item.id} value={item.id}>
-                            {details || item.id}
+                            {details || item.name || item.id}
                           </option>
                         );
                       })}

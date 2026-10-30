@@ -218,6 +218,28 @@ custom Brave binary path, `E2E_HLS_URL=https://.../playlist.m3u8` to override
 the stream, or `E2E_CLEAN_DOWNLOAD=1` to delete the downloaded file after the
 run.
 
+Run the local playlist and encrypted-caption regression:
+
+```bash
+pnpm test:e2e:playlists
+```
+
+This installs published v5.5.8 builds and the candidate in fresh Brave MV3 and
+Firefox MV2 profiles. It tests actual capture of extensionless, `.m3u`, and
+unusually typed HLS responses; direct TS/fMP4/audio-only media playlists; and
+AES-128 WebVTT captions with implicit/explicit IVs, key rotation, clear lead-ins,
+and byte ranges. The old caption failure is detected by inspecting the saved
+file even when the extension reports completion. Fixed files are fully decoded
+and compared with source frames, audio hashes, and caption text/timing.
+
+Requires macOS, Brave, Firefox, FFmpeg/FFprobe, and GitHub CLI. The script
+downloads its pinned geckodriver or accepts `E2E_GECKODRIVER`. Use
+`E2E_PLAYLIST_BROWSERS=brave` or `firefox`, `E2E_BASELINE_ONLY=1`, or
+`E2E_PLAYLIST_CASES=direct-ts,captions-rotation` to narrow a run.
+Logs, JSON results, and saved media remain in the printed temporary directory.
+Profiles and processes are cleaned up; remove generated build outputs after
+verification.
+
 Run the local network and job recovery regression:
 
 ```bash
