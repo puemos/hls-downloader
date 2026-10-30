@@ -97,7 +97,6 @@ beforeAll(async () => {
       ),
     );
   }
-  let directReads = 0;
   assets.set(
     "/parent/master.m3u8",
     Buffer.from("#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1000\nvideo.m3u8\n"),
@@ -106,8 +105,8 @@ beforeAll(async () => {
     const url = new URL(request.url!, "http://localhost");
     requests.push(url.pathname + url.search);
     if (url.pathname === "/direct.vtt") {
-      response.writeHead(directReads++ === 0 ? 200 : 403);
-      response.end(parts[0]);
+      response.writeHead(403);
+      response.end("Expired caption URL");
       return;
     }
     let body = assets.get(url.pathname);

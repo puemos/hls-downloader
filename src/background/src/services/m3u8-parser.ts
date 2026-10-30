@@ -30,7 +30,8 @@ export const M3u8Parser: IParser = {
     const segments = parser.manifest.segments;
     const fragments: Fragment[] = [];
     // Read the decimal text directly to preserve the full 64-bit sequence number.
-    const sequence = string.match(/^#EXT-X-MEDIA-SEQUENCE:(\d+)\r?$/m)?.[1] ?? "0";
+    const sequence =
+      string.match(/^#EXT-X-MEDIA-SEQUENCE:(\d+)\r?$/m)?.[1] ?? "0";
     const mediaSequence = BigInt(sequence);
 
     let index = 0;
@@ -99,7 +100,11 @@ export const M3u8Parser: IParser = {
 
     return fragments;
   },
-  parseMasterPlaylist(manifestText: string, baseurl: string): Level[] {
+  parseMasterPlaylist(
+    manifestText: string,
+    baseurl: string,
+    playlistID = baseurl,
+  ): Level[] {
     const parser = new Parser();
     parser.push(manifestText);
     parser.end();
@@ -165,7 +170,7 @@ export const M3u8Parser: IParser = {
     const results: Level[] = playlists.map((playlist) => ({
       type: "stream",
       id: v4(),
-      playlistID: baseurl,
+      playlistID,
       uri: buildAbsoluteURL(baseurl, playlist.uri),
       bitrate: playlist.attributes.BANDWIDTH,
       fps: playlist.attributes["FRAME-RATE"],
@@ -184,8 +189,8 @@ export const M3u8Parser: IParser = {
           return [
             {
               type: "audio",
-              id: generateTrackId(baseurl, "audio", key, label),
-              playlistID: baseurl,
+              id: generateTrackId(playlistID, "audio", key, label),
+              playlistID,
               uri: buildAbsoluteURL(baseurl, entry.uri),
               bitrate: undefined,
               fps: undefined,
@@ -215,8 +220,8 @@ export const M3u8Parser: IParser = {
           return [
             {
               type: "subtitle",
-              id: generateTrackId(baseurl, "subtitle", groupId, label),
-              playlistID: baseurl,
+              id: generateTrackId(playlistID, "subtitle", groupId, label),
+              playlistID,
               uri: buildAbsoluteURL(baseurl, entry.uri),
               language: entry.language,
               name: label,
@@ -234,30 +239,28 @@ export const M3u8Parser: IParser = {
 
     const closedCaptionResults: Level[] = Object.entries(
       closedCaptions,
-    ).flatMap(
-      ([groupId, entries]) => {
-        return Object.entries(entries).flatMap(([label, entry]) => {
-          if (!entry.uri) {
-            return [];
-          }
-          return [
-            {
-              type: "subtitle",
-              id: generateTrackId(baseurl, "closed-caption", groupId, label),
-              playlistID: baseurl,
-              uri: buildAbsoluteURL(baseurl, entry.uri),
-              language: entry.language,
-              name: label,
-              characteristics: entry.characteristics,
-              instreamId: entry.instreamId,
-              isDefault: entry.default,
-              autoSelect: entry.autoselect,
-              groupId,
-            },
-          ];
-        });
-      },
-    );
+    ).flatMap(([groupId, entries]) => {
+      return Object.entries(entries).flatMap(([label, entry]) => {
+        if (!entry.uri) {
+          return [];
+        }
+        return [
+          {
+            type: "subtitle",
+            id: generateTrackId(playlistID, "closed-caption", groupId, label),
+            playlistID,
+            uri: buildAbsoluteURL(baseurl, entry.uri),
+            language: entry.language,
+            name: label,
+            characteristics: entry.characteristics,
+            instreamId: entry.instreamId,
+            isDefault: entry.default,
+            autoSelect: entry.autoselect,
+            groupId,
+          },
+        ];
+      });
+    });
 
     return [
       ...results,
@@ -303,7 +306,7 @@ export const M3u8Parser: IParser = {
               : new Uint8Array(
                   key.iv.buffer,
                   key.iv.byteOffset,
-                  key.iv.byteLength
+                  key.iv.byteLength,
                 );
           iv = `0x${Array.from(view as Uint8Array)
             .map((byte) => byte.toString(16).padStart(2, "0"))
@@ -323,7 +326,7 @@ export const M3u8Parser: IParser = {
     (Array.isArray(sessionKeys) ? sessionKeys : [sessionKeys]).forEach(
       (key: any) => {
         collectKey(key);
-      }
+      },
     );
 
     return {

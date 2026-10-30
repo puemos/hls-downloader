@@ -66,7 +66,7 @@ function retryAfter(response: Response): number {
 async function fetchResponse<Data>(
   url: string,
   request: RequestInit | undefined,
-  read: (response: Response) => Promise<Data>,
+  read: (response: Response, responseURI: string) => Promise<Data>,
   signal?: AbortSignal,
 ): Promise<Data> {
   signal?.throwIfAborted();
@@ -113,7 +113,7 @@ async function fetchResponse<Data>(
           },
         )
       : response;
-    return await read(monitored);
+    return await read(monitored, response.url || url);
   } finally {
     clearTimeout(timer!);
     signal?.removeEventListener("abort", abort);
@@ -173,14 +173,33 @@ async function fetchWithRetry<Data>(
   throw new Error("Fetch error");
 }
 
+export async function fetchTextResponse(
+  url: string,
+  attempts: number = 1,
+  signal?: AbortSignal,
+): Promise<{ text: string; uri: string }> {
+  return fetchWithRetry(
+    () =>
+      fetchResponse(
+        url,
+        undefined,
+        async (response, uri) => ({
+          text: await response.text(),
+          uri,
+        }),
+        signal,
+      ),
+    attempts,
+    signal,
+  );
+}
+
 export async function fetchText(
   url: string,
   attempts: number = 1,
   signal?: AbortSignal,
 ) {
-  const fetchFn: FetchFn<string> = () =>
-    fetchResponse(url, undefined, (response) => response.text(), signal);
-  return fetchWithRetry(fetchFn, attempts, signal);
+  return (await fetchTextResponse(url, attempts, signal)).text;
 }
 
 export async function fetchArrayBuffer(
@@ -223,5 +242,6 @@ export async function fetchArrayBuffer(
 }
 export const FetchLoader = {
   fetchText,
+  fetchTextResponse,
   fetchArrayBuffer,
 };

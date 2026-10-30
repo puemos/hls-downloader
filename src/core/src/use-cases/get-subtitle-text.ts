@@ -1,7 +1,7 @@
 import { Level } from "../entities";
 import { IDecryptor, ILoader, IParser } from "../services";
-import { getFragmentsDetailsFactory } from "./get-fragments-details";
-import { appendQueryParams } from "../utils/url";
+import { parseFragmentsDetails } from "./get-fragments-details";
+import { getPlaylistDocumentFactory } from "./get-playlist-document";
 import { fetchWithFallback } from "../utils/fetch";
 import { downloadSingleFactory } from "./download-single-fragment";
 import { decryptSingleFragmentFactory } from "./decrypt-single-fragment";
@@ -16,15 +16,17 @@ export const getSubtitleTextFactory = (
     fetchAttempts: number,
     options: { baseUri?: string } = {},
   ): Promise<string> => {
-    const baseUri = options.baseUri ?? level.playlistID ?? level.uri;
-    const fragments = await getFragmentsDetailsFactory(loader, parser)(
+    const document = await getPlaylistDocumentFactory(loader)(
       level,
       fetchAttempts,
-      {
-        baseUri,
-        supportedEncryptionMethods: ["AES-128"],
-      },
+      options,
     );
+    // Direct WebVTT has already been fetched. Repeating that request can expire
+    // signed or single-use caption URLs even though the first response was valid.
+    if (/^\uFEFF?WEBVTT(?:[ \t].*)?(?:\r?\n|$)/.test(document.text)) {
+      return document.text.trim();
+    }
+    const fragments = parseFragmentsDetails(document, parser, ["AES-128"]);
 
     const parts: string[] = [];
 
@@ -59,15 +61,7 @@ export const getSubtitleTextFactory = (
         parts.push(fragmentText.trim());
       }
     } else {
-      const primaryUri = appendQueryParams(baseUri, level.uri);
-      const fallbackUri = primaryUri !== level.uri ? level.uri : null;
-      const { data: text } = await fetchWithFallback(
-        primaryUri,
-        fallbackUri,
-        fetchAttempts,
-        loader.fetchText,
-      );
-      parts.push(text.trim());
+      parts.push(document.text.trim());
     }
 
     return parts.join("\n\n");

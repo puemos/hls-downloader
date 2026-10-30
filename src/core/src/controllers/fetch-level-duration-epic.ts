@@ -5,6 +5,7 @@ import { RootAction, RootState } from "../store/root-reducer";
 import { levelsSlice } from "../store/slices/levels-slice";
 import { Dependencies } from "../services";
 import { getPlaylistDurationFactory } from "../use-cases";
+import { appendQueryParams } from "../utils/url";
 
 export const fetchLevelDurationEpic: Epic<
   RootAction,
@@ -21,7 +22,9 @@ export const fetchLevelDurationEpic: Epic<
         return EMPTY;
       }
       const toFetch = addedLevels.filter(
-        (level) => state$.value.levels.durations[level.id] === undefined
+        (level) =>
+          level.type !== "subtitle" &&
+          state$.value.levels.durations[level.id] === undefined,
       );
       if (!toFetch.length) {
         return EMPTY;
@@ -30,26 +33,32 @@ export const fetchLevelDurationEpic: Epic<
       return from(toFetch).pipe(
         mergeMap(
           (level) =>
-            from(run(level.uri, null, fetchAttempts)).pipe(
+            from(
+              run(
+                appendQueryParams(level.baseUri ?? level.playlistID, level.uri),
+                level.uri,
+                fetchAttempts,
+              ),
+            ).pipe(
               mergeMap((durationSec) =>
                 of(
                   levelsSlice.actions.setDuration({
                     levelId: level.id,
                     durationSec,
-                  })
-                )
+                  }),
+                ),
               ),
               catchError(() =>
                 of(
                   levelsSlice.actions.setDuration({
                     levelId: level.id,
                     durationSec: null,
-                  })
-                )
-              )
+                  }),
+                ),
+              ),
             ),
-          4
-        )
+          4,
+        ),
       );
-    })
+    }),
   );

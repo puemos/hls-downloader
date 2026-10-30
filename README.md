@@ -218,6 +218,29 @@ custom Brave binary path, `E2E_HLS_URL=https://.../playlist.m3u8` to override
 the stream, or `E2E_CLEAN_DOWNLOAD=1` to delete the downloaded file after the
 run.
 
+Run the local redirected-playlist and single-use caption regression:
+
+```bash
+pnpm test:e2e:redirects
+```
+
+This compares published v5.5.10 with the candidate in fresh Brave MV3 and
+Firefox MV2 profiles. Two local HTTP servers serve real H.264/AAC streams with
+master and media-playlist redirects, redirect chains, cross-origin redirects,
+replaced authentication tokens, AES-128 TS/fMP4 inputs, initialization maps,
+and byte-range media. Caption cases include redirected HLS playlists and direct
+WebVTT URLs that expire after one read. Controls cover ordinary TS/fMP4,
+encryption, captions, and MKV output.
+
+Every fixed saved file is fully decoded and checked against all source video
+frames, the complete audio hash, and caption text and timing. Requires macOS,
+Brave, Firefox, FFmpeg/FFprobe, and GitHub CLI. The script downloads its pinned
+geckodriver or accepts `E2E_GECKODRIVER`. Use `E2E_REDIRECT_BROWSERS=brave` or
+`firefox`, `E2E_BASELINE_ONLY=1`, `E2E_SKIP_BASELINE=1`, or
+`E2E_REDIRECT_CASES=master-302,encrypted-fmp4,caption-once` to narrow a run.
+Logs, request records, JSON results, and actual saved files remain in the
+printed temporary directory. Remove generated build outputs after verification.
+
 Run the local saved-media integrity regression:
 
 ```bash

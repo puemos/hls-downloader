@@ -7,7 +7,11 @@ export interface ParsedEncryption {
 }
 
 export interface IParser {
-  parseMasterPlaylist(string: string, baseurl: string): Level[];
+  parseMasterPlaylist(
+    string: string,
+    baseurl: string,
+    playlistID?: string,
+  ): Level[];
   parseLevelPlaylist(string: string, baseurl: string): Fragment[];
   inspectLevelEncryption(string: string, baseurl: string): ParsedEncryption;
 }

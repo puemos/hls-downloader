@@ -19,6 +19,8 @@ export class Level {
     readonly autoSelect?: boolean,
     readonly forced?: boolean,
     readonly groupId?: string,
-    readonly audioGroupId?: string
+    readonly audioGroupId?: string,
+    // The final master URL supplies descendant query parameters after redirects.
+    readonly baseUri?: string,
   ) {}
 }

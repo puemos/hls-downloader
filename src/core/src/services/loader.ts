@@ -1,4 +1,14 @@
+export interface LoadedText {
+  text: string;
+  uri: string;
+}
+
 export interface ILoader {
+  fetchTextResponse?(
+    url: string,
+    attempts?: number,
+    signal?: AbortSignal,
+  ): Promise<LoadedText>;
   fetchText(
     url: string,
     attempts?: number,

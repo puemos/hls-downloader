@@ -148,8 +148,7 @@ describe("use-cases", () => {
     const loader: ILoader = {
       fetchText: vi
         .fn()
-        .mockResolvedValueOnce("#EXTM3U")
-        .mockResolvedValueOnce(" WEBVTT\n\n00:00.000 --> 00:01.000\nHello "),
+        .mockResolvedValue("WEBVTT\n\n00:00.000 --> 00:01.000\nHello "),
       fetchArrayBuffer: vi.fn(),
     };
     const parser: IParser = {
