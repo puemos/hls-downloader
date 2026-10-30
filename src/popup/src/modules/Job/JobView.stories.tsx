@@ -59,6 +59,7 @@ export const Init: Story = {
       deleteJob={() => {}}
       cancelJob={() => {}}
       saveAsJob={() => {}}
+      renameJob={() => {}}
       expanded={false}
       onToggle={() => {}}
     />
@@ -75,6 +76,7 @@ export const Queued: Story = {
       deleteJob={() => {}}
       cancelJob={() => {}}
       saveAsJob={() => {}}
+      renameJob={() => {}}
       expanded={false}
       onToggle={() => {}}
     />
@@ -91,6 +93,7 @@ export const Downloading: Story = {
       deleteJob={() => {}}
       cancelJob={() => {}}
       saveAsJob={() => {}}
+      renameJob={() => {}}
       expanded={true}
       onToggle={() => {}}
     />
@@ -119,6 +122,7 @@ export const Saving: Story = {
       deleteJob={() => {}}
       cancelJob={() => {}}
       saveAsJob={() => {}}
+      renameJob={() => {}}
       expanded={true}
       onToggle={() => {}}
     />
@@ -135,6 +139,7 @@ export const Done: Story = {
       deleteJob={() => {}}
       cancelJob={() => {}}
       saveAsJob={() => {}}
+      renameJob={() => {}}
       expanded={false}
       onToggle={() => {}}
     />
@@ -159,6 +164,7 @@ export const SavingDetail: Story = {
         deleteJob={() => {}}
         cancelJob={() => {}}
         saveAsJob={() => {}}
+        renameJob={() => {}}
         expanded
         detail
         onToggle={() => {}}
@@ -184,6 +190,7 @@ export const ReadyDetail: Story = {
         deleteJob={() => {}}
         cancelJob={() => {}}
         saveAsJob={() => {}}
+        renameJob={() => {}}
         expanded
         detail
         onToggle={() => {}}
@@ -209,6 +216,7 @@ export const ErrorDetail: Story = {
         deleteJob={() => {}}
         cancelJob={() => {}}
         saveAsJob={() => {}}
+        renameJob={() => {}}
         expanded
         detail
         onToggle={() => {}}

@@ -12,6 +12,7 @@ export * from "./generate-subtitle-file-name";
 export * from "./generate-track-id";
 export * from "./generate-sequence-iv";
 export * from "./sanitize-filename";
+export * from "./rename-job-filename";
 export * from "./delete-bucket";
 export * from "./fs-cleanup";
 export * from "./download-subtitle-track";

@@ -5,6 +5,7 @@ import {
   CaseReducer,
 } from "@reduxjs/toolkit";
 import { Job, JobStatus } from "../../entities";
+import { renameJobFilename } from "../../use-cases/rename-job-filename";
 
 export interface IJobsState {
   jobs: Record<string, Job | null>;
@@ -36,6 +37,10 @@ export interface ISaveAsJobPayload {
 }
 export interface ISaveAsJobSuccessPayload {
   jobId: string;
+}
+export interface IRenameJobPayload {
+  jobId: string;
+  filename: string;
 }
 export interface ISetSaveProgressPayload {
   jobId: string;
@@ -72,6 +77,7 @@ interface IJobsReducers {
     IJobsState,
     PayloadAction<ISetSaveProgressPayload>
   >;
+  rename: CaseReducer<IJobsState, PayloadAction<IRenameJobPayload>>;
   [key: string]: CaseReducer<IJobsState, PayloadAction<any>>;
 }
 
@@ -194,6 +200,19 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
       if (!jobStatus) return;
       jobStatus.saveProgress = progress;
       jobStatus.saveMessage = message;
+    },
+    rename(state, action: PayloadAction<IRenameJobPayload>) {
+      const { jobId, filename } = action.payload;
+      const job = state.jobs[jobId];
+      // The save in progress already read the old name.
+      if (!job || state.jobsStatus[jobId]?.status === "saving") return;
+      const renamed = renameJobFilename(
+        job.filename,
+        filename,
+        job.outputContainer,
+      );
+      if (!renamed) return;
+      state.jobs[jobId] = { ...job, filename: renamed };
     },
   },
 });

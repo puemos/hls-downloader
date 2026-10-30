@@ -385,4 +385,71 @@ describe("jobs slice", () => {
       expect(nextState).toEqual(initialState);
     });
   });
+
+  describe("rename action", () => {
+    const stateWith = (
+      filename: string,
+      status: Parameters<typeof createTestJobStatus>[0]["status"] = "ready",
+    ) => ({
+      jobs: { job1: createTestJob({ id: "job1", filename }) },
+      jobsStatus: { job1: createTestJobStatus({ status }) },
+    });
+
+    it("should use the new name and keep the container extension", () => {
+      const nextState = jobsSlice.reducer(
+        stateWith("Watch Show Free HD-index.mp4"),
+        jobsSlice.actions.rename({ jobId: "job1", filename: "Show S01E02" }),
+      );
+
+      expect(nextState.jobs["job1"]?.filename).toBe("Show S01E02.mp4");
+    });
+
+    it("should not double the extension when the user types it", () => {
+      const nextState = jobsSlice.reducer(
+        stateWith("episode-index.mkv"),
+        jobsSlice.actions.rename({ jobId: "job1", filename: "Episode 3.MKV" }),
+      );
+
+      expect(nextState.jobs["job1"]?.filename).toBe("Episode 3.mkv");
+    });
+
+    it("should sanitize characters browsers reject", () => {
+      const nextState = jobsSlice.reducer(
+        stateWith("video.mp4"),
+        jobsSlice.actions.rename({ jobId: "job1", filename: ' a/b: "c" ' }),
+      );
+
+      expect(nextState.jobs["job1"]?.filename).toBe("a_b_ _c_.mp4");
+    });
+
+    it("should ignore a name that is empty after sanitizing", () => {
+      const initialState = stateWith("video.mp4");
+      const nextState = jobsSlice.reducer(
+        initialState,
+        jobsSlice.actions.rename({ jobId: "job1", filename: "  ..  " }),
+      );
+
+      expect(nextState).toEqual(initialState);
+    });
+
+    it("should not rename while the job is being saved", () => {
+      const initialState = stateWith("video.mp4", "saving");
+      const nextState = jobsSlice.reducer(
+        initialState,
+        jobsSlice.actions.rename({ jobId: "job1", filename: "new name" }),
+      );
+
+      expect(nextState).toEqual(initialState);
+    });
+
+    it("should ignore unknown jobs", () => {
+      const initialState = stateWith("video.mp4");
+      const nextState = jobsSlice.reducer(
+        initialState,
+        jobsSlice.actions.rename({ jobId: "missing", filename: "new name" }),
+      );
+
+      expect(nextState).toEqual(initialState);
+    });
+  });
 });
