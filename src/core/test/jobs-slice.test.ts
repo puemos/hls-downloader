@@ -442,6 +442,28 @@ describe("jobs slice", () => {
       expect(nextState).toEqual(initialState);
     });
 
+    it("should keep a rename made while the job is being prepared", () => {
+      const job = createTestJob({ id: "job1", filename: "page-index.mp4" });
+      const preparing = {
+        jobs: { job1: job },
+        jobsStatus: {
+          job1: { status: "preparing" as const, total: 0, done: 0 },
+        },
+      };
+
+      const renamed = jobsSlice.reducer(
+        preparing,
+        jobsSlice.actions.rename({ jobId: "job1", filename: "Episode 5" }),
+      );
+      const prepared = jobsSlice.reducer(
+        renamed,
+        jobsSlice.actions.prepared({ job }),
+      );
+
+      expect(prepared.jobs["job1"]?.filename).toBe("Episode 5.mp4");
+      expect(prepared.jobsStatus["job1"]?.status).toBe("downloading");
+    });
+
     it("should ignore unknown jobs", () => {
       const initialState = stateWith("video.mp4");
       const nextState = jobsSlice.reducer(

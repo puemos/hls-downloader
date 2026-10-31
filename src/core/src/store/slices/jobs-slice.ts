@@ -126,12 +126,11 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
     },
     prepared(state, action: PayloadAction<IAddJobPayload>) {
       const { job } = action.payload;
-      if (
-        !state.jobs[job.id] ||
-        state.jobsStatus[job.id]?.status !== "preparing"
-      )
-        return;
-      state.jobs[job.id] = job;
+      const current = state.jobs[job.id];
+      if (!current || state.jobsStatus[job.id]?.status !== "preparing") return;
+      // The prepared job was built from the job as it was when preparation
+      // started, so keep a name the user changed in the meantime.
+      state.jobs[job.id] = { ...job, filename: current.filename };
       state.jobsStatus[job.id] = {
         status: "downloading",
         total: job.videoFragments.length + job.audioFragments.length,
