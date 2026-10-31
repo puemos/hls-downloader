@@ -13,6 +13,8 @@ import type { BulkDownloads } from "./useBulkDownloads";
 
 export default function BulkDownloadSheet({ bulk }: { bulk: BulkDownloads }) {
   const qualityRef = useRef<HTMLSelectElement>(null);
+  const modeRef = useRef(bulk.mode);
+  modeRef.current = bulk.mode;
   useEffect(() => {
     if (bulk.mode !== "review") return;
     const previousFocus = document.activeElement as HTMLElement | null;
@@ -40,7 +42,9 @@ export default function BulkDownloadSheet({ bulk }: { bulk: BulkDownloads }) {
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("keydown", onKeyDown);
-      if (previousFocus?.isConnected) previousFocus.focus();
+      // Restoring a tab's focus after queueing can activate Capture again.
+      if (modeRef.current === "selecting" && previousFocus?.isConnected)
+        previousFocus.focus();
     };
   }, [bulk.mode]);
   return (

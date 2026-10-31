@@ -13,6 +13,14 @@ import {
   levelInspectionsSlice,
 } from "@hls-downloader/core/lib/store/slices";
 import type { Level } from "@hls-downloader/core/lib/entities";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@hls-downloader/design-system";
+import { RouterContext } from "../Navbar/RouterContext";
+import { TabOptions } from "../Navbar/types";
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -41,7 +49,25 @@ afterEach(() => {
   }
 });
 
-function renderSniffer() {
+function TestNavigation({ children }: { children: React.ReactNode }) {
+  const [tab, setTab] = React.useState(TabOptions.SNIFTER);
+  return (
+    <RouterContext.Provider
+      value={{ tab, setTab: (value) => setTab(value as TabOptions) }}
+    >
+      <Tabs value={tab} onValueChange={(value) => setTab(value as TabOptions)}>
+        <TabsContent value={TabOptions.SNIFTER}>{children}</TabsContent>
+        <TabsContent value={TabOptions.DOWNLOADS}>Queued downloads</TabsContent>
+        <TabsList>
+          <TabsTrigger value={TabOptions.SNIFTER}>Capture</TabsTrigger>
+          <TabsTrigger value={TabOptions.DOWNLOADS}>Downloads</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    </RouterContext.Provider>
+  );
+}
+
+function renderSniffer(withNavigation = false) {
   const actions: any[] = [];
   const recordActions: Middleware = () => (next) => (action) => {
     actions.push(action);
@@ -82,7 +108,13 @@ function renderSniffer() {
   act(() => {
     root.render(
       <Provider store={store}>
-        <SnifferModule />
+        {withNavigation ? (
+          <TestNavigation>
+            <SnifferModule />
+          </TestNavigation>
+        ) : (
+          <SnifferModule />
+        )}
       </Provider>,
     );
   });
@@ -166,6 +198,35 @@ function changeInput(element: HTMLInputElement, value: string) {
 }
 
 describe("SnifferModule", () => {
+  it("stays on Downloads after queueing when Capture had focus before review", async () => {
+    const { container, store, actions } = renderSniffer(true);
+    addTracks(store);
+    act(() => button(container, "Capture").focus());
+    click(button(container, "Select"));
+    click(button(container, "Select visible"));
+    click(button(container, "Review 2 streams"));
+    await act(async () => {
+      await new Promise(requestAnimationFrame);
+    });
+    expect(document.activeElement?.getAttribute("aria-label")).toBe(
+      "Bulk video quality",
+    );
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    });
+    expect(document.activeElement).toBe(button(container, "Capture"));
+    click(button(container, "Review 2 streams"));
+    await act(async () => {
+      await new Promise(requestAnimationFrame);
+    });
+    click(button(container, "Queue 2 downloads"));
+    expect(actions.filter(levelsSlice.actions.download.match)).toHaveLength(2);
+    expect(
+      container.querySelector('[role="tab"][data-state="active"]')?.textContent,
+    ).toBe("Downloads");
+    expect(container.textContent).toContain("Queued downloads");
+  });
+
   it("selects only visible streams and preserves selection across filters", () => {
     const { container } = renderSniffer();
     click(button(container, "Select"));
