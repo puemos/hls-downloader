@@ -42,6 +42,7 @@ interface ReturnType {
   deleteJob: () => void;
   cancelJob: () => void;
   saveAsJob: () => void;
+  renameJob: (filename: string) => void;
 }
 
 const useJobController = ({ id }: { id: string }): ReturnType => {
@@ -72,6 +73,9 @@ const useJobController = ({ id }: { id: string }): ReturnType => {
   function saveAsJob() {
     dispatch(jobsSlice.actions.saveAs({ jobId: id }));
   }
+  function renameJob(filename: string) {
+    dispatch(jobsSlice.actions.rename({ jobId: id, filename }));
+  }
   return {
     status,
     job,
@@ -81,6 +85,7 @@ const useJobController = ({ id }: { id: string }): ReturnType => {
     deleteJob,
     cancelJob,
     saveAsJob,
+    renameJob,
   };
 };
 
