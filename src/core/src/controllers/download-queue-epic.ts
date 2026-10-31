@@ -32,10 +32,11 @@ export const downloadQueueEpic: Epic<
         .sort(
           (a, b) =>
             (jobs[a]?.createdAt ?? Number.MAX_SAFE_INTEGER) -
-            (jobs[b]?.createdAt ?? Number.MAX_SAFE_INTEGER)
+            (jobs[b]?.createdAt ?? Number.MAX_SAFE_INTEGER),
         );
       const activeCount = Object.values(jobsStatus).filter(
-        (status) => status?.status === "downloading"
+        (status) =>
+          status?.status === "downloading" || status?.status === "preparing",
       ).length;
       const available =
         limit <= 0 ? queued.length : Math.max(0, limit - activeCount);
@@ -45,8 +46,8 @@ export const downloadQueueEpic: Epic<
       const toStart = queued.slice(0, available).map((jobId) =>
         jobsSlice.actions.download({
           jobId,
-        })
+        }),
       );
       return toStart.length ? of(...toStart) : EMPTY;
-    })
+    }),
   );

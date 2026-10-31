@@ -47,6 +47,7 @@ interface IJobsReducers {
   download: CaseReducer<IJobsState, PayloadAction<IDownloadJobPayload>>;
   clear: CaseReducer<IJobsState>;
   add: CaseReducer<IJobsState, PayloadAction<IAddJobPayload>>;
+  prepared: CaseReducer<IJobsState, PayloadAction<IAddJobPayload>>;
   queue: CaseReducer<IJobsState, PayloadAction<IDownloadJobPayload>>;
   cancel: CaseReducer<IJobsState, PayloadAction<IDeleteJobPayload>>;
   delete: CaseReducer<IJobsState, PayloadAction<IDeleteJobPayload>>;
@@ -95,7 +96,7 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
         ...(state.jobsStatus[jobId] ?? {
           total,
         }),
-        status: "downloading",
+        status: job.source ? "preparing" : "downloading",
         total,
         done: 0,
         saveProgress: 0,
@@ -117,12 +118,33 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
         saveProgress: 0,
       };
     },
+    prepared(state, action: PayloadAction<IAddJobPayload>) {
+      const { job } = action.payload;
+      if (
+        !state.jobs[job.id] ||
+        state.jobsStatus[job.id]?.status !== "preparing"
+      )
+        return;
+      state.jobs[job.id] = job;
+      state.jobsStatus[job.id] = {
+        status: "downloading",
+        total: job.videoFragments.length + job.audioFragments.length,
+        done: 0,
+        saveProgress: 0,
+      };
+    },
     queue(state, action: PayloadAction<IDownloadJobPayload>) {
       const { jobId } = action.payload;
       const job = state.jobs[jobId];
       if (!job) {
         return;
       }
+      if (
+        ["preparing", "downloading", "saving"].includes(
+          state.jobsStatus[jobId]?.status ?? "",
+        )
+      )
+        return;
       const total = job.videoFragments.length + job.audioFragments.length;
       state.jobsStatus[jobId] = {
         ...(state.jobsStatus[jobId] ?? {

@@ -199,7 +199,17 @@ a committed patch for [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-g
 The audit still reports this low-severity advisory because upstream has not
 published a fixed version. The security check exercises the installed patch
 against prototype-poisoning regressions and verifies merge compatibility; it
-also rejects all moderate, high, and critical dependency advisories.
+also rejects moderate, high, and critical dependency advisories, with the guarded
+legacy exception below.
+
+Modern glob and minimatch consumers use patched releases. The broad version
+range in [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249)
+also flags minimatch 3, which predates the vulnerable optimization phase added
+in version 7. A documented audit exception preserves that legacy CommonJS API.
+The verifier rejects any lockfile version other than the inspected legacy
+branch and the patched modern release, and checks that legacy patterns do not
+enter the amplification phase. It also verifies that cancelled glob traversal
+performs no directory reads.
 
 Run the local browser e2e smoke test:
 
@@ -217,6 +227,30 @@ CI and skips when `CI=true`. Set `E2E_BROWSER=/path/to/Brave Browser` for a
 custom Brave binary path, `E2E_HLS_URL=https://.../playlist.m3u8` to override
 the stream, or `E2E_CLEAN_DOWNLOAD=1` to delete the downloaded file after the
 run.
+
+Run the local job preparation and recovery regression:
+
+```bash
+pnpm test:e2e:preparation
+```
+
+This installs published v5.5.11 and the candidate in fresh Brave MV3 and
+Firefox MV2 profiles. A local HTTP server serves real H.264/AAC streams and
+injects video/audio/caption manifest failures, empty selected media playlists,
+and stalled manifest bodies after Start download. Recovery cases require a
+visible error and a successful Retry. Each cancellation case cancels six
+stalled preparations before saving a new complete download.
+
+Every candidate file is fully decoded and compared with all source video
+frames, complete audio hashes, and caption text/timing. Controls cover TS,
+fMP4, AES-128 media and captions, empty WebVTT, MKV, direct audio-only streams,
+and redirected playlists. Requires macOS, Brave, Firefox, FFmpeg/FFprobe,
+and GitHub CLI. The script downloads its pinned geckodriver or accepts
+`E2E_GECKODRIVER`. Use `E2E_PREPARATION_BROWSERS=brave` or `firefox`,
+`E2E_BASELINE_ONLY=1`, `E2E_SKIP_BASELINE=1`, or
+`E2E_PREPARATION_CASES=fail-video,empty-audio,cancel-caption` to narrow a run.
+Logs, request records, JSON results, and saved files remain in the printed
+temporary directory. Remove generated build outputs after verification.
 
 Run the local redirected-playlist and single-use caption regression:
 

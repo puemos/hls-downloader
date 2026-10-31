@@ -74,9 +74,13 @@ export const cleanupStorageEpic: Epic<
         if (!status) {
           return false;
         }
-        return ["downloading", "queued", "saving", "ready"].includes(
-          status.status,
-        );
+        return [
+          "preparing",
+          "downloading",
+          "queued",
+          "saving",
+          "ready",
+        ].includes(status.status);
       });
 
       const cancelActions = cancellableJobs.map((jobId) =>

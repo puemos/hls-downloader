@@ -1,4 +1,5 @@
 type JobStatusType =
+  | "preparing"
   | "downloading"
   | "done"
   | "ready"

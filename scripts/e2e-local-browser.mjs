@@ -942,6 +942,10 @@ async function main() {
         "Storage fault was not installed",
       );
     }
+    if (process.env.E2E_JOB_FLOW?.startsWith("prepare-"))
+      await fetch(new URL("arm", process.env.E2E_CONTROL_URL), {
+        method: "POST",
+      });
     await clickButton(cdp, popupSession.sessionId, "Start download");
     await waitForText(
       cdp,
@@ -960,7 +964,38 @@ async function main() {
         if (label)
           await clickButtonByAriaLabel(cdp, popupSession.sessionId, label);
       };
-      if (process.env.E2E_JOB_FLOW === "storage-retry") {
+      if (process.env.E2E_JOB_FLOW === "prepare-retry") {
+        try {
+          await waitFor(
+            "visible preparation error",
+            async () =>
+              /\bError\b/.test(
+                await evaluate(
+                  cdp,
+                  popupSession.sessionId,
+                  "document.body.innerText",
+                ),
+              ),
+            { timeoutMs: 7000 },
+          );
+        } catch {
+          throw new Error(
+            "Preparation did not show a retryable error in Downloads",
+          );
+        }
+        await openDetails();
+        const message = await evaluate(
+          cdp,
+          popupSession.sessionId,
+          "document.body.innerText",
+        );
+        assert(/HTTP 403|contains no media segments/.test(message), message);
+        await fetch(new URL("release", process.env.E2E_CONTROL_URL), {
+          method: "POST",
+        });
+        await clickButton(cdp, popupSession.sessionId, "Retry");
+        flowEvidence = { retriedPreparation: true, errorMessage: message };
+      } else if (process.env.E2E_JOB_FLOW === "storage-retry") {
         try {
           await waitForText(
             cdp,
@@ -995,7 +1030,9 @@ async function main() {
           retriedAfterStorageFailure: true,
           partialDirectories: folders.length,
         };
-      } else if (process.env.E2E_JOB_FLOW === "cancel-retry") {
+      } else if (
+        ["cancel-retry", "prepare-cancel"].includes(process.env.E2E_JOB_FLOW)
+      ) {
         assert(
           process.env.E2E_CONTROL_URL,
           "Cancellation control URL required",

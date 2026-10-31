@@ -1,4 +1,13 @@
 import { Fragment } from "./fragment";
+import { Level } from "./level";
+import { Playlist } from "./playlist";
+
+export interface JobSource {
+  playlist: Playlist;
+  video: Level;
+  audio?: Level;
+  subtitle?: Level;
+}
 import type { OutputContainer } from "./output-container";
 
 export class Job {
@@ -16,6 +25,7 @@ export class Job {
     readonly subtitleText?: string,
     readonly subtitleLanguage?: string,
     readonly subtitleName?: string,
-    readonly outputContainer?: OutputContainer
+    readonly outputContainer?: OutputContainer,
+    readonly source?: JobSource,
   ) {}
 }
