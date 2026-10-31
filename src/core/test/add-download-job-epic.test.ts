@@ -1,240 +1,113 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { firstValueFrom } from "rxjs";
-import { addDownloadJobEpic } from "../src/controllers/add-download-job-epic.ts";
-import { levelsSlice } from "../src/store/slices/levels-slice.ts";
-import { jobsSlice } from "../src/store/slices/index.ts";
+import { describe, expect, it } from "vitest";
+import { firstValueFrom, of, toArray } from "rxjs";
+import { addDownloadJobEpic } from "../src/controllers/add-download-job-epic";
+import { levelsSlice, jobsSlice } from "../src/store/slices";
 import {
+  createMockDependencies,
+  createMockState,
   createTestLevel,
   createTestPlaylist,
-  createTestFragment,
-  createMockState,
-  createMockLoader,
-  createMockParser,
-  createMockFS,
-  toObservable,
 } from "./test-utils";
 
-describe("addDownloadJobEpic", () => {
-  // Setup test fixtures
-  let videoLevel;
-  let audioLevel;
-  let subtitleLevel;
-  let playlist;
-  let videoFragment;
-  let audioFragment;
-  let mockLoader;
-  let mockParser;
-  let mockFS;
-  let mockState;
-
-  beforeEach(() => {
-    // Create test entities using the test utils
-    videoLevel = createTestLevel({
-      id: "v",
-      playlistID: "p",
-      uri: "video",
-      width: 1920,
-      height: 1080,
-      bitrate: 1000,
-    });
-
-    audioLevel = createTestLevel({
-      id: "a",
-      playlistID: "p",
-      uri: "audio",
-      type: "audio",
-    });
-
-    subtitleLevel = createTestLevel({
-      id: "s",
-      playlistID: "p",
-      uri: "subtitle",
-      type: "subtitle",
-    });
-
-    playlist = createTestPlaylist({
-      id: "p",
-      uri: "http://example.com/master.m3u8",
-      pageTitle: "page",
-    });
-
-    videoFragment = createTestFragment({ uri: "vf", index: 0 });
-    audioFragment = createTestFragment({ uri: "af", index: 0 });
-
-    // Create mock services
-    mockLoader = createMockLoader();
-    mockParser = createMockParser();
-    mockFS = createMockFS();
-
-    // Configure mock parser to return different fragments based on URI
-    mockParser.parseLevelPlaylist = vi
-      .fn()
-      .mockImplementation((_text, uri) =>
-        uri === "video" ? [videoFragment] : [audioFragment]
-      );
-
-    // Create mock state
-    mockState = createMockState({
-      levels: { v: videoLevel, a: audioLevel, s: subtitleLevel },
+function setup(container: "mp4" | "mkv" = "mp4") {
+  const playlist = createTestPlaylist({
+    id: "p",
+    uri: "https://example.com/master.m3u8",
+    pageTitle: "Episode",
+  });
+  const video = createTestLevel({ id: "v", playlistID: "p", uri: "video" });
+  const audio = createTestLevel({
+    id: "a",
+    type: "audio",
+    playlistID: "p",
+    uri: "audio",
+  });
+  const subtitle = createTestLevel({
+    id: "s",
+    type: "subtitle",
+    playlistID: "p",
+    uri: "captions",
+  });
+  return {
+    playlist,
+    video,
+    audio,
+    subtitle,
+    deps: createMockDependencies(),
+    state: createMockState({
       playlists: { p: playlist },
-      fetchAttempts: 1,
-    });
-  });
+      levels: { v: video, a: audio, s: subtitle },
+      outputContainer: container,
+    }),
+  };
+}
+async function create(test: ReturnType<typeof setup>, subtitles = false) {
+  return firstValueFrom(
+    addDownloadJobEpic(
+      of(
+        levelsSlice.actions.download({
+          levelID: "v",
+          audioLevelID: "a",
+          ...(subtitles ? { subtitleLevelID: "s" } : {}),
+        }),
+      ),
+      { value: test.state } as any,
+      test.deps,
+    ),
+  );
+}
 
-  it("creates a download job for video and audio levels", async () => {
-    // Setup
-    const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
-    );
-    const deps = { loader: mockLoader, parser: mockParser };
-
-    // Execute
-    const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
-    );
-
-    // Verify
-    expect(result.type).toBe(jobsSlice.actions.add.type);
-    expect(result).toHaveProperty("payload");
-    expect((result as any).payload).toBeDefined();
-
-    const { job } = (result as any).payload;
+describe("job creation before preparation", () => {
+  it("creates a visible queued job and retains the selection without network or filesystem work", async () => {
+    const test = setup();
+    const action = await create(test);
+    expect(jobsSlice.actions.add.match(action)).toBe(true);
+    const job = (action as any).payload.job;
     expect(job).toMatchObject({
-      filename: "page-master.mp4",
-      outputContainer: "mp4",
-      videoFragments: [videoFragment],
-      audioFragments: [audioFragment],
-      bitrate: 1000,
-      width: 1920,
-      height: 1080,
+      videoFragments: [],
+      audioFragments: [],
+      source: { playlist: test.playlist, video: test.video, audio: test.audio },
     });
-
-    expect(job.id).toBeTypeOf("string");
-    expect(job.id.length).toBeGreaterThan(0);
-    expect(job.createdAt).toBeTypeOf("number");
-
-    // Verify service calls
-    expect(mockLoader.fetchText).toHaveBeenCalledWith("video", 1);
-    expect(mockLoader.fetchText).toHaveBeenCalledWith("audio", 1);
-    expect(mockParser.parseLevelPlaylist).toHaveBeenCalledTimes(2);
+    const state = jobsSlice.reducer(undefined, action);
+    expect(state.jobs[job.id]).toEqual(job);
+    expect(state.jobsStatus[job.id]?.status).toBe("queued");
+    expect(test.deps.loader.fetchText).not.toHaveBeenCalled();
+    expect(test.deps.fs.setSubtitleText).not.toHaveBeenCalled();
   });
-
-  it("creates a download job for video only when no audio level is provided", async () => {
-    // Setup
-    const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v" })
-    );
-    const deps = { loader: mockLoader, parser: mockParser };
-
-    // Execute
-    const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
-    );
-
-    // Verify
-    expect(result.type).toBe(jobsSlice.actions.add.type);
-    expect(result).toHaveProperty("payload");
-
-    const { job } = (result as any).payload;
-    expect(job.videoFragments).toEqual([videoFragment]);
-    expect(job.audioFragments).toEqual([]);
-
-    // Verify service calls - should only call for video
-    expect(mockLoader.fetchText).toHaveBeenCalledWith("video", 1);
-    expect(mockLoader.fetchText).toHaveBeenCalledTimes(1);
-    expect(mockParser.parseLevelPlaylist).toHaveBeenCalledTimes(1);
-  });
-
-  it("uses the correct fetch attempts from config", async () => {
-    // Setup - configure fetch attempts
-    mockState.config.fetchAttempts = 3;
-    const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
-    );
-    const deps = { loader: mockLoader, parser: mockParser };
-    // Execute
-    await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
-    );
-    // Verify that loader uses the configured fetch attempts
-    expect(mockLoader.fetchText).toHaveBeenCalledWith("video", 3);
-    expect(mockLoader.fetchText).toHaveBeenCalledWith("audio", 3);
-  });
-
-  it("generates correct filename from playlist information", async () => {
-    // Setup - different playlist title
-    playlist.pageTitle = "My Custom Title";
-    const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v" })
-    );
-    const deps = { loader: mockLoader, parser: mockParser };
-    // Execute
-    const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
-    );
-
-    // Verify filename contains the custom title
-    expect(result.type).toBe(jobsSlice.actions.add.type);
-    expect((result as any).payload.job.filename).toBe(
-      "My Custom Title-master.mp4"
-    );
-  });
-
-  it("uses configured mkv output for new download jobs", async () => {
-    mockState.config.outputContainer = "mkv";
-    const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v", audioLevelID: "a" })
-    );
-    const deps = { loader: mockLoader, parser: mockParser };
-
-    const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
-    );
-
-    expect(result.type).toBe(jobsSlice.actions.add.type);
-    expect((result as any).payload.job).toMatchObject({
-      filename: "page-master.mkv",
+  it.each(["mp4", "mkv"] as const)(
+    "preserves the configured %s filename and output",
+    async (container) => {
+      const action = await create(setup(container));
+      expect((action as any).payload.job).toMatchObject({
+        filename: `Episode-master.${container}`,
+        outputContainer: container,
+      });
+    },
+  );
+  it("retains subtitle selection and forces MKV before preparation", async () => {
+    const test = setup();
+    const action = await create(test, true);
+    expect((action as any).payload.job).toMatchObject({
+      filename: "Episode-master.mkv",
       outputContainer: "mkv",
+      source: { subtitle: test.subtitle },
     });
   });
-
-  it("forces mkv output when subtitles are selected", async () => {
-    mockState.config.outputContainer = "mp4";
-    const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v", subtitleLevelID: "s" })
+  it("does not disable later selections after a missing playlist", async () => {
+    const test = setup();
+    const actions = await firstValueFrom(
+      addDownloadJobEpic(
+        of(
+          levelsSlice.actions.download({ levelID: "missing" }),
+          levelsSlice.actions.download({ levelID: "v" }),
+        ),
+        { value: test.state } as any,
+        test.deps,
+      ).pipe(toArray()),
     );
-    const deps = { loader: mockLoader, parser: mockParser, fs: mockFS };
-
-    const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
-    );
-
-    expect(result.type).toBe(jobsSlice.actions.add.type);
-    expect((result as any).payload.job).toMatchObject({
-      filename: "page-master.mkv",
-      outputContainer: "mkv",
-    });
-  });
-
-  it("handles errors when fetching fragments", async () => {
-    // Setup - configure loader to fail
-    mockLoader.fetchText = vi
-      .fn()
-      .mockRejectedValue(new Error("Network error"));
-
-    const action$ = toObservable(
-      levelsSlice.actions.download({ levelID: "v" })
-    );
-    const deps = { loader: mockLoader, parser: mockParser };
-    const result = await firstValueFrom(
-      addDownloadJobEpic(action$, { value: mockState } as any, deps as any)
-    );
-
-    expect(result).toMatchObject({
-      type: jobsSlice.actions.downloadFailed.type,
-      payload: {
-        message: "Network error",
-      },
-    });
+    expect(actions.map((action) => action.type)).toEqual([
+      jobsSlice.actions.downloadFailed.type,
+      jobsSlice.actions.add.type,
+    ]);
   });
 });

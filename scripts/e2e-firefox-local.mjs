@@ -226,6 +226,10 @@ async function main() {
       });
     if (process.env.E2E_JOB_FLOW === "storage-retry")
       assert.equal(await background(installStorageFailure), true);
+    if (process.env.E2E_JOB_FLOW?.startsWith("prepare-"))
+      await fetch(new URL("arm", process.env.E2E_CONTROL_URL), {
+        method: "POST",
+      });
     await clickText("Start download");
     let flowEvidence;
     if (process.env.E2E_JOB_FLOW) {
@@ -236,7 +240,30 @@ async function main() {
         if (button)
           await command("POST", `/element/${button[elementKey]}/click`, {});
       };
-      if (process.env.E2E_JOB_FLOW === "storage-retry") {
+      if (process.env.E2E_JOB_FLOW === "prepare-retry") {
+        try {
+          await waitFor(
+            "visible preparation error",
+            async () =>
+              /\bError\b/.test(
+                await evaluate("return document.body.innerText"),
+              ),
+            7000,
+          );
+        } catch {
+          throw new Error(
+            "Preparation did not show a retryable error in Downloads",
+          );
+        }
+        await openDetails();
+        const message = await evaluate("return document.body.innerText");
+        assert(/HTTP 403|contains no media segments/.test(message), message);
+        await fetch(new URL("release", process.env.E2E_CONTROL_URL), {
+          method: "POST",
+        });
+        await clickText("Retry");
+        flowEvidence = { retriedPreparation: true, errorMessage: message };
+      } else if (process.env.E2E_JOB_FLOW === "storage-retry") {
         try {
           await waitFor(
             "recoverable storage error",
@@ -264,7 +291,9 @@ async function main() {
           retriedAfterStorageFailure: true,
           partialDirectories: folders.length,
         };
-      } else if (process.env.E2E_JOB_FLOW === "cancel-retry") {
+      } else if (
+        ["cancel-retry", "prepare-cancel"].includes(process.env.E2E_JOB_FLOW)
+      ) {
         assert(
           process.env.E2E_CONTROL_URL,
           "Cancellation control URL required",

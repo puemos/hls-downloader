@@ -11,6 +11,8 @@ overrides:
   # Keep legacy consumers on the fixed CommonJS API.
   brace-expansion@<1.1.21: "1.1.21"
   brace-expansion@>=3.0.0 <5.0.12: "5.0.12"
+  glob@>=9.0.0 <14.0.2: "14.0.2"
+  minimatch@>=7.0.0 <11.0.1: "11.0.3"
   fast-uri@>=3.0.0 <3.1.9: "3.1.9"
   image-size@>=1.2.0 <2.0.3: "2.0.3"
   js-yaml@<=4.1.1: "4.3.0"
@@ -23,3 +25,9 @@ overrides:
   ws@>=8.0.0 <8.21.0: "8.21.0"
 patchedDependencies:
   deepmerge@4.3.1: patches/deepmerge@4.3.1.patch
+# GHSA-g3hv-75wg-m249 broadly flags v3, but its vulnerable optimization phase
+# was introduced in v7. Modern consumers are pinned above the fix; the security
+# verifier enforces both the lockfile versions and the unaffected legacy path.
+audit:
+  ignore:
+    - GHSA-g3hv-75wg-m249

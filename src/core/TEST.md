@@ -115,11 +115,19 @@ it("creates a download job for video and audio levels", async () => {
   // Verify
   expect(result.type).toBe(jobsSlice.actions.add.type);
   expect(result.payload.job).toMatchObject({
-    videoFragments: [videoFragment],
-    audioFragments: [audioFragment],
+    videoFragments: [],
+    audioFragments: [],
+    source: { video: videoLevel, audio: audioLevel },
   });
 });
 ```
+
+Job creation now records the selected source before any network I/O. The
+`prepareJobFactory` use case loads the manifests and captions inside the active
+job's cancellation/error boundary; `jobs/prepared` installs the resulting
+fragments before media download starts. Test creation and preparation separately.
+The real HTTP integration in `src/background/test/job-preparation.integration.test.ts`
+covers visible failures, Retry, queue limits, cancellation, and empty tracks.
 
 ## Testing Use Cases
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { readdirSync } from "node:fs";
+import fs, { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 
@@ -87,3 +87,62 @@ assert.equal(
 console.log(
   "Verified deepmerge prototype-poisoning patch and merge compatibility",
 );
+
+// GHSA-g3hv-75wg-m249 affects optimizationLevel >= 2 preprocessing, introduced
+// in minimatch 7. The advisory's broad <11.0.1 range also flags legacy v3,
+// which has no first/second-phase preprocessing. Keep that exception fail-closed:
+// only this inspected legacy branch and the patched modern release may resolve.
+const minimatchVersions = new Set(
+  [
+    ...readFileSync("pnpm-lock.yaml", "utf8").matchAll(
+      /^  minimatch@([^:]+):$/gm,
+    ),
+  ].map((match) => match[1]),
+);
+assert.deepEqual([...minimatchVersions].sort(), ["11.0.3", "3.1.5"]);
+const legacyMatch = require(
+  resolve(pnpmStore, "minimatch@3.1.5/node_modules/minimatch"),
+);
+assert.equal(typeof legacyMatch, "function");
+assert.equal(legacyMatch.Minimatch.prototype.firstPhasePreProcess, undefined);
+assert.equal(legacyMatch.Minimatch.prototype.secondPhasePreProcess, undefined);
+const legacyPattern = new legacyMatch.Minimatch("a/**/../".repeat(12) + "b", {
+  optimizationLevel: 2,
+});
+assert.equal(legacyPattern.globParts.length, 1);
+assert(legacyMatch("src/example.ts", "src/**/*.ts"));
+assert(!legacyMatch("src/example.js", "src/**/*.ts"));
+const modernMatch = require(
+  resolve(pnpmStore, "minimatch@11.0.3/node_modules/minimatch"),
+);
+assert(modernMatch.minimatch("@scope/package", "@scope/*"));
+assert(!modernMatch.minimatch("other/package", "@scope/*"));
+console.log(
+  "Verified patched modern minimatch and unaffected legacy CommonJS branch",
+);
+
+// Exercise the exact glob resolved by the build cleanup tool, not an old copy
+// left in pnpm's store. Pre-aborted traversal must not read any directory.
+const rimrafRequire = createRequire(require.resolve("rimraf"));
+assert.equal(rimrafRequire("glob/package.json").version, "14.0.2");
+const { glob } = rimrafRequire("glob");
+const aborted = new AbortController();
+aborted.abort(new Error("Security check: traversal cancelled"));
+let directoryReads = 0;
+await assert.rejects(
+  glob("*", {
+    cwd: process.cwd(),
+    signal: aborted.signal,
+    fs: {
+      ...fs,
+      readdir(...args) {
+        directoryReads++;
+        return fs.readdir(...args);
+      },
+    },
+  }),
+  /traversal cancelled/,
+);
+await new Promise((resolve) => setImmediate(resolve));
+assert.equal(directoryReads, 0);
+console.log("Verified glob cancellation stops filesystem traversal");

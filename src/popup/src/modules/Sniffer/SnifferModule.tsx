@@ -1,6 +1,7 @@
 import React from "react";
 import SnifferView from "./SnifferView";
 import useSnifferController from "./SnifferController";
+import useBulkDownloads from "./useBulkDownloads";
 
 const SnifferModule = () => {
   const {
@@ -9,6 +10,7 @@ const SnifferModule = () => {
     filter,
     setCurrentPlaylistId,
     playlists,
+    capturedPlaylists,
     hasPlaylists,
     currentPlaylistId,
     copyPlaylistsToClipboard,
@@ -17,9 +19,11 @@ const SnifferModule = () => {
     setDirectURI,
     addDirectPlaylist,
   } = useSnifferController();
+  const bulk = useBulkDownloads(capturedPlaylists, playlists);
 
   return (
     <SnifferView
+      bulk={bulk}
       filter={filter}
       clearPlaylists={clearPlaylists}
       removePlaylist={removePlaylist}

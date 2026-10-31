@@ -98,7 +98,8 @@ export function buildJobViewDerived(
 ): JobViewDerived {
   const isError = status?.status === "error";
   const isQueued = status?.status === "queued";
-  const isDownloading = status?.status === "downloading";
+  const isDownloading =
+    status?.status === "downloading" || status?.status === "preparing";
   const isSaving = status?.status === "saving";
   const isReady = ["ready", "done"].includes(status?.status ?? "");
 
@@ -117,6 +118,7 @@ export function buildJobViewDerived(
   > = {
     init: { label: "Pending", variant: "outline" },
     queued: { label: "Queued", variant: "outline" },
+    preparing: { label: "Preparing", variant: "default" },
     downloading: { label: "Downloading", variant: "default" },
     saving: { label: "Saving", variant: "default" },
     ready: { label: "Ready", variant: "secondary" },

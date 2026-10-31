@@ -43,6 +43,8 @@
     "test:e2e:subtitles": "E2E_SUBTITLE_TRUNCATION=1 node scripts/e2e-aes128-local.mjs",
     "test:e2e:mkv": "node scripts/e2e-mkv-local.mjs",
     "test:e2e:network": "node scripts/e2e-network-local.mjs",
+    "test:e2e:preparation": "node scripts/e2e-preparation-local.mjs",
+    "test:e2e:bulk": "node scripts/e2e-bulk-local.mjs",
     "test:e2e:redirects": "node scripts/e2e-redirects-local.mjs",
     "test:e2e:integrity": "node scripts/e2e-media-integrity-local.mjs",
     "test:e2e:playlists": "node scripts/e2e-playlists-local.mjs",
