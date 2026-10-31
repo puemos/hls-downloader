@@ -4,40 +4,8 @@ import usePlaylistController from "./PlaylistController";
 import { Level, Playlist } from "@hls-downloader/core/lib/entities";
 import { useSelector } from "react-redux";
 import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
-
-export function selectPreferredAudioLevel(
-  audioLevels: Level[] = [],
-  preferredLanguage?: string | null
-): string | undefined {
-  if (!audioLevels || audioLevels.length === 0) {
-    return;
-  }
-  const normalized = preferredLanguage?.toLowerCase() ?? null;
-  const score = (level: Level) => {
-    const lang = level.language?.toLowerCase() ?? "";
-    return {
-      languageIndex:
-        normalized && lang === normalized ? 0 : Number.POSITIVE_INFINITY,
-      isDefault: level.isDefault ? 0 : 1,
-      isAuto: level.autoSelect ? 0 : 1,
-    };
-  };
-
-  return [...audioLevels].sort((a, b) => {
-    const aScore = score(a);
-    const bScore = score(b);
-    if (aScore.languageIndex !== bScore.languageIndex) {
-      return aScore.languageIndex - bScore.languageIndex;
-    }
-    if (aScore.isDefault !== bScore.isDefault) {
-      return aScore.isDefault - bScore.isDefault;
-    }
-    if (aScore.isAuto !== bScore.isAuto) {
-      return aScore.isAuto - bScore.isAuto;
-    }
-    return 0;
-  })[0]?.id;
-}
+import { selectPreferredAudioLevel } from "@hls-downloader/core/lib/use-cases/select-preferred-audio-level";
+export { selectPreferredAudioLevel };
 
 const PlaylistModule = ({
   id,
@@ -61,31 +29,31 @@ const PlaylistModule = ({
   });
 
   const playlist = useSelector<RootState, Playlist | null>(
-    (state) => state.playlists.playlists[id] ?? null
+    (state) => state.playlists.playlists[id] ?? null,
   );
   const [videoId, setVideoId] = useState<string>();
   const [audioId, setAudioId] = useState<string>();
   const [subtitleId, setSubtitleId] = useState<string>("");
   const levelDurations = useSelector(
-    (state: RootState) => state.levels.durations
+    (state: RootState) => state.levels.durations,
   );
 
   const videoLevels = useMemo(
     () => levels.filter((l) => l.type === "stream"),
-    [levels]
+    [levels],
   );
   const audioLevels = useMemo(
     () => levels.filter((l) => l.type === "audio"),
-    [levels]
+    [levels],
   );
   const subtitleLevels = useMemo(
     () => levels.filter((l) => l.type === "subtitle"),
-    [levels]
+    [levels],
   );
 
   const selectedVideo = useMemo(
     () => videoLevels.find((v) => v.id === videoId),
-    [videoLevels, videoId]
+    [videoLevels, videoId],
   );
 
   const filteredAudioLevels = useMemo(() => {
@@ -97,7 +65,7 @@ const PlaylistModule = ({
 
   const selectedAudio = useMemo(
     () => filteredAudioLevels.find((a) => a.id === audioId),
-    [filteredAudioLevels, audioId]
+    [filteredAudioLevels, audioId],
   );
 
   const storedAudioId = preferences.audioSelections[id];
@@ -191,7 +159,7 @@ const PlaylistModule = ({
   const hasMedia = requiresVideo || requiresAudio;
 
   const estimate = useMemo(() => {
-    const storedDuration = videoId ? levelDurations[videoId] ?? null : null;
+    const storedDuration = videoId ? (levelDurations[videoId] ?? null) : null;
     const duration = storedDuration ?? null;
     if (!duration || !selectedVideo) {
       return undefined;
@@ -265,7 +233,7 @@ const PlaylistModule = ({
   ].flatMap((entry) => (entry ? [entry] : []));
 
   const encryptionBlocked = encryptionSummaries.some(
-    (summary) => summary.supported === false
+    (summary) => summary.supported === false,
   );
 
   const canDownload =
@@ -282,7 +250,7 @@ const PlaylistModule = ({
     downloadLevel(
       primaryId,
       requiresAudio ? audioId : undefined,
-      subtitleId || undefined
+      subtitleId || undefined,
     );
   }
 

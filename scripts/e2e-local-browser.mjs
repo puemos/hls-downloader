@@ -1246,4 +1246,23 @@ async function main() {
   }
 }
 
-await main();
+export {
+  CdpClient,
+  evaluate,
+  waitFor,
+  clickButton,
+  clickButtonByAriaLabel,
+  setInputValue,
+  clickTab,
+  writeDownloadPreferences,
+  reservePort,
+  getBravePath,
+  stopChild,
+  sessionExceptions,
+};
+
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+)
+  await main();

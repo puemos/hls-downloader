@@ -126,6 +126,13 @@ Current releases require Firefox 128 or newer, or Chromium 111 or newer.
 4. Pick your video & audio streams, then press **Download**.
 5. Grab a coffee ☕ – `ffmpeg.wasm` merges everything and your browser prompts you to save the MP4 when done.
 
+To download several captured streams, click **Select**, choose streams (or
+**Select visible** to select the filtered list), then **Review**. Choose the best
+available quality or a resolution cap and check each stream's video and audio
+selection before adding them to the queue. Saved language choices and the active
+download limit still apply. Streams without a suitable quality or supported
+encryption are listed separately and are not queued.
+
 The extension needs enough free disk space for both the downloaded fragments
 and the finalized media file. Browser storage estimates can be conservative and
 are treated as informational when unlimited storage permission is active.

@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 interface ReturnType {
   playlists: Playlist[];
+  capturedPlaylists: Playlist[];
   hasPlaylists: boolean;
   currentPlaylistId: string | undefined;
   filter: string;
@@ -92,11 +93,10 @@ const useSnifferController = (): ReturnType => {
       (playlist) =>
         playlistsStatusRecord[playlist.id]?.status === "ready" ||
         playlist.initiator === "Direct",
-    );
+    )
+    .sort((a, b) => b.createdAt - a.createdAt);
 
   const playlists = capturedPlaylists.filter(playlistFilter(filter));
-
-  playlists.sort((a, b) => b.createdAt - a.createdAt);
 
   function copyPlaylistsToClipboard() {
     const playlistUris = playlists.map((p) => p.uri).join("\n");
@@ -110,6 +110,7 @@ const useSnifferController = (): ReturnType => {
     setFilter,
     setCurrentPlaylistId,
     playlists,
+    capturedPlaylists,
     hasPlaylists: capturedPlaylists.length > 0,
     currentPlaylistId,
     copyPlaylistsToClipboard,

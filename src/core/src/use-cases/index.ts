@@ -21,3 +21,5 @@ export * from "./inspect-level-encryption";
 export * from "./get-storage-stats";
 export * from "./get-playlist-duration";
 export * from "./prepare-job";
+export * from "./select-preferred-audio-level";
+export * from "./select-bulk-downloads";

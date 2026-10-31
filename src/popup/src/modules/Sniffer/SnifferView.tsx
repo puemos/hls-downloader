@@ -2,6 +2,7 @@ import { Playlist } from "@hls-downloader/core/lib/entities";
 import { Button, Input, Card } from "@hls-downloader/design-system";
 import {
   Check,
+  CheckSquare,
   ChevronRight,
   Copy,
   Link2,
@@ -15,8 +16,11 @@ import PlaylistModule from "../Playlist/PlaylistModule";
 import ScreenHeader from "../../components/ScreenHeader";
 import DetailScreen from "../../components/DetailScreen";
 import BottomSheet from "../../components/BottomSheet";
+import BulkDownloadSheet from "./BulkDownloadSheet";
+import type { BulkDownloads } from "./useBulkDownloads";
 
 interface Props {
+  bulk?: BulkDownloads;
   playlists: Playlist[];
   hasPlaylists: boolean;
   currentPlaylistId: string | undefined;
@@ -32,6 +36,7 @@ interface Props {
 }
 
 const SnifferView = ({
+  bulk,
   clearPlaylists,
   removePlaylist,
   copyPlaylistsToClipboard,
@@ -94,15 +99,32 @@ const SnifferView = ({
           <ScreenHeader
             title="Capture"
             action={
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 shrink-0 gap-1.5 px-2.5 text-[10px]"
-                onClick={() => setManualOpen(true)}
-              >
-                <Link2 className="h-3.5 w-3.5" />
-                Add URL
-              </Button>
+              <div className="flex items-center gap-1.5">
+                {bulk && hasPlaylists && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1.5 px-2.5 text-[10px]"
+                    onClick={bulk.mode === "idle" ? bulk.start : bulk.cancel}
+                  >
+                    {bulk.mode === "idle" ? (
+                      <CheckSquare className="h-3.5 w-3.5" />
+                    ) : (
+                      <X className="h-3.5 w-3.5" />
+                    )}
+                    {bulk.mode === "idle" ? "Select" : "Cancel"}
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 shrink-0 gap-1.5 px-2.5 text-[10px]"
+                  onClick={() => setManualOpen(true)}
+                >
+                  <Link2 className="h-3.5 w-3.5" />
+                  Add URL
+                </Button>
+              </div>
             }
           />
 
@@ -142,6 +164,28 @@ const SnifferView = ({
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
+            </div>
+          )}
+
+          {bulk && bulk.mode !== "idle" && (
+            <div className="flex shrink-0 items-center justify-between px-0.5 text-[11px]">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 px-1.5 text-[11px] text-primary"
+                onClick={bulk.toggleAll}
+                disabled={playlists.length === 0}
+              >
+                {bulk.allVisibleSelected
+                  ? "Deselect visible"
+                  : "Select visible"}
+              </Button>
+              <span
+                className="font-semibold text-muted-foreground"
+                role="status"
+              >
+                {bulk.selectedIds.length} selected
+              </span>
             </div>
           )}
 
@@ -194,9 +238,28 @@ const SnifferView = ({
                   onOpen={() => setCurrentPlaylistId(item.id)}
                   onRemove={() => removePlaylist(item.id)}
                   animateEntry={enteringPlaylistIds.has(item.id)}
+                  selection={
+                    bulk && bulk.mode !== "idle"
+                      ? {
+                          checked: bulk.selectedIds.includes(item.id),
+                          toggle: () => bulk.toggle(item.id),
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </div>
+          )}
+          {bulk && bulk.mode !== "idle" && (
+            <Button
+              className="h-10 w-full shrink-0 gap-2 text-[12px]"
+              disabled={bulk.selectedIds.length === 0}
+              onClick={bulk.review}
+            >
+              Review {bulk.selectedIds.length} stream
+              {bulk.selectedIds.length === 1 ? "" : "s"}
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Button>
           )}
         </div>
       )}
@@ -256,6 +319,7 @@ const SnifferView = ({
           </Button>
         </div>
       </BottomSheet>
+      {bulk && <BulkDownloadSheet bulk={bulk} />}
     </div>
   );
 };
@@ -267,11 +331,13 @@ const PlaylistRow = ({
   onOpen,
   onRemove,
   animateEntry,
+  selection,
 }: {
   playlist: Playlist;
   onOpen: () => void;
   onRemove: () => void;
   animateEntry: boolean;
+  selection?: { checked: boolean; toggle: () => void };
 }) => {
   const [copied, setCopied] = useState(false);
   const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -309,9 +375,22 @@ const PlaylistRow = ({
     >
       <button
         className="group flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left transition-colors duration-150 hover:bg-accent/35 active:bg-accent/55"
-        onClick={onOpen}
-        aria-label={`Choose quality for ${playlist.pageTitle || "captured stream"}`}
+        onClick={selection ? selection.toggle : onOpen}
+        role={selection ? "checkbox" : undefined}
+        aria-checked={selection?.checked}
+        aria-label={
+          selection
+            ? `Select ${playlist.pageTitle || "captured stream"}`
+            : `Choose quality for ${playlist.pageTitle || "captured stream"}`
+        }
       >
+        {selection && (
+          <span
+            className={`grid h-4 w-4 shrink-0 place-items-center rounded-[4px] border ${selection.checked ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background"}`}
+          >
+            {selection.checked && <Check className="h-3 w-3" strokeWidth={3} />}
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <div className="truncate text-[12px] font-bold leading-tight">
             {playlist.pageTitle}
@@ -326,47 +405,51 @@ const PlaylistRow = ({
             minute: "2-digit",
           })}
         </time>
-        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-foreground" />
+        {!selection && (
+          <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-foreground" />
+        )}
       </button>
-      <div className="flex shrink-0 items-center border-l border-border/70 px-1">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8 text-muted-foreground"
-          onClick={copyPlaylistUrl}
-          aria-label={
-            copied
-              ? `URL copied for ${playlist.pageTitle || "captured stream"}`
-              : `Copy URL for ${playlist.pageTitle || "captured stream"}`
-          }
-          title={copied ? "URL copied" : "Copy URL"}
-        >
-          <span className="grid h-3.5 w-3.5 place-items-center">
-            <Copy
-              data-active={!copied}
-              className={`motion-copy-icon col-start-1 row-start-1 h-3.5 w-3.5 ${
-                copied ? "scale-90 opacity-0" : "scale-100 opacity-100"
-              }`}
-            />
-            <Check
-              data-active={copied}
-              className={`motion-copy-icon col-start-1 row-start-1 h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 ${
-                copied ? "scale-100 opacity-100" : "scale-90 opacity-0"
-              }`}
-            />
-          </span>
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-          onClick={onRemove}
-          aria-label={`Remove ${playlist.pageTitle || "captured stream"}`}
-          title="Remove stream"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </div>
+      {!selection && (
+        <div className="flex shrink-0 items-center border-l border-border/70 px-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-muted-foreground"
+            onClick={copyPlaylistUrl}
+            aria-label={
+              copied
+                ? `URL copied for ${playlist.pageTitle || "captured stream"}`
+                : `Copy URL for ${playlist.pageTitle || "captured stream"}`
+            }
+            title={copied ? "URL copied" : "Copy URL"}
+          >
+            <span className="grid h-3.5 w-3.5 place-items-center">
+              <Copy
+                data-active={!copied}
+                className={`motion-copy-icon col-start-1 row-start-1 h-3.5 w-3.5 ${
+                  copied ? "scale-90 opacity-0" : "scale-100 opacity-100"
+                }`}
+              />
+              <Check
+                data-active={copied}
+                className={`motion-copy-icon col-start-1 row-start-1 h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 ${
+                  copied ? "scale-100 opacity-100" : "scale-90 opacity-0"
+                }`}
+              />
+            </span>
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            onClick={onRemove}
+            aria-label={`Remove ${playlist.pageTitle || "captured stream"}`}
+            title="Remove stream"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };
