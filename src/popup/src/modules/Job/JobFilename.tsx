@@ -48,7 +48,10 @@ export const JobFilename = ({
     );
   }
 
+  // A save that starts mid-edit blocks the rename, so keep the draft until
+  // renaming is allowed again instead of dropping what was typed.
   const save = () => {
+    if (!canRename) return;
     if (draft.trim()) onRename(draft);
     setDraft(null);
   };
@@ -62,6 +65,9 @@ export const JobFilename = ({
         className="h-7 px-2 text-[12px] font-semibold"
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={(event) => {
+          // Enter also confirms IME composition (Japanese, Chinese, ...).
+          // Safari reports that keydown as keyCode 229 without isComposing.
+          if (event.nativeEvent.isComposing || event.keyCode === 229) return;
           if (event.key === "Enter") {
             event.preventDefault();
             save();
@@ -78,6 +84,8 @@ export const JobFilename = ({
         size="icon"
         className="h-7 w-7 shrink-0"
         aria-label="Save file name"
+        title={canRename ? undefined : "Can't rename while saving"}
+        disabled={!canRename}
         onClick={save}
       >
         <Check className="h-3.5 w-3.5" />
