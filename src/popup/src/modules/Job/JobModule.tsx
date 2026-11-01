@@ -12,8 +12,16 @@ const JobModule = ({
   detail?: boolean;
   onOpen?: () => void;
 }) => {
-  const { cancelJob, deleteJob, downloadJob, saveAsJob, status, job, derived } =
-    useJobController({ id });
+  const {
+    cancelJob,
+    deleteJob,
+    downloadJob,
+    saveAsJob,
+    renameJob,
+    status,
+    job,
+    derived,
+  } = useJobController({ id });
   const [expanded, setExpanded] = useState(false);
 
   const view = (
@@ -24,6 +32,7 @@ const JobModule = ({
       deleteJob={deleteJob}
       downloadJob={downloadJob}
       saveAsJob={saveAsJob}
+      renameJob={renameJob}
       status={status}
       expanded={detail || expanded}
       navigation={Boolean(onOpen)}

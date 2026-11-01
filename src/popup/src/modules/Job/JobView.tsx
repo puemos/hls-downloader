@@ -29,6 +29,7 @@ import {
   DetailPanel,
   DetailRow,
 } from "../../components/DetailSurface";
+import { JobFilename } from "./JobFilename";
 
 interface Props {
   job: Job | null;
@@ -38,6 +39,7 @@ interface Props {
   deleteJob: () => void;
   cancelJob: () => void;
   saveAsJob: () => void;
+  renameJob: (filename: string) => void;
   expanded: boolean;
   onToggle: () => void;
   navigation?: boolean;
@@ -52,6 +54,7 @@ const JobView = ({
   deleteJob,
   cancelJob,
   saveAsJob,
+  renameJob,
   expanded,
   onToggle,
   navigation = false,
@@ -201,6 +204,7 @@ const JobView = ({
         deleteJob={deleteJob}
         cancelJob={cancelJob}
         saveAsJob={saveAsJob}
+        renameJob={renameJob}
       />
     );
   }
@@ -274,9 +278,12 @@ const JobView = ({
               <HoverCard>
                 <HoverCardTrigger asChild>
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="block mr-1 min-w-0 max-w-full truncate text-sm font-semibold">
-                      {job.filename}
-                    </div>
+                    <JobFilename
+                      filename={job.filename}
+                      canRename={!isSaving}
+                      onRename={renameJob}
+                      className="mr-1 text-sm font-semibold"
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
@@ -413,6 +420,7 @@ const JobDetailView = ({
   deleteJob,
   cancelJob,
   saveAsJob,
+  renameJob,
 }: {
   status: JobStatus | null;
   derived: import("./JobController").JobViewDerived;
@@ -421,6 +429,7 @@ const JobDetailView = ({
   deleteJob: () => void;
   cancelJob: () => void;
   saveAsJob: () => void;
+  renameJob: (filename: string) => void;
 }) => {
   const {
     percent,
@@ -471,7 +480,13 @@ const JobDetailView = ({
   return (
     <div className="flex h-full min-w-0 flex-col gap-3">
       <DetailHeader
-        title={job.filename}
+        title={
+          <JobFilename
+            filename={job.filename}
+            canRename={!isSaving}
+            onRename={renameJob}
+          />
+        }
         supporting={
           <span>
             {new Date(job.createdAt!).toLocaleString([], {
