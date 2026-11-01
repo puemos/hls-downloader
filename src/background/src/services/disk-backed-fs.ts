@@ -14,7 +14,10 @@ import type {
   StorageSnapshot,
 } from "@hls-downloader/core/lib/services";
 import type { OutputContainer } from "@hls-downloader/core/lib/entities";
-import { sanitizeFilename } from "@hls-downloader/core/lib/use-cases";
+import {
+  MAX_FILENAME_LENGTH,
+  sanitizeFilename,
+} from "@hls-downloader/core/lib/use-cases";
 import browser from "webextension-polyfill";
 import filenamify from "filenamify/browser";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
@@ -1153,9 +1156,10 @@ const saveAs: IFS["saveAs"] = async (
     throw new Error("Downloads API unavailable");
   }
   installDownloadListener();
+  // Core already builds names within these rules. This is the last check
+  // before the name reaches the browser.
   const filename = filenamify(sanitizeFilename(path ?? "") || "stream.mp4", {
-    // Each UTF-16 code unit needs at most 3 UTF-8 bytes. Stay below 255 bytes.
-    maxLength: 80,
+    maxLength: MAX_FILENAME_LENGTH,
   });
   let downloadId: number;
   try {
