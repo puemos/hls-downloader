@@ -4,7 +4,11 @@ import { catchError, filter, map, mergeMap } from "rxjs/operators";
 import { RootAction, RootState } from "../store/root-reducer";
 import { jobsSlice } from "../store/slices";
 import { Dependencies } from "../services";
-import { prepareDownloadBucketFactory, saveAsFactory } from "../use-cases";
+import {
+  containerFromFilename,
+  prepareDownloadBucketFactory,
+  saveAsFactory,
+} from "../use-cases";
 
 export const saveAsJobEpic: Epic<
   RootAction,
@@ -19,8 +23,7 @@ export const saveAsJobEpic: Epic<
       const job = store$.value.jobs.jobs[jobId]!;
       const dialog = store$.value.config.saveDialog;
       const container =
-        job.outputContainer ??
-        (job.filename.toLowerCase().endsWith(".mkv") ? "mkv" : "mp4");
+        job.outputContainer ?? containerFromFilename(job.filename);
 
       const ensureSubtitle$ =
         job?.subtitleText !== undefined && job.subtitleText !== null
