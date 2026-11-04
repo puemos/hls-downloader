@@ -67,6 +67,35 @@ describe("finalizeFilename", () => {
   });
 });
 
+describe("saving a shown name again", () => {
+  // The rename field shows the name without its extension.
+  const resave = (filename: string) =>
+    renameJobFilename(filename, filename.replace(/\.(mp4|mkv)$/i, ""));
+
+  it.each([
+    ["a cut after a stray dot", `${"a".repeat(MAX_FILENAME_LENGTH - 6)} . b`],
+    ["a cut on a copy of the extension", `${"a".repeat(72)}.mp4.mp4 tail`],
+    ["a repeated extension", "Episode.mp4.mp4"],
+    ["a reserved name", "CON"],
+    ["a long reserved name", "aux." + "b".repeat(100)],
+    ["characters removed next to spaces", "a \u200c\u200c b"],
+  ])("keeps %s unchanged", (_case, name) => {
+    const filename = renameJobFilename("video.mp4", name)!;
+    expect(filename.length).toBeLessThanOrEqual(MAX_FILENAME_LENGTH);
+    expect(finalizeFilename(filename)).toBe(filename);
+    expect(resave(filename)).toBe(filename);
+  });
+
+  it("drops the dot filenamify leaves when it cuts the name", () => {
+    expect(
+      renameJobFilename(
+        "video.mp4",
+        `${"a".repeat(MAX_FILENAME_LENGTH - 6)} . b`,
+      ),
+    ).toBe(`${"a".repeat(MAX_FILENAME_LENGTH - 6)}.mp4`);
+  });
+});
+
 describe("containerFromFilename", () => {
   it("reads the container from the extension", () => {
     expect(containerFromFilename("video.MKV")).toBe("mkv");
