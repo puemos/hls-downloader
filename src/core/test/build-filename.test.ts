@@ -3,6 +3,7 @@ import {
   MAX_FILENAME_LENGTH,
   buildFilename,
   containerFromFilename,
+  finalizeFilename,
 } from "../src/use-cases/build-filename";
 import { generateFileName } from "../src/use-cases/generate-file-name";
 import { generateSubtitleFileName } from "../src/use-cases/generate-subtitle-file-name";
@@ -34,11 +35,9 @@ describe("buildFilename", () => {
     expect(longTitle.startsWith(filename.slice(0, -4))).toBe(true);
   });
 
-  it("does not leave a trailing space or dot after shortening", () => {
-    const name = `${"a".repeat(MAX_FILENAME_LENGTH - 6)} . b`;
-    expect(buildFilename(name, "mp4")).toBe(
-      `${"a".repeat(MAX_FILENAME_LENGTH - 6)}.mp4`,
-    );
+  it("renames reserved names", () => {
+    expect(buildFilename("CON", "mp4")).toBe("CON!.mp4");
+    expect(buildFilename("nul.mkv", "mkv")).toBe("nul!.mkv");
   });
 
   it("does not split an emoji when shortening", () => {
@@ -47,6 +46,24 @@ describe("buildFilename", () => {
     expect(buildFilename(name, "mp4")).toBe(
       `${"a".repeat(MAX_FILENAME_LENGTH - 6)}.mp4`,
     );
+  });
+});
+
+describe("finalizeFilename", () => {
+  it.each([
+    "CON.mp4",
+    longTitle + ".mp4",
+    `${"a".repeat(MAX_FILENAME_LENGTH - 6)} . b.mp4`,
+    "映画 🏳️‍⚧️-ja.vtt",
+    "😀".repeat(100) + ".mkv",
+  ])("leaves its own result unchanged for %j", (name) => {
+    const filename = finalizeFilename(name);
+    expect(filename.length).toBeLessThanOrEqual(MAX_FILENAME_LENGTH);
+    expect(finalizeFilename(filename)).toBe(filename);
+  });
+
+  it("uses the fallback when nothing usable is left", () => {
+    expect(finalizeFilename("\u200d\u202e")).toBe("stream.mp4");
   });
 });
 

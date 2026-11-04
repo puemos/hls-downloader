@@ -1,3 +1,4 @@
+import filenamify from "filenamify/browser";
 import type { OutputContainer } from "../entities/output-container";
 import { sanitizeFilename } from "./sanitize-filename";
 
@@ -9,11 +10,25 @@ export function containerFromFilename(filename: string): OutputContainer {
 }
 
 /**
- * Builds a filename from a base name and an extension. Every filename the
- * extension creates, renames or saves goes through here, so they all follow
- * the same rules: the name is sanitized, a repeated extension is dropped, and
- * the base is shortened so the whole name fits MAX_FILENAME_LENGTH with the
- * extension intact. Returns undefined when nothing usable is left.
+ * The final filename rules: sanitizes the name, renames reserved names such
+ * as CON, and shortens it to MAX_FILENAME_LENGTH with the extension kept.
+ * Applying it to a name it already returned gives the same name, so the
+ * save path can run it again without changing what core built.
+ */
+export function finalizeFilename(
+  name: string,
+  fallback = "stream.mp4",
+): string {
+  return filenamify(sanitizeFilename(name) || fallback, {
+    maxLength: MAX_FILENAME_LENGTH,
+  });
+}
+
+/**
+ * Builds a filename from a base name and an extension. Creating, renaming
+ * and saving all end in finalizeFilename, so they follow the same rules. A
+ * repeated extension is dropped. Returns undefined when nothing usable is
+ * left.
  */
 export function buildFilename(
   name: string,
@@ -22,24 +37,7 @@ export function buildFilename(
   const withoutExtension = name
     .trim()
     .replace(new RegExp(`\\.${extension}$`, "i"), "");
-  const baseName = truncate(
-    sanitizeFilename(withoutExtension),
-    MAX_FILENAME_LENGTH - extension.length - 1,
-  );
+  const baseName = sanitizeFilename(withoutExtension);
   if (!baseName) return undefined;
-  return `${baseName}.${extension}`.normalize("NFC");
-}
-
-let segmenter: Intl.Segmenter | undefined;
-
-// Cut on grapheme boundaries so emoji and combined characters stay whole.
-function truncate(name: string, maxLength: number): string {
-  if (name.length <= maxLength) return name;
-  segmenter ??= new Intl.Segmenter(undefined, { granularity: "grapheme" });
-  let truncated = "";
-  for (const { segment } of segmenter.segment(name)) {
-    if (truncated.length + segment.length > maxLength) break;
-    truncated += segment;
-  }
-  return truncated.replace(/[\s.~]+$/, "");
+  return finalizeFilename(`${baseName}.${extension}`);
 }

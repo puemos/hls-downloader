@@ -104,6 +104,12 @@ import {
   getJobsDirectory,
 } from "../src/services/opfs-storage";
 import type { PreparedDownload } from "@hls-downloader/core/lib/services";
+import { Level, Playlist } from "@hls-downloader/core/lib/entities";
+import {
+  generateFileName,
+  generateSubtitleFileName,
+  renameJobFilename,
+} from "@hls-downloader/core/lib/use-cases";
 
 async function writeExport(exportId: string, bytes: number[]): Promise<void> {
   const handle = await getExportHandle(exportId, true);
@@ -625,6 +631,73 @@ describe("disk-backed filesystem", () => {
       await vi.waitFor(() => expectExportMissing(artifact.exportId));
     },
   );
+
+  describe("filenames built by core", () => {
+    const longTitle = "A Very Long Page Title ".repeat(10).trim();
+    const unicodeTitle =
+      "映画『トランジット・デイズ』🏳️\u200d⚧️ " + "日".repeat(80);
+    const playlist = (pageTitle: string) =>
+      new Playlist("1", "https://a/b/index.m3u8", Date.now(), pageTitle);
+    const video = new Level("stream", "l", "1", "uri");
+    const subtitle = new Level(
+      "subtitle",
+      "English",
+      "1",
+      "uri",
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "en",
+    );
+
+    it.each([
+      ["renamed reserved name", renameJobFilename("video.mp4", "CON")!],
+      ["renamed reserved mkv name", renameJobFilename("video.mkv", "aux")!],
+      ["renamed long name", renameJobFilename("video.mp4", longTitle)!],
+      ["renamed Unicode name", renameJobFilename("video.mkv", unicodeTitle)!],
+      ["generated long name", generateFileName()(playlist(longTitle), video)],
+      [
+        "generated Unicode name",
+        generateFileName()(playlist(unicodeTitle), video, {
+          container: "mkv",
+        }),
+      ],
+      [
+        "long subtitle name",
+        generateSubtitleFileName()(playlist(longTitle), subtitle),
+      ],
+      [
+        "Unicode subtitle name",
+        generateSubtitleFileName()(playlist(unicodeTitle), subtitle),
+      ],
+    ])("saves a %s unchanged (%j)", async (_case, filename) => {
+      const artifact: PreparedDownload = {
+        url: "blob:core-name",
+        exportId: "core-name.mp4",
+        mime: "video/mp4",
+        size: 1,
+      };
+      await writeExport(artifact.exportId, [1]);
+
+      const downloadId = await IndexedDBFS.saveAs(filename, artifact, {
+        dialog: false,
+      });
+
+      const { downloads } = (await vi.importMock(
+        "webextension-polyfill",
+      )) as any;
+      expect(downloads.download).toHaveBeenCalledWith({
+        url: artifact.url,
+        saveAs: false,
+        conflictAction: "uniquify",
+        filename,
+      });
+
+      emitDownloadState(downloadId, "complete");
+      await vi.waitFor(() => expectExportMissing(artifact.exportId));
+    });
+  });
 
   it("keeps a shared export until the last duplicate save completes", async () => {
     const artifact: PreparedDownload = {
