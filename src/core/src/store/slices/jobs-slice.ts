@@ -4,8 +4,39 @@ import {
   Slice,
   CaseReducer,
 } from "@reduxjs/toolkit";
-import { Job, JobStatus } from "../../entities";
+import { Job, JobDownloadSpeed, JobStatus } from "../../entities";
 import { renameJobFilename } from "../../use-cases/rename-job-filename";
+
+// Long enough to even out fragments that finish together when several are
+// downloaded at once, short enough to follow changes in speed.
+export const SPEED_WINDOW_MS = 2000;
+
+function nextDownloadSpeed(
+  speed: JobDownloadSpeed | undefined,
+  bytes: number,
+  at: number,
+): JobDownloadSpeed {
+  // The first fragment only starts the clock, since the time it took to
+  // download is not known.
+  if (!speed) {
+    return { updatedAt: at, windowStartedAt: at, windowBytes: 0 };
+  }
+  const windowBytes = speed.windowBytes + bytes;
+  const elapsed = at - speed.windowStartedAt;
+  if (elapsed < SPEED_WINDOW_MS) {
+    return { ...speed, updatedAt: at, windowBytes };
+  }
+  const measured = (windowBytes * 1000) / elapsed;
+  return {
+    bytesPerSecond:
+      speed.bytesPerSecond === undefined
+        ? measured
+        : (speed.bytesPerSecond + measured) / 2,
+    updatedAt: at,
+    windowStartedAt: at,
+    windowBytes: 0,
+  };
+}
 
 export interface IJobsState {
   jobs: Record<string, Job | null>;
@@ -27,6 +58,10 @@ export interface IFinishJobDownloadPayload {
 }
 export interface IIncJobDownloadStatusPayload {
   jobId: string;
+  /** Size of the fragment that finished. */
+  bytes?: number;
+  /** When it finished, in ms since the epoch. */
+  at?: number;
 }
 export interface IDownloadJobFailedPayload {
   jobId: string;
@@ -108,6 +143,8 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
         saveProgress: 0,
         saveMessage: undefined,
         errorMessage: undefined,
+        downloadedBytes: undefined,
+        speed: undefined,
       };
     },
     clear(state) {
@@ -161,6 +198,8 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
         saveProgress: 0,
         saveMessage: undefined,
         errorMessage: undefined,
+        downloadedBytes: undefined,
+        speed: undefined,
       };
     },
     cancel(_state, _action: PayloadAction<IDeleteJobPayload>) {},
@@ -195,11 +234,14 @@ export const jobsSlice: Slice<IJobsState, IJobsReducers, "jobs"> = createSlice({
       state,
       action: PayloadAction<IIncJobDownloadStatusPayload>,
     ) {
-      const { jobId: jobId } = action.payload;
+      const { jobId, bytes, at } = action.payload;
       const jobStatus = state.jobsStatus[jobId];
       if (!jobStatus) return;
 
       jobStatus.done++;
+      if (bytes === undefined || at === undefined) return;
+      jobStatus.downloadedBytes = (jobStatus.downloadedBytes ?? 0) + bytes;
+      jobStatus.speed = nextDownloadSpeed(jobStatus.speed, bytes, at);
     },
     saveAs(state, action: PayloadAction<ISaveAsJobPayload>) {
       const { jobId } = action.payload;

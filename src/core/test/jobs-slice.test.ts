@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { jobsSlice } from "../src/store/slices/jobs-slice";
+import { jobsSlice, SPEED_WINDOW_MS } from "../src/store/slices/jobs-slice";
 import {
   createTestJob,
   createTestFragment,
@@ -145,6 +145,89 @@ describe("jobs slice", () => {
 
       expect(state.jobsStatus["job1"]?.done).toBe(3);
     });
+  });
+
+  describe("download speed", () => {
+    const downloading = () => ({
+      jobs: { job1: createTestJob({ id: "job1" }) },
+      jobsStatus: {
+        job1: { status: "downloading" as const, total: 20, done: 0 },
+      } as Record<string, any>,
+    });
+    const fragment = (state: any, bytes: number, at: number) =>
+      jobsSlice.reducer(
+        state,
+        jobsSlice.actions.incDownloadStatus({ jobId: "job1", bytes, at }),
+      );
+
+    it("counts downloaded bytes", () => {
+      let state = downloading();
+      state = fragment(state, 100, 1000);
+      state = fragment(state, 50, 1100);
+      expect(state.jobsStatus.job1?.downloadedBytes).toBe(150);
+      expect(state.jobsStatus.job1?.done).toBe(2);
+    });
+
+    it("measures speed once a window has passed", () => {
+      let state = downloading();
+      state = fragment(state, 1000, 0);
+      state = fragment(state, 1000, SPEED_WINDOW_MS / 2);
+      expect(state.jobsStatus.job1?.speed?.bytesPerSecond).toBeUndefined();
+
+      // 3000 bytes over 2 s after the first fragment started the clock.
+      state = fragment(state, 2000, SPEED_WINDOW_MS);
+      expect(state.jobsStatus.job1?.speed).toEqual({
+        bytesPerSecond: 1500,
+        updatedAt: SPEED_WINDOW_MS,
+        windowStartedAt: SPEED_WINDOW_MS,
+        windowBytes: 0,
+      });
+    });
+
+    it("smooths the speed with the previous window", () => {
+      let state = downloading();
+      state = fragment(state, 0, 0);
+      state = fragment(state, 4000, 2000); // 2000 B/s
+      state = fragment(state, 8000, 4000); // 4000 B/s
+      expect(state.jobsStatus.job1?.speed?.bytesPerSecond).toBe(3000);
+    });
+
+    it("counts a pause in the window it happened in", () => {
+      let state = downloading();
+      state = fragment(state, 0, 0);
+      state = fragment(state, 10_000, 10_000);
+      expect(state.jobsStatus.job1?.speed?.bytesPerSecond).toBe(1000);
+    });
+
+    it("leaves speed alone when the fragment size is not known", () => {
+      let state = downloading();
+      state = jobsSlice.reducer(
+        state,
+        jobsSlice.actions.incDownloadStatus({ jobId: "job1" }),
+      );
+      expect(state.jobsStatus.job1?.done).toBe(1);
+      expect(state.jobsStatus.job1?.speed).toBeUndefined();
+      expect(state.jobsStatus.job1?.downloadedBytes).toBeUndefined();
+    });
+
+    it.each(["queue", "download"] as const)(
+      "starts from zero when the job is downloaded again (%s)",
+      (action) => {
+        let state = downloading();
+        state = fragment(state, 1000, 0);
+        state = fragment(state, 1000, SPEED_WINDOW_MS);
+        state = jobsSlice.reducer(
+          state,
+          jobsSlice.actions.downloadFailed({ jobId: "job1", message: "x" }),
+        );
+        state = jobsSlice.reducer(
+          state,
+          jobsSlice.actions[action]({ jobId: "job1" }),
+        );
+        expect(state.jobsStatus.job1?.downloadedBytes).toBeUndefined();
+        expect(state.jobsStatus.job1?.speed).toBeUndefined();
+      },
+    );
   });
 
   // Finish download tests

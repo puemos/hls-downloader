@@ -4,6 +4,12 @@ import { downloadJobEpic } from "../src/controllers/download-job-epic.ts";
 import { jobsSlice } from "../src/store/slices/index.ts";
 import { Fragment, Key } from "../src/entities/index.ts";
 
+const progressFor = (jobId: string) =>
+  expect.objectContaining({
+    type: jobsSlice.actions.incDownloadStatus.type,
+    payload: expect.objectContaining({ jobId }),
+  });
+
 describe("downloadJobEpic", () => {
   function setup() {
     const action$ = new Subject<any>();
@@ -54,9 +60,7 @@ describe("downloadJobEpic", () => {
     );
     test.action$.next(jobsSlice.actions.download({ jobId: "two" }));
     await vi.waitFor(() =>
-      expect(test.actions).toContainEqual(
-        jobsSlice.actions.incDownloadStatus({ jobId: "two" }),
-      ),
+      expect(test.actions).toContainEqual(progressFor("two")),
     );
     expect(test.errors).toEqual([]);
     test.subscription.unsubscribe();
@@ -111,9 +115,7 @@ describe("downloadJobEpic", () => {
     expect(signal?.aborted ?? false).toBe(false);
     resolve(new ArrayBuffer(1));
     await vi.waitFor(() =>
-      expect(test.actions).toContainEqual(
-        jobsSlice.actions.incDownloadStatus({ jobId: "one" }),
-      ),
+      expect(test.actions).toContainEqual(progressFor("one")),
     );
     test.subscription.unsubscribe();
   });
@@ -160,10 +162,11 @@ describe("downloadJobEpic", () => {
       }),
     };
     const loader = {
-      fetchArrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(0)),
+      fetchArrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(5)),
     };
     const decryptor = { decrypt: vi.fn() };
     const action$ = of(jobsSlice.actions.download({ jobId: "1" }));
+    vi.spyOn(Date, "now").mockReturnValue(1234);
     const state = {
       config: { concurrency: 1, fetchAttempts: 1 },
       jobs: {
@@ -185,6 +188,9 @@ describe("downloadJobEpic", () => {
       ),
     );
     expect(fs.createBucket).toHaveBeenCalledWith("1", 1, 0);
-    expect(result).toEqual(jobsSlice.actions.incDownloadStatus({ jobId: "1" }));
+    expect(result).toEqual(
+      jobsSlice.actions.incDownloadStatus({ jobId: "1", bytes: 5, at: 1234 }),
+    );
+    vi.restoreAllMocks();
   });
 });

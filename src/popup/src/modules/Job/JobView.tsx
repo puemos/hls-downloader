@@ -24,6 +24,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { Metadata } from "../../components/Metadata";
 import { formatBytes } from "../../utils/format-bytes";
+import { formatSpeed, formatTimeLeft } from "../../utils/format-speed";
 import {
   DetailHeader,
   DetailPanel,
@@ -185,6 +186,9 @@ const JobView = ({
             {derived.size.expectedBytes
               ? `~${formatBytes(derived.size.expectedBytes)}`
               : "Estimating size"}
+            {isDownloading &&
+              speedLabel(derived.speed) &&
+              ` · ${speedLabel(derived.speed)}`}
           </span>
         </div>
       </div>
@@ -355,7 +359,12 @@ const JobView = ({
         </div>
 
         <div className="w-full space-y-2">
-          {isDownloading && <JobProgressView progress={progress} />}
+          {isDownloading && (
+            <JobProgressView
+              progress={progress}
+              speedLabel={speedLabel(derived.speed)}
+            />
+          )}
           {isSaving && <JobSavingView saving={saving} />}
           {isError && (
             <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">
@@ -521,6 +530,11 @@ const JobDetailView = ({
                 ? saving.message || "Preparing file"
                 : `${derived.progress.done} of ${derived.progress.total} segments`}
             </span>
+            {isDownloading && speedLabel(derived.speed) && (
+              <span className="shrink-0 tabular-nums">
+                {speedLabel(derived.speed)}
+              </span>
+            )}
           </div>
         </div>
       )}
@@ -712,7 +726,27 @@ type ProgressView = {
   total: number;
 };
 
-const JobProgressView = ({ progress }: { progress: ProgressView }) => {
+function speedLabel(
+  speed: import("./JobController").JobViewDerived["speed"],
+): string | undefined {
+  if (speed.bytesPerSecond === undefined) return undefined;
+  return [
+    formatSpeed(speed.bytesPerSecond),
+    speed.secondsLeft !== undefined
+      ? formatTimeLeft(speed.secondsLeft)
+      : undefined,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+const JobProgressView = ({
+  progress,
+  speedLabel,
+}: {
+  progress: ProgressView;
+  speedLabel?: string;
+}) => {
   const clampedPer = Math.max(0, Math.min(100, progress.percent));
 
   return (
@@ -724,6 +758,11 @@ const JobProgressView = ({ progress }: { progress: ProgressView }) => {
           </span>
           %
         </span>
+        {speedLabel && (
+          <span className="text-muted-foreground tabular-nums leading-tight">
+            {speedLabel}
+          </span>
+        )}
         <span className="text-muted-foreground inline-flex items-center gap-1 leading-tight">
           <span className="inline-block min-w-[3ch] text-right">
             {progress.done}

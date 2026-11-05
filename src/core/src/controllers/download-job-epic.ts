@@ -113,7 +113,11 @@ export const downloadJobEpic: Epic<
                         decrypted,
                         signal,
                       );
-                      return jobsSlice.actions.incDownloadStatus({ jobId });
+                      return jobsSlice.actions.incDownloadStatus({
+                        jobId,
+                        bytes: data.byteLength,
+                        at: Date.now(),
+                      });
                     }, store$.value.config.concurrency),
                   ),
                 ),
