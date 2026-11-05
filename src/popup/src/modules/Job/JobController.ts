@@ -2,7 +2,12 @@ import { Job, JobStatus } from "@hls-downloader/core/lib/entities";
 import { RootState } from "@hls-downloader/core/lib/store/root-reducer";
 import { jobsSlice } from "@hls-downloader/core/lib/store/slices";
 import { StorageBucketStats } from "@hls-downloader/core/lib/use-cases/get-storage-stats";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+// A download that has not finished a fragment for this long is treated as
+// stalled, and its last speed is no longer shown.
+export const SPEED_STALE_MS = 10_000;
 
 export type JobViewDerived = {
   percent: number;
@@ -30,6 +35,10 @@ export type JobViewDerived = {
     averageChunkBytes?: number;
     totalFragments?: number;
     availableBytes?: number;
+  };
+  speed: {
+    bytesPerSecond?: number;
+    secondsLeft?: number;
   };
 };
 
@@ -59,7 +68,8 @@ const useJobController = ({ id }: { id: string }): ReturnType => {
   const availableBytes = useSelector<RootState, number | undefined>((state) =>
     state.storage.quotaIsAdvisory ? undefined : state.storage.availableBytes,
   );
-  const derived = buildJobViewDerived(status, bucket, availableBytes);
+  const now = useNow(status?.status === "downloading");
+  const derived = buildJobViewDerived(status, bucket, availableBytes, now);
 
   function downloadJob() {
     dispatch(jobsSlice.actions.queue({ jobId: id }));
@@ -91,10 +101,24 @@ const useJobController = ({ id }: { id: string }): ReturnType => {
 
 export default useJobController;
 
+// Re-renders every second while active, so a stalled download stops showing
+// its last speed even when no new state arrives.
+function useNow(active: boolean): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return;
+    setNow(Date.now());
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [active]);
+  return now;
+}
+
 export function buildJobViewDerived(
   status: JobStatus | null,
   bucket?: StorageBucketStats,
   availableBytes?: number,
+  now = Date.now(),
 ): JobViewDerived {
   const isError = status?.status === "error";
   const isQueued = status?.status === "queued";
@@ -162,6 +186,25 @@ export function buildJobViewDerived(
       ? Math.max(0, expectedBytes - storedBytes)
       : undefined;
 
+  const speed = status?.speed;
+  const bytesPerSecond =
+    status?.status === "downloading" &&
+    speed?.bytesPerSecond !== undefined &&
+    speed.bytesPerSecond > 0 &&
+    now - speed.updatedAt <= SPEED_STALE_MS
+      ? speed.bytesPerSecond
+      : undefined;
+  const fragmentsLeft = progressTotal - progressDone;
+  const bytesLeft =
+    remainingBytes ??
+    (status?.downloadedBytes !== undefined && progressDone > 0
+      ? (fragmentsLeft * status.downloadedBytes) / progressDone
+      : undefined);
+  const secondsLeft =
+    bytesPerSecond !== undefined && bytesLeft !== undefined && fragmentsLeft > 0
+      ? bytesLeft / bytesPerSecond
+      : undefined;
+
   return {
     percent,
     headerStatusLabel,
@@ -189,5 +232,6 @@ export function buildJobViewDerived(
       totalFragments: bucket?.totalFragments,
       availableBytes,
     },
+    speed: { bytesPerSecond, secondsLeft },
   };
 }

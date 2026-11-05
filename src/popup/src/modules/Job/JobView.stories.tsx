@@ -49,6 +49,19 @@ const detailBucket = {
 const derive = (status: any, withStorage = false) =>
   buildJobViewDerived(status, withStorage ? detailBucket : undefined);
 
+const downloadingStatus = () => ({
+  status: "downloading" as const,
+  total: 10,
+  done: 3,
+  downloadedBytes: 3.6 * 1024 * 1024,
+  speed: {
+    bytesPerSecond: 2.4 * 1024 * 1024,
+    updatedAt: Date.now(),
+    windowStartedAt: Date.now(),
+    windowBytes: 0,
+  },
+});
+
 export const Init: Story = {
   render: () => (
     <JobView
@@ -87,8 +100,8 @@ export const Downloading: Story = {
   render: () => (
     <JobView
       job={sampleJob}
-      status={{ status: "downloading", total: 10, done: 3 }}
-      derived={derive({ status: "downloading", total: 10, done: 3 })}
+      status={downloadingStatus()}
+      derived={derive(downloadingStatus())}
       downloadJob={() => {}}
       deleteJob={() => {}}
       cancelJob={() => {}}
@@ -160,6 +173,27 @@ export const SavingDetail: Story = {
         job={sampleJob}
         status={status}
         derived={derive(status, true)}
+        downloadJob={() => {}}
+        deleteJob={() => {}}
+        cancelJob={() => {}}
+        saveAsJob={() => {}}
+        renameJob={() => {}}
+        expanded
+        detail
+        onToggle={() => {}}
+      />
+    );
+  },
+};
+
+export const DownloadingDetail: Story = {
+  render: () => {
+    const status = downloadingStatus();
+    return (
+      <JobView
+        job={sampleJob}
+        status={status}
+        derived={derive(status)}
         downloadJob={() => {}}
         deleteJob={() => {}}
         cancelJob={() => {}}
